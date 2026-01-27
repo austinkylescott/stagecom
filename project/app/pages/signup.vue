@@ -1,42 +1,48 @@
 <script setup lang="ts">
 import * as z from "zod";
-import type { FormSubmitEvent, AuthFormField } from "@nuxt/ui";
+import type { AuthFormField, FormSubmitEvent } from "@nuxt/ui";
 
 const supabase = useSupabaseClient();
 const authError = ref<string | null>(null);
 const isSubmitting = ref(false);
+const toast = useToast();
 
 const signInWithOAuth = async (provider: "google" | "github") => {
   authError.value = null;
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider,
-  });
+  const { error } = await supabase.auth.signInWithOAuth({ provider });
   if (error) {
     authError.value = error.message;
   }
 };
 
-const toast = useToast();
-
 const fields: AuthFormField[] = [
+  {
+    name: "name",
+    type: "text",
+    label: "Full name",
+    placeholder: "How should we greet you?",
+    required: true,
+  },
   {
     name: "email",
     type: "email",
     label: "Email",
-    placeholder: "Enter your email",
+    placeholder: "you@example.com",
     required: true,
   },
   {
     name: "password",
     label: "Password",
     type: "password",
-    placeholder: "Enter your password",
+    placeholder: "Create a password",
     required: true,
   },
   {
-    name: "remember",
-    label: "Remember me",
-    type: "checkbox",
+    name: "confirm",
+    label: "Confirm password",
+    type: "password",
+    placeholder: "Repeat your password",
+    required: true,
   },
 ];
 
@@ -45,7 +51,7 @@ const providers = [
     label: "Google",
     icon: "i-simple-icons-google",
     onClick: () => {
-      toast.add({ title: "Google", description: "Login with Google" });
+      toast.add({ title: "Google", description: "Continue with Google" });
       signInWithOAuth("google");
     },
   },
@@ -53,38 +59,57 @@ const providers = [
     label: "GitHub",
     icon: "i-simple-icons-github",
     onClick: () => {
-      toast.add({ title: "GitHub", description: "Login with GitHub" });
+      toast.add({ title: "GitHub", description: "Continue with GitHub" });
       signInWithOAuth("github");
     },
   },
 ];
 
-const schema = z.object({
-  email: z.email("Invalid email"),
-  password: z
-    .string("Password is required")
-    .min(8, "Must be at least 8 characters"),
-});
+const schema = z
+  .object({
+    name: z.string().min(2, "Name is required"),
+    email: z.email("Invalid email"),
+    password: z
+      .string("Password is required")
+      .min(8, "Must be at least 8 characters"),
+    confirm: z.string("Please confirm your password"),
+  })
+  .refine((data) => data.password === data.confirm, {
+    message: "Passwords must match",
+    path: ["confirm"],
+  });
 
 type Schema = z.output<typeof schema>;
 
-async function onSubmit(payload: FormSubmitEvent<Schema>) {
+const onSubmit = async (payload: FormSubmitEvent<Schema>) => {
   authError.value = null;
   isSubmitting.value = true;
 
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signUp({
     email: payload.data.email,
     password: payload.data.password,
+    options: {
+      data: {
+        full_name: payload.data.name,
+      },
+      emailRedirectTo:
+        typeof window !== "undefined"
+          ? `${window.location.origin}/confirm`
+          : undefined,
+    },
   });
 
   if (error) {
     authError.value = error.message;
-  } else {
+  } else if (data.user?.aud === "authenticated") {
+    // Email confirmation disabled, or user already confirmed
     await navigateTo("/");
+  } else {
+    await navigateTo("/confirm");
   }
 
   isSubmitting.value = false;
-}
+};
 </script>
 
 <template>
@@ -94,19 +119,14 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         :schema="schema"
         :fields="fields"
         :providers="providers"
-        title="Welcome back!"
-        icon="i-lucide-lock"
+        title="Create your account"
+        icon="i-lucide-user-plus"
         :loading="isSubmitting"
         @submit="onSubmit"
       >
         <template #description>
-          Don't have an account?
-          <ULink to="/signup" class="text-primary font-medium">Sign up</ULink>.
-        </template>
-        <template #password-hint>
-          <ULink to="#" class="text-primary font-medium" tabindex="-1"
-            >Forgot password?</ULink
-          >
+          Already have an account?
+          <ULink to="/login" class="text-primary font-medium">Log in</ULink>.
         </template>
         <template #validation>
           <UAlert
@@ -117,7 +137,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
           />
         </template>
         <template #footer>
-          By signing in, you agree to our
+          By signing up, you agree to our
           <ULink to="#" class="text-primary font-medium">Terms of Service</ULink
           >.
         </template>

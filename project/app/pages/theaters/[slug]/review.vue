@@ -1,18 +1,19 @@
 <script setup lang="ts">
 const route = useRoute();
-const apiFetch = useApi();
 const slug = computed(() => route.params.slug as string);
 
 const { data, refresh, pending, error } = useAsyncData(
   () =>
-    apiFetch<{
+    $fetch<{
       shows: {
         id: string;
         title: string;
         status: string;
         startsAt: string | null;
       }[];
-    }>(`/api/theaters/${slug.value}/review`),
+    }>(`/api/theaters/${slug.value}/review`, {
+      credentials: "include",
+    }),
   { watch: [slug], server: false },
 );
 
@@ -20,9 +21,10 @@ const message = ref("");
 
 const updateStatus = async (showId: string, action: "approve" | "reject") => {
   message.value = "";
-  await apiFetch(`/api/shows/${showId}/status`, {
+  await $fetch(`/api/shows/${showId}/status`, {
     method: "POST",
-    body: JSON.stringify({ action }),
+    credentials: "include",
+    body: { action },
   });
   message.value = action === "approve" ? "Approved" : "Rejected";
   await refresh();
