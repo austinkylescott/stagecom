@@ -1,4 +1,5 @@
 import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
+import type { Enums } from "~/types/database.types";
 
 export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient(event);
@@ -56,7 +57,8 @@ export default defineEventHandler(async (event) => {
   }
 
   // 3) Update show status and public listing flag
-  const newStatus = action === "approve" ? "approved" : "rejected";
+  const newStatus: Enums<"show_status"> =
+    action === "approve" ? "approved" : "rejected";
   const isPublicListed = action === "approve";
 
   const { error: updateError } = await supabase
@@ -64,7 +66,6 @@ export default defineEventHandler(async (event) => {
     .update({
       status: newStatus,
       is_public_listed: isPublicListed,
-      approved_at: action === "approve" ? new Date().toISOString() : null,
     })
     .eq("id", showId);
 

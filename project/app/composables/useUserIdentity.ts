@@ -1,3 +1,14 @@
+type ProfileRow = {
+  id: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  timezone: string | null;
+  pronouns?: string | null;
+  bio?: string | null;
+  city?: string | null;
+  visibility?: "public" | "private" | "theater_only";
+};
+
 export const useUserIdentity = () => {
   const user = useSupabaseUser();
   const supabase = useSupabaseClient();
@@ -7,14 +18,19 @@ export const useUserIdentity = () => {
     refresh: refreshProfile,
     pending: profilePending,
     error: profileError,
-  } = useAsyncData(
-    "current-profile",
+  } = useAsyncData<ProfileRow | null>(
+    () => `current-profile-${user.value?.id || "anon"}`,
     async () => {
-      if (!user.value) return null;
+      const userId = user.value?.id;
+      // Supabase sometimes hydrates a user shell before the id is available on the client.
+      // Skip querying until we have a definite id to avoid "id=undefined" requests.
+      if (!userId) return null;
       const { data, error } = await supabase
         .from("profiles")
-        .select("display_name, avatar_url, timezone")
-        .eq("id", user.value.id)
+        .select(
+          "id, display_name, avatar_url, timezone, pronouns, bio, city, visibility",
+        )
+        .eq("id", userId)
         .maybeSingle();
 
       if (error) throw error;
@@ -32,7 +48,11 @@ export const useUserIdentity = () => {
     if (primaryName) return primaryName;
 
     const metaName = (
-      meta.display_name || meta.full_name || meta.name || meta.user_name || ""
+      meta.display_name ||
+      meta.full_name ||
+      meta.name ||
+      meta.user_name ||
+      ""
     ).trim();
     if (metaName) return metaName;
 
@@ -48,7 +68,9 @@ export const useUserIdentity = () => {
   });
 
   const avatarUrl = computed(() => {
-    return profile.value?.avatar_url || user.value?.user_metadata?.avatar_url || null;
+    return (
+      profile.value?.avatar_url || user.value?.user_metadata?.avatar_url || null
+    );
   });
 
   const email = computed(() => user.value?.email || "");

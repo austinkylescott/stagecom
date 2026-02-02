@@ -1,15 +1,11 @@
 import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
+import type { Enums, Tables } from "~/types/database.types";
 
-type ReviewShowRow = {
-  id: string;
-  title: string;
-  status: string;
-};
-
-type OccurrenceRow = {
-  show_id: string;
-  starts_at: string;
-};
+type ReviewShowRow = Pick<Tables<"shows">, "id" | "title" | "status">;
+type OccurrenceRow = Pick<
+  Tables<"show_occurrences">,
+  "show_id" | "starts_at" | "status"
+>;
 
 export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient(event);

@@ -9,13 +9,25 @@ const navItems = [
 </script>
 
 <template>
-  <div class="flex items-center justify-between py-3">
-    <div class="flex items-center gap-4">
-      <UNavigationMenu :items="navItems" class="hidden sm:flex" />
-    </div>
+  <UHeader mode="drawer">
+    <template #title>
+      <div>Stagecom</div>
+    </template>
 
-    <div class="flex items-center gap-2">
-      <AccountMenu />
-    </div>
-  </div>
+    <template #body>
+      <UNavigationMenu orientation="vertical" :items="navItems" />
+    </template>
+
+    <UNavigationMenu :items="navItems" />
+
+    <template #right>
+      <div class="flex items-center gap-2">
+        <AppAccountMenu />
+      </div>
+    </template>
+  </UHeader>
+
+  <UContainer class="py-8">
+    <slot />
+  </UContainer>
 </template>

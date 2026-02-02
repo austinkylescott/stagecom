@@ -27,6 +27,7 @@ drop type if exists casting_mode cascade;
 drop type if exists show_status cascade;
 drop type if exists membership_status cascade;
 drop type if exists theater_role cascade;
+drop type if exists profile_visibility cascade;
 
 -- Enums
 create type theater_role as enum ('manager', 'staff', 'member');
@@ -40,6 +41,7 @@ create type show_cast_status as enum ('pending', 'accepted', 'declined', 'withdr
 create type review_action as enum ('submitted', 'approved', 'rejected', 'changes_requested');
 create type notification_entity as enum ('show', 'occurrence', 'cast');
 create type email_outbox_status as enum ('queued', 'sent', 'failed');
+create type profile_visibility as enum ('public', 'theater_only', 'private');
 
 -- Users / profiles (ties to Supabase auth.users)
 create table profiles (
@@ -47,10 +49,24 @@ create table profiles (
     display_name text not null,
     avatar_url text,
     timezone text default 'UTC',
+    pronouns text,
+    bio text,
+    city text,
+    handle text,
+    home_theater_id uuid,
+    contact_links jsonb not null default '{}'::jsonb,
+    notification_preferences jsonb not null default '{}'::jsonb,
+    availability jsonb,
+    casting_notes text,
+    visibility profile_visibility not null default 'theater_only',
+    verified_at timestamptz,
+    trust_flags jsonb not null default '{}'::jsonb,
+    deleted_at timestamptz,
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
 create index idx_profiles_display_name on profiles using gin (to_tsvector('english', display_name));
+create unique index idx_profiles_handle_lower_unique on profiles (lower(handle));
 
 -- Theaters
 create table theaters (
@@ -189,6 +205,11 @@ create trigger trg_theaters_updated
 create trigger trg_shows_updated
   before update on shows
   for each row execute procedure set_timestamp();
+
+-- Late-bound FK to avoid circular dependency
+alter table profiles
+  add constraint fk_profiles_home_theater
+  foreign key (home_theater_id) references theaters(id) on delete set null;
 
 -- Bootstrap profile on new auth user (e.g., GitHub OAuth display name)
 create or replace function public.handle_new_user()

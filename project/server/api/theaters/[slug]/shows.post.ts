@@ -1,4 +1,5 @@
 import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
+import type { Enums, TablesInsert } from "~/types/database.types";
 
 /**
  * POST /api/theaters/:slug/shows
@@ -37,19 +38,37 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: "Theater not found" });
   }
 
-  const status = submitForReview ? "pending_review" : "draft";
+  const status: Enums<"show_status"> = submitForReview ? "pending_review" : "draft";
+
+  // Validate casting_mode against enum to avoid invalid inserts
+  const allowedCastingModes: Enums<"casting_mode">[] = [
+    "direct_invite",
+    "theater_casting",
+    "public_casting",
+  ];
+  const casting_mode: Enums<"casting_mode"> | null = allowedCastingModes.includes(
+    castingMode as Enums<"casting_mode">
+  )
+    ? (castingMode as Enums<"casting_mode">)
+    : null;
+
+  if (!casting_mode) {
+    throw createError({ statusCode: 400, statusMessage: "Invalid casting mode" });
+  }
+
+  const payload: TablesInsert<"shows"> = {
+    theater_id: theater.id,
+    title,
+    description,
+    status,
+    casting_mode,
+    is_public_listed: false,
+    created_by_user_id: user.id,
+  };
 
   const { data: show, error: showError } = await supabase
     .from("shows")
-    .insert({
-      theater_id: theater.id,
-      title,
-      description,
-      status,
-      casting_mode: castingMode,
-      is_public_listed: false,
-      created_by: user.id,
-    })
+    .insert(payload)
     .select("id")
     .single();
 

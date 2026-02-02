@@ -5,7 +5,7 @@ const user = useSupabaseUser();
 const { data, pending, error, refresh } = useAsyncData(
   async () => {
     const [profilesRes, membershipsRes] = await Promise.all([
-      supabase.from("profiles").select("id,display_name,avatar_url,phone_number"),
+      supabase.from("profiles").select("id,display_name,avatar_url"),
       supabase
         .from("theater_memberships")
         .select("user_id,theater_id,status")
@@ -63,10 +63,13 @@ const filteredProfiles = computed(() => {
       <div>
         <h1 class="text-2xl font-semibold">Performers</h1>
         <p class="text-slate-600">
-          Discover performers, see who you share stages with, and invite new voices.
+          Discover performers, see who you share stages with, and invite new
+          voices.
         </p>
       </div>
-      <UButton icon="i-heroicons-arrow-path" variant="ghost" @click="refresh">Refresh</UButton>
+      <UButton icon="i-heroicons-arrow-path" variant="ghost" @click="refresh"
+        >Refresh</UButton
+      >
     </div>
 
     <UInput
@@ -80,12 +83,17 @@ const filteredProfiles = computed(() => {
       {{ error?.message || error?.data?.message }}
     </div>
 
-    <div v-if="pending" class="text-sm text-slate-600">Loading performers...</div>
+    <div v-if="pending" class="text-sm text-slate-600">
+      Loading performers...
+    </div>
 
     <div v-else class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       <UCard v-for="performer in filteredProfiles" :key="performer.id">
         <div class="flex items-center gap-3">
-          <UAvatar :src="performer.avatar_url" :text="performer.display_name?.[0] || 'P'" />
+          <UAvatar
+            :src="performer.avatar_url"
+            :text="performer.display_name?.[0] || 'P'"
+          />
           <div>
             <p class="font-semibold">
               {{ performer.display_name || "Unnamed performer" }}
@@ -107,8 +115,8 @@ const filteredProfiles = computed(() => {
     </div>
 
     <div class="text-xs text-slate-500">
-      Social clustering v1 uses shared theater membership as a proxy for “play together”. We can extend
-      this to co-cast counts when cast data lands.
+      Social clustering v1 uses shared theater membership as a proxy for “play
+      together”. We can extend this to co-cast counts when cast data lands.
     </div>
   </div>
 </template>

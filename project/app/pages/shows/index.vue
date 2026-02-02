@@ -8,13 +8,19 @@ const sortedShows = computed(() =>
   (data.value?.shows || []).slice().sort((a, b) => {
     if (!a.nextStartsAt) return 1;
     if (!b.nextStartsAt) return -1;
-    return new Date(a.nextStartsAt).getTime() - new Date(b.nextStartsAt).getTime();
+    return (
+      new Date(a.nextStartsAt).getTime() - new Date(b.nextStartsAt).getTime()
+    );
   }),
 );
 
-const firstTheaterSlug = computed(() => data.value?.shows?.[0]?.theaterSlug || "");
+const firstTheaterSlug = computed(
+  () => data.value?.shows?.[0]?.theaterSlug || "",
+);
 const newShowLink = computed(() =>
-  firstTheaterSlug.value ? `/theaters/${firstTheaterSlug.value}/shows/new` : "/theaters",
+  firstTheaterSlug.value
+    ? `/theaters/${firstTheaterSlug.value}/shows/new`
+    : "/theaters",
 );
 
 const today = new Date();
@@ -49,7 +55,8 @@ const occurrencesByDay = computed(() => {
       <div>
         <h1 class="text-2xl font-semibold">Shows</h1>
         <p class="text-slate-600">
-          Upcoming shows for theaters you're a member of. Calendar highlights the next occurrence per show.
+          Upcoming shows for theaters you're a member of. Calendar highlights
+          the next occurrence per show.
         </p>
       </div>
       <UButton color="primary" icon="i-heroicons-plus" :to="newShowLink">
@@ -68,7 +75,10 @@ const occurrencesByDay = computed(() => {
         </template>
 
         <div v-if="pending" class="text-sm text-slate-600">Loading...</div>
-        <div v-else-if="sortedShows.length === 0" class="text-sm text-slate-600">
+        <div
+          v-else-if="sortedShows.length === 0"
+          class="text-sm text-slate-600"
+        >
           No shows yet. Join or create a theater, then add a show.
         </div>
         <div v-else class="space-y-3">
@@ -90,13 +100,27 @@ const occurrencesByDay = computed(() => {
               {{ show.description }}
             </p>
             <p class="text-xs text-slate-700 mt-2">
-              Next: {{ show.nextStartsAt ? new Date(show.nextStartsAt).toLocaleString() : "TBD" }}
+              Next:
+              {{
+                show.nextStartsAt
+                  ? new Date(show.nextStartsAt).toLocaleString()
+                  : "TBD"
+              }}
             </p>
             <div class="mt-2 flex gap-2">
-              <UButton size="xs" variant="ghost" :to="`/theaters/${show.theaterSlug}/review`">
+              <UButton
+                size="xs"
+                variant="ghost"
+                :to="`/theaters/${show.theaterSlug}/review`"
+              >
                 Review queue
               </UButton>
-              <UButton size="xs" color="primary" variant="soft" :to="`/theaters/${show.theaterSlug}/shows/new`">
+              <UButton
+                size="xs"
+                color="primary"
+                variant="soft"
+                :to="`/theaters/${show.theaterSlug}/shows/new`"
+              >
                 Add occurrence
               </UButton>
             </div>
@@ -109,17 +133,26 @@ const occurrencesByDay = computed(() => {
           <div class="font-semibold">This month</div>
         </template>
         <div class="grid grid-cols-7 gap-2 text-xs">
-          <div class="text-slate-500 text-center" v-for="d in ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']" :key="d">
+          <div
+            class="text-slate-500 text-center"
+            v-for="d in ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']"
+            :key="d"
+          >
             {{ d }}
           </div>
           <div
             v-for="day in monthDays"
             :key="day.toISOString()"
-            class="border border-slate-200 rounded-md min-h-[72px] p-2 flex flex-col gap-1"
+            class="border border-slate-200 rounded-md min-h-18 p-2 flex flex-col gap-1"
           >
             <div class="text-slate-700 font-medium">{{ day.getDate() }}</div>
             <div class="flex flex-col gap-1">
-              <template v-for="occ in occurrencesByDay.get(day.toISOString().slice(0, 10)) || []" :key="occ.id">
+              <template
+                v-for="occ in occurrencesByDay.get(
+                  day.toISOString().slice(0, 10),
+                ) || []"
+                :key="occ.id"
+              >
                 <UBadge size="xs" color="blue" variant="soft" class="truncate">
                   {{ occ.title }}
                 </UBadge>

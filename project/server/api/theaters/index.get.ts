@@ -1,11 +1,5 @@
 import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
-
-type TheaterRow = {
-  id: string;
-  name: string;
-  slug: string;
-  timezone: string | null;
-};
+import type { Tables } from "~/types/database.types";
 
 export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient(event);
@@ -17,15 +11,24 @@ export default defineEventHandler(async (event) => {
     .order("name");
 
   if (theatersError) {
-    throw createError({ statusCode: 500, statusMessage: theatersError.message });
+    throw createError({
+      statusCode: 500,
+      statusMessage: theatersError.message,
+    });
   }
 
+  type TheaterRow = Pick<
+    Tables<"theaters">,
+    "id" | "name" | "slug" | "timezone"
+  >;
   let myTheaters: TheaterRow[] = [];
 
   if (user) {
     const { data: memberships, error: membershipError } = await supabase
       .from("theater_memberships")
-      .select("theater_id, role, status, theaters:theater_id (id,name,slug,timezone)")
+      .select(
+        "theater_id, role, status, theaters:theater_id (id,name,slug,timezone)",
+      )
       .eq("user_id", user.id)
       .eq("status", "active");
 
@@ -36,10 +39,7 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    myTheaters =
-      memberships
-        ?.map((m: any) => m.theaters)
-        .filter(Boolean) ?? [];
+    myTheaters = memberships?.map((m: any) => m.theaters).filter(Boolean) ?? [];
   }
 
   return {

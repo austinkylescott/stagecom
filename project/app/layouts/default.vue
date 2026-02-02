@@ -1,12 +1,7 @@
 <template>
   <UApp>
     <div class="min-h-screen">
-      <UHeader title="Stagecom" to="/">
-        <UContainer>
-          <AppNav />
-        </UContainer>
-      </UHeader>
-
+      <AppNav />
       <UContainer class="py-8">
         <slot />
       </UContainer>

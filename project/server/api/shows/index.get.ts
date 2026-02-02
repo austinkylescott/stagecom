@@ -1,18 +1,15 @@
 import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
+import type { Tables } from "~/types/database.types";
 
-type ShowRow = {
-  id: string;
-  title: string;
-  description: string | null;
-  status: string;
-  theater_id: string;
-};
+type ShowRow = Pick<
+  Tables<"shows">,
+  "id" | "title" | "description" | "status" | "theater_id"
+>;
 
-type OccRow = {
-  show_id: string;
-  starts_at: string;
-  status: string;
-};
+type OccRow = Pick<
+  Tables<"show_occurrences">,
+  "show_id" | "starts_at" | "status"
+>;
 
 export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient(event);
@@ -45,7 +42,10 @@ export default defineEventHandler(async (event) => {
     .in("id", theaterIds);
 
   if (theatersError) {
-    throw createError({ statusCode: 500, statusMessage: theatersError.message });
+    throw createError({
+      statusCode: 500,
+      statusMessage: theatersError.message,
+    });
   }
 
   // Shows for those theaters

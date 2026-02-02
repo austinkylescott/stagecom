@@ -1,15 +1,11 @@
 import { serverSupabaseClient } from "#supabase/server";
+import type { Tables } from "~/types/database.types";
 
-type PublicShowRow = {
-  id: string;
-  title: string;
-  description: string | null;
-};
-
-type OccurrenceRow = {
-  show_id: string;
-  starts_at: string; // ISO string from Postgres timestamptz
-};
+type PublicShowRow = Pick<Tables<"shows">, "id" | "title" | "description">;
+type OccurrenceRow = Pick<
+  Tables<"show_occurrences">,
+  "show_id" | "starts_at" | "status"
+>;
 
 export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient(event);
