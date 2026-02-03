@@ -10,14 +10,19 @@ Postgres-first, Supabase-friendly schema blueprint.
 - id (uuid)
 - name
 - slug (unique)
-- timezone
+- tagline (promo blurb)
+- street
+- city
+- state_region
+- postal_code
+- country
 
 ---
 
 ### theater_memberships
 - theater_id
 - user_id
-- role (manager, staff, member)
+- roles (array of theater_role; admin, manager, staff, instructor, member)
 - status (active, inactive)
 
 ---

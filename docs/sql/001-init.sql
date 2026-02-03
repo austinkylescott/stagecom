@@ -30,7 +30,7 @@ drop type if exists theater_role cascade;
 drop type if exists profile_visibility cascade;
 
 -- Enums
-create type theater_role as enum ('manager', 'staff', 'member');
+create type theater_role as enum ('admin', 'manager', 'staff', 'instructor', 'member');
 create type membership_status as enum ('active', 'inactive');
 create type show_status as enum ('draft', 'pending_review', 'approved', 'rejected', 'cancelled');
 create type casting_mode as enum ('direct_invite', 'theater_casting', 'public_casting');
@@ -73,7 +73,12 @@ create table theaters (
     id uuid primary key default gen_random_uuid(),
     name text not null,
     slug text not null unique,
-    timezone text not null default 'UTC',
+    tagline text,
+    street text,
+    city text,
+    state_region text,
+    postal_code text,
+    country text,
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
@@ -82,7 +87,7 @@ create table theaters (
 create table theater_memberships (
     theater_id uuid not null references theaters(id) on delete cascade,
     user_id uuid not null references profiles(id) on delete cascade,
-    role theater_role not null,
+    roles theater_role[] not null default array['member']::theater_role[],
     status membership_status not null default 'active',
     created_at timestamptz not null default now(),
     primary key (theater_id, user_id)
