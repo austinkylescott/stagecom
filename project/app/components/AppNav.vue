@@ -26,8 +26,4 @@ const navItems = [
       </div>
     </template>
   </UHeader>
-
-  <UContainer class="py-8">
-    <slot />
-  </UContainer>
 </template>

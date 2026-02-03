@@ -19,14 +19,44 @@ const { data, refresh, pending, error } = useAsyncData(
 
 const message = ref("");
 
-const updateStatus = async (showId: string, action: "approve" | "reject") => {
+const reasons = [
+  { label: "Missing description", value: "missing_description" },
+  { label: "Schedule unclear", value: "schedule_unclear" },
+  { label: "Casting incomplete", value: "casting_incomplete" },
+  { label: "Content policy", value: "content_policy" },
+  { label: "Other", value: "other" },
+] as const;
+
+const feedback = reactive<Record<string, { reason: string; note: string }>>({});
+
+const getFeedback = (showId: string) => {
+  if (!feedback[showId]) {
+    feedback[showId] = { reason: reasons[0].value, note: "" };
+  }
+  return feedback[showId];
+};
+
+const updateStatus = async (
+  showId: string,
+  action: "approve" | "reject" | "changes_requested",
+) => {
   message.value = "";
+  const payload: Record<string, any> = { action };
+
+  if (action === "changes_requested") {
+    const fb = getFeedback(showId);
+    payload.reason = fb.reason;
+    payload.note = fb.note || null;
+  }
+
   await $fetch(`/api/shows/${showId}/status`, {
     method: "POST",
     credentials: "include",
-    body: { action },
+    body: payload,
   });
-  message.value = action === "approve" ? "Approved" : "Rejected";
+  if (action === "approve") message.value = "Approved";
+  else if (action === "reject") message.value = "Rejected";
+  else message.value = "Changes requested";
   await refresh();
 };
 </script>
@@ -61,20 +91,43 @@ const updateStatus = async (showId: string, action: "approve" | "reject") => {
         }}</span>
       </template>
       <template #actions-data="{ row }">
-        <div class="flex gap-2">
-          <UButton
-            size="xs"
-            color="emerald"
-            @click="updateStatus(row.id, 'approve')"
-            >Approve</UButton
-          >
-          <UButton
-            size="xs"
-            color="red"
-            variant="soft"
-            @click="updateStatus(row.id, 'reject')"
-            >Reject</UButton
-          >
+        <div class="space-y-2">
+          <div class="flex gap-2 flex-wrap">
+            <UButton
+              size="xs"
+              color="emerald"
+              @click="updateStatus(row.id, 'approve')"
+              >Approve</UButton
+            >
+            <UButton
+              size="xs"
+              color="red"
+              variant="soft"
+              @click="updateStatus(row.id, 'reject')"
+              >Reject</UButton
+            >
+            <UButton
+              size="xs"
+              color="orange"
+              variant="soft"
+              @click="updateStatus(row.id, 'changes_requested')"
+              >Needs work</UButton
+            >
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <USelect
+              size="xs"
+              :options="reasons"
+              option-attribute="label"
+              value-attribute="value"
+              v-model="getFeedback(row.id).reason"
+            />
+            <UInput
+              size="xs"
+              v-model="getFeedback(row.id).note"
+              placeholder="Optional note"
+            />
+          </div>
         </div>
       </template>
     </UTable>

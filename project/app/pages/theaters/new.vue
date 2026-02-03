@@ -5,8 +5,23 @@ const router = useRouter();
 
 const form = reactive({
   name: "",
-  slug: "",
-  timezone: "America/New_York",
+  tagline: "",
+  street: "",
+  city: "",
+  state_region: "",
+  postal_code: "",
+  country: "",
+});
+
+const slugPreview = computed(() => {
+  const base = form.name
+    .trim()
+    .toLowerCase()
+    .replace(/^the\s+/, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60);
+  return base || "will-be-generated";
 });
 
 const loading = ref(false);
@@ -54,13 +69,38 @@ const handleSubmit = async () => {
             <UInput v-model="form.name" placeholder="Bright Comedy" />
           </UFormField>
 
-          <UFormField label="Slug" description="Used in URLs">
-            <UInput v-model="form.slug" placeholder="bright-comedy" />
+          <UFormField label="Slug" description="Auto-assigned; editable later">
+            <UInput :model-value="slugPreview" disabled />
           </UFormField>
 
-          <UFormField label="Timezone">
-            <UInput v-model="form.timezone" placeholder="America/New_York" />
+          <UFormField label="Tagline" description="Short promo blurb">
+            <UInput
+              v-model="form.tagline"
+              placeholder="Late-night improv hub"
+            />
           </UFormField>
+
+          <UFormField label="Street address">
+            <UInput v-model="form.street" placeholder="123 Main St" />
+          </UFormField>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <UFormField label="City">
+              <UInput v-model="form.city" placeholder="Chicago" />
+            </UFormField>
+            <UFormField label="State/Region">
+              <UInput v-model="form.state_region" placeholder="IL" />
+            </UFormField>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <UFormField label="Postal code">
+              <UInput v-model="form.postal_code" placeholder="60601" />
+            </UFormField>
+            <UFormField label="Country">
+              <UInput v-model="form.country" placeholder="USA" />
+            </UFormField>
+          </div>
 
           <div class="flex gap-2 items-center">
             <UButton :loading="loading" color="primary" @click="handleSubmit">
@@ -71,7 +111,7 @@ const handleSubmit = async () => {
           </div>
         </UForm>
         <p class="text-sm text-slate-600">
-          Creator becomes manager automatically.
+          Creator becomes admin automatically.
         </p>
       </div>
     </UCard>

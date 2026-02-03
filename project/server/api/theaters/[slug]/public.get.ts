@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
   // 1) Theater lookup
   const { data: theater, error: theaterError } = await supabase
     .from("theaters")
-    .select("id")
+    .select("id,name,tagline,street,city,state_region,postal_code,country")
     .eq("slug", slug)
     .maybeSingle();
 
@@ -45,7 +45,9 @@ export default defineEventHandler(async (event) => {
   }
 
   const safeShows: PublicShowRow[] = shows ?? [];
-  if (safeShows.length === 0) return { shows: [] };
+  if (safeShows.length === 0) {
+    return { theater, shows: [] };
+  }
 
   // 3) Fetch occurrences for these shows
   const showIds = safeShows.map((s) => s.id);
@@ -79,5 +81,5 @@ export default defineEventHandler(async (event) => {
     startsAt: earliestByShow.get(s.id) ?? null,
   }));
 
-  return { shows: result };
+  return { theater, shows: result };
 });

@@ -11,12 +11,14 @@ export default defineEventHandler(async (event) => {
 
   const showId = String(event.context.params?.id || "");
   const body = await readBody(event);
-  const action = body?.action as "approve" | "reject";
+  const action = body?.action as "approve" | "reject" | "changes_requested";
+  const reason = body?.reason as string | undefined;
+  const note = body?.note as string | undefined;
 
   if (!showId) {
     throw createError({ statusCode: 400, statusMessage: "Missing show id" });
   }
-  if (!action || !["approve", "reject"].includes(action)) {
+  if (!action || !["approve", "reject", "changes_requested"].includes(action)) {
     throw createError({ statusCode: 400, statusMessage: "Invalid action" });
   }
 
@@ -37,7 +39,7 @@ export default defineEventHandler(async (event) => {
   // 2) Confirm user is theater staff/manager
   const { data: memberships, error: membershipError } = await supabase
     .from("theater_memberships")
-    .select("role,status")
+    .select("roles,status")
     .eq("theater_id", show.theater_id)
     .eq("user_id", user.id)
     .eq("status", "active");
@@ -49,16 +51,20 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  const staffRoles: Enums<"theater_role">[] = ["admin", "manager", "staff"];
   const isStaff = (memberships ?? []).some((m) =>
-    ["manager", "staff"].includes(m.role),
+    (m.roles || []).some((r) => staffRoles.includes(r)),
   );
   if (!isStaff) {
     throw createError({ statusCode: 403, statusMessage: "Not allowed" });
   }
 
   // 3) Update show status and public listing flag
-  const newStatus: Enums<"show_status"> =
-    action === "approve" ? "approved" : "rejected";
+  let newStatus: Enums<"show_status">;
+  if (action === "approve") newStatus = "approved";
+  else if (action === "reject") newStatus = "rejected";
+  else newStatus = "pending_review";
+
   const isPublicListed = action === "approve";
 
   const { error: updateError } = await supabase
@@ -73,5 +79,24 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 500, statusMessage: updateError.message });
   }
 
-  return { status: newStatus };
+  // log review event
+  const reviewAction: Enums<"review_action"> =
+    action === "approve"
+      ? "approved"
+      : action === "reject"
+        ? "rejected"
+        : "changes_requested";
+
+  const { error: logError } = await supabase.from("show_review_events").insert({
+    show_id: showId,
+    action: reviewAction,
+    actor_user_id: user.id,
+    note: note || reason || null,
+  });
+
+  if (logError) {
+    throw createError({ statusCode: 500, statusMessage: logError.message });
+  }
+
+  return { status: newStatus, action: reviewAction };
 });

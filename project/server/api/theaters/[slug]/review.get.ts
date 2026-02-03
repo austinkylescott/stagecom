@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
   // 2) Check membership is staff/manager
   const { data: membershipRows, error: membershipError } = await supabase
     .from("theater_memberships")
-    .select("role,status")
+    .select("roles,status")
     .eq("theater_id", theater.id)
     .eq("user_id", user.id)
     .eq("status", "active");
@@ -52,8 +52,9 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  const staffRoles: Enums<"theater_role">[] = ["admin", "manager", "staff"];
   const isStaff = (membershipRows ?? []).some((m) =>
-    ["manager", "staff"].includes(m.role),
+    (m.roles || []).some((r) => staffRoles.includes(r)),
   );
 
   if (!isStaff) {

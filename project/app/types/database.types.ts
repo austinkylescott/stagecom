@@ -104,42 +104,77 @@ export type Database = {
       }
       profiles: {
         Row: {
+          availability: Json | null
           avatar_url: string | null
           bio: string | null
+          casting_notes: string | null
           city: string | null
+          contact_links: Json
           created_at: string
+          deleted_at: string | null
           display_name: string
+          handle: string | null
+          home_theater_id: string | null
           id: string
+          notification_preferences: Json
           pronouns: string | null
           timezone: string | null
+          trust_flags: Json
           updated_at: string
-          visibility: string | null
+          verified_at: string | null
+          visibility: Database["public"]["Enums"]["profile_visibility"]
         }
         Insert: {
+          availability?: Json | null
           avatar_url?: string | null
           bio?: string | null
+          casting_notes?: string | null
           city?: string | null
+          contact_links?: Json
           created_at?: string
+          deleted_at?: string | null
           display_name: string
+          handle?: string | null
+          home_theater_id?: string | null
           id?: string
+          notification_preferences?: Json
           pronouns?: string | null
           timezone?: string | null
+          trust_flags?: Json
           updated_at?: string
-          visibility?: string | null
+          verified_at?: string | null
+          visibility?: Database["public"]["Enums"]["profile_visibility"]
         }
         Update: {
+          availability?: Json | null
           avatar_url?: string | null
           bio?: string | null
+          casting_notes?: string | null
           city?: string | null
+          contact_links?: Json
           created_at?: string
+          deleted_at?: string | null
           display_name?: string
+          handle?: string | null
+          home_theater_id?: string | null
           id?: string
+          notification_preferences?: Json
           pronouns?: string | null
           timezone?: string | null
+          trust_flags?: Json
           updated_at?: string
-          visibility?: string | null
+          verified_at?: string | null
+          visibility?: Database["public"]["Enums"]["profile_visibility"]
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_profiles_home_theater"
+            columns: ["home_theater_id"]
+            isOneToOne: false
+            referencedRelation: "theaters"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       show_cast: {
         Row: {
@@ -374,21 +409,21 @@ export type Database = {
       theater_memberships: {
         Row: {
           created_at: string
-          role: Database["public"]["Enums"]["theater_role"]
+          roles: Database["public"]["Enums"]["theater_role"][]
           status: Database["public"]["Enums"]["membership_status"]
           theater_id: string
           user_id: string
         }
         Insert: {
           created_at?: string
-          role: Database["public"]["Enums"]["theater_role"]
+          roles?: Database["public"]["Enums"]["theater_role"][]
           status?: Database["public"]["Enums"]["membership_status"]
           theater_id: string
           user_id: string
         }
         Update: {
           created_at?: string
-          role?: Database["public"]["Enums"]["theater_role"]
+          roles?: Database["public"]["Enums"]["theater_role"][]
           status?: Database["public"]["Enums"]["membership_status"]
           theater_id?: string
           user_id?: string
@@ -412,27 +447,42 @@ export type Database = {
       }
       theaters: {
         Row: {
+          city: string | null
+          country: string | null
           created_at: string
           id: string
           name: string
+          postal_code: string | null
           slug: string
-          timezone: string
+          state_region: string | null
+          street: string | null
+          tagline: string | null
           updated_at: string
         }
         Insert: {
+          city?: string | null
+          country?: string | null
           created_at?: string
           id?: string
           name: string
+          postal_code?: string | null
           slug: string
-          timezone?: string
+          state_region?: string | null
+          street?: string | null
+          tagline?: string | null
           updated_at?: string
         }
         Update: {
+          city?: string | null
+          country?: string | null
           created_at?: string
           id?: string
           name?: string
+          postal_code?: string | null
           slug?: string
-          timezone?: string
+          state_region?: string | null
+          street?: string | null
+          tagline?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -449,6 +499,7 @@ export type Database = {
       email_outbox_status: "queued" | "sent" | "failed"
       membership_status: "active" | "inactive"
       notification_entity: "show" | "occurrence" | "cast"
+      profile_visibility: "public" | "theater_only" | "private"
       review_action: "submitted" | "approved" | "rejected" | "changes_requested"
       show_cast_source: "invited" | "requested"
       show_cast_status:
@@ -465,7 +516,7 @@ export type Database = {
         | "approved"
         | "rejected"
         | "cancelled"
-      theater_role: "manager" | "staff" | "member"
+      theater_role: "admin" | "manager" | "staff" | "instructor" | "member"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -597,6 +648,7 @@ export const Constants = {
       email_outbox_status: ["queued", "sent", "failed"],
       membership_status: ["active", "inactive"],
       notification_entity: ["show", "occurrence", "cast"],
+      profile_visibility: ["public", "theater_only", "private"],
       review_action: ["submitted", "approved", "rejected", "changes_requested"],
       show_cast_source: ["invited", "requested"],
       show_cast_status: [
@@ -615,7 +667,7 @@ export const Constants = {
         "rejected",
         "cancelled",
       ],
-      theater_role: ["manager", "staff", "member"],
+      theater_role: ["admin", "manager", "staff", "instructor", "member"],
     },
   },
 } as const
