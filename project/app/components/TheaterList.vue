@@ -52,7 +52,10 @@ const emit = defineEmits<{
     >
       Loading...
     </div>
-    <div v-else-if="!theaters || theaters.length === 0" class="text-sm text-slate-600">
+    <div
+      v-else-if="!theaters || theaters.length === 0"
+      class="text-sm text-slate-600"
+    >
       {{ emptyMessage || "Nothing yet." }}
     </div>
     <div v-else class="space-y-3">
@@ -70,5 +73,9 @@ const emit = defineEmits<{
         @home="(action, th) => emit('home', action, th)"
       />
     </div>
+
+    <template #footer>
+      <slot name="footer" />
+    </template>
   </UCard>
 </template>
