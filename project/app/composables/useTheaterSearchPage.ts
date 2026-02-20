@@ -1,5 +1,6 @@
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import type { ComputedRef, Ref } from "vue";
+import { useSearchQuery } from "~/composables/useSearchQuery";
 import { useTheaterSearch } from "~/composables/useTheaterSearch";
 
 type Theater = {
@@ -15,12 +16,19 @@ type Theater = {
 };
 
 export const useTheaterSearchPage = (homeId: ComputedRef<string | null>) => {
-  const search = ref("");
-  const sort = ref<"name_asc" | "recent" | "next_show">("name_asc");
-  const page = ref(1);
+  const {
+    searchInput: search,
+    search: debouncedSearch,
+    sort,
+    page,
+  } = useSearchQuery<"name_asc" | "recent" | "next_show">({
+    initialSort: "name_asc",
+    debounce: 300,
+    maxWait: 800,
+  });
 
   const { data, pending, error, refresh } = useTheaterSearch({
-    search,
+    search: debouncedSearch,
     sort,
     page,
   });

@@ -131,7 +131,6 @@ export const useTheaterMembershipManager = (opts: ManagerOptions) => {
       await opts.toggleMembership(theater, "leave");
       opts.mutateMembership?.(theater, false);
       await opts.setHome(null);
-      await refreshAll();
     } finally {
       leavingHome.value = false;
       showLeaveHomeModal.value = false;

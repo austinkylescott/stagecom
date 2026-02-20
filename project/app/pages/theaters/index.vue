@@ -78,7 +78,6 @@ const {
     </div>
 
     <HomeTheaterHero
-      :key="homeId || 'none'"
       :theater="homeTheater"
       :shows="homeShows"
       :candidates="homeCandidates"
