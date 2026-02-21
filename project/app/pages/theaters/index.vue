@@ -61,6 +61,16 @@ const {
   refreshAll: refreshLists,
   mutateMembership,
 });
+
+const handleMembershipChanged = (payload: {
+  theaterId: string;
+  isMember: boolean;
+  isHome: boolean;
+}) => {
+  const theater = { id: payload.theaterId } as any;
+  mutateMembership(theater, payload.isMember);
+  refreshLists();
+};
 </script>
 
 <template>
@@ -100,6 +110,7 @@ const {
         :home-loading-ids="homeBusyIds"
         @toggle="(action, theater) => handleToggle(action, theater)"
         @home="(action, theater) => handleHome(action, theater)"
+        @membership-changed="handleMembershipChanged"
       />
 
       <TheaterList
@@ -112,6 +123,7 @@ const {
         :home-loading-ids="homeBusyIds"
         @toggle="(action, theater) => handleToggle(action, theater)"
         @home="(action, theater) => handleHome(action, theater)"
+        @membership-changed="handleMembershipChanged"
       >
         <template #header>
           <div class="flex flex-col gap-3 w-full">

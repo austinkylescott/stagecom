@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useLocationFormatter } from "~/composables/useLocationFormatter";
+import TheaterFollowHomeButtons from "~/components/TheaterFollowHomeButtons.vue";
 
 type Theater = {
   id: string;
@@ -18,13 +19,17 @@ const props = defineProps<{
   primaryLabel?: string;
   primaryTo?: string;
   showFollow?: boolean;
-  loading?: boolean; // membership action loading
-  homeLoading?: boolean;
+  loading?: boolean; // membership action loading (legacy)
+  homeLoading?: boolean; // legacy
 }>();
 
 const emit = defineEmits<{
   (e: "toggle", action: "join" | "leave", theater: Theater): void;
   (e: "home", action: "set" | "clear", theater: Theater): void;
+  (
+    e: "membership-changed",
+    payload: { theaterId: string; isMember: boolean; isHome: boolean },
+  ): void;
 }>();
 
 const { formatLocation } = useLocationFormatter();
@@ -47,39 +52,14 @@ const { formatLocation } = useLocationFormatter();
       <UButton size="xs" :to="primaryTo || `/theaters/${theater.slug}`">
         {{ primaryLabel || "View" }}
       </UButton>
-      <UButton
+      <TheaterFollowHomeButtons
+        v-if="showFollow"
+        :theater="theater"
+        :is-member="isMember"
+        :is-home="isHome"
         size="xs"
-        variant="ghost"
-        :color="isHome ? 'primary' : 'gray'"
-        :icon="isHome ? 'i-heroicons-arrow-left-on-rectangle' : 'i-heroicons-home'"
-        :loading="homeLoading"
-        :disabled="homeLoading"
-        @click="emit('home', isHome ? 'clear' : 'set', theater)"
+        @updated="(p) => emit('membership-changed', p)"
       />
-      <template v-if="showFollow">
-        <UButton
-          v-if="!isMember"
-          size="xs"
-          color="primary"
-          variant="soft"
-          :loading="loading"
-          :disabled="loading"
-          @click="emit('toggle', 'join', theater)"
-        >
-          Follow
-        </UButton>
-        <UButton
-          v-else
-          size="xs"
-          color="red"
-          variant="ghost"
-          :loading="loading"
-          :disabled="loading"
-          @click="emit('toggle', 'leave', theater)"
-        >
-          Unfollow
-        </UButton>
-      </template>
     </div>
   </div>
 </template>

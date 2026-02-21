@@ -33,6 +33,10 @@ const props = withDefaults(
 const emit = defineEmits<{
   (e: "toggle", action: "join" | "leave", theater: Theater): void;
   (e: "home", action: "set" | "clear", theater: Theater): void;
+  (
+    e: "membership-changed",
+    payload: { theaterId: string; isMember: boolean; isHome: boolean },
+  ): void;
 }>();
 </script>
 
@@ -71,6 +75,7 @@ const emit = defineEmits<{
         :home-loading="homeLoadingIds?.has(theater.id)"
         @toggle="(action, th) => emit('toggle', action, th)"
         @home="(action, th) => emit('home', action, th)"
+        @membership-changed="(p) => emit('membership-changed', p)"
       />
     </div>
 

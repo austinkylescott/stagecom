@@ -45,23 +45,39 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: "Theater not found" });
   }
 
-  // Ensure user has active membership in theater
+  // Ensure user has active membership in theater. If missing, auto-follow as member.
   const { data: membership, error: membershipError } = await supabase
     .from("theater_memberships")
-    .select("theater_id")
+    .select("theater_id,status,roles")
     .eq("theater_id", theater.id)
     .eq("user_id", userId)
-    .eq("status", "active")
     .maybeSingle();
 
   if (membershipError) {
-    throw createError({ statusCode: 500, statusMessage: membershipError.message });
-  }
-  if (!membership) {
     throw createError({
-      statusCode: 403,
-      statusMessage: "You must be a member to set this as home",
+      statusCode: 500,
+      statusMessage: membershipError.message,
     });
+  }
+
+  if (!membership || membership.status !== "active") {
+    const upsertPayload = {
+      theater_id: theater.id,
+      user_id: userId,
+      roles: membership?.roles?.length ? membership.roles : ["member" as const],
+      status: "active" as const,
+    };
+
+    const { error: followError } = await supabase
+      .from("theater_memberships")
+      .upsert(upsertPayload, { onConflict: "theater_id,user_id" });
+
+    if (followError) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: followError.message,
+      });
+    }
   }
 
   // Update profile
