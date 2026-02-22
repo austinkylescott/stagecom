@@ -1,10 +1,10 @@
-import { defineQueryOptions, useQuery } from "@pinia/colada";
+import { defineQueryOptions, useQuery, useQueryCache } from "@pinia/colada";
 import { computed } from "vue";
 import type { Ref } from "vue";
 import { useRequestHeaders } from "#app";
 import { queryKeys } from "~/composables/queryKeys";
 
-type TheaterDetails = {
+export type TheaterDetails = {
   theater: {
     id: string;
     name: string;
@@ -60,8 +60,15 @@ const theaterDetailsQueryOptions = defineQueryOptions<Params, TheaterDetails>(
     }) as const,
 );
 
-export const useTheaterDetails = (slug: Ref<string>) => {
+export const useTheaterDetails = (
+  slug: Ref<string>,
+  initialData?: Ref<TheaterDetails | null | undefined>,
+) => {
   const params = computed<Params>(() => ({ slug: slug.value }));
+  const queryCache = useQueryCache();
+  if (import.meta.server && initialData?.value) {
+    queryCache.setQueryData(queryKeys.theater(slug.value), initialData.value);
+  }
   const query = useQuery(theaterDetailsQueryOptions, params);
   return { ...query };
 };

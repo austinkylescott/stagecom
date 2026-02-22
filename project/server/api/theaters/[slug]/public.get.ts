@@ -2,10 +2,7 @@ import { serverSupabaseClient } from "#supabase/server";
 import type { Tables } from "~/types/database.types";
 
 type PublicShowRow = Pick<Tables<"shows">, "id" | "title" | "description">;
-type OccurrenceRow = Pick<
-  Tables<"show_occurrences">,
-  "show_id" | "starts_at" | "status"
->;
+type OccurrenceRow = Pick<Tables<"show_occurrences">, "show_id" | "starts_at">;
 
 export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient(event);

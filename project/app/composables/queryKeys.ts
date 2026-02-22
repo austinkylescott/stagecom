@@ -4,7 +4,7 @@ export const queryKeys = {
     sort: "name_asc" | "recent" | "next_show";
     page: number;
     pageSize: number;
-  }) => ["theaters", params] as const,
+  }) => (params ? (["theaters", params] as const) : (["theaters"] as const)),
 
   theater: (slug: string) => ["theater", { slug }] as const,
 

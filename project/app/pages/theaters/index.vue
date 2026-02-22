@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useRequestHeaders } from "#app";
 import TheaterList from "~/components/TheaterList.vue";
 import HomeTheaterHero from "~/components/HomeTheaterHero.vue";
 import HomeTheaterPrompt from "~/components/HomeTheaterPrompt.vue";
@@ -6,10 +7,23 @@ import HomeTheaterLeavePrompt from "~/components/HomeTheaterLeavePrompt.vue";
 import { useMembershipToggle } from "~/composables/useMembershipToggle";
 import { useHomeTheaterState } from "~/composables/useHomeTheaterState";
 import { useTheaterSearchPage } from "~/composables/useTheaterSearchPage";
+import type { TheatersResponse } from "~/composables/useTheaterSearch";
 import { useTheaterMembershipManager } from "~/composables/useTheaterMembershipManager";
 
 const { homeTheater, homeShows, homeCandidates, homeId, hasHome, saveHome } =
   useHomeTheaterState();
+
+const { data: initialTheaters } = await useAsyncData(() =>
+  $fetch<TheatersResponse>("/api/theaters", {
+    headers: import.meta.server ? useRequestHeaders(["cookie"]) : undefined,
+    credentials: "include",
+    params: {
+      sort: "name_asc",
+      page: 1,
+      pageSize: 20,
+    },
+  }),
+);
 
 const {
   search,
@@ -22,7 +36,7 @@ const {
   totalPages,
   showPagination,
   mutateMembership,
-} = useTheaterSearchPage(homeId);
+} = useTheaterSearchPage(homeId, initialTheaters);
 
 const { toggleMembership } = useMembershipToggle();
 

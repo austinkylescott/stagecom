@@ -20,6 +20,7 @@ const profileQueryOptions = defineQueryOptions<Params, ProfileRow | null>(
     key: queryKeys.profile(params?.userId || ""),
     query: async () => {
       if (import.meta.server) return null;
+      if (!params?.userId) return null;
 
       const supabase = useSupabaseClient();
       const { data, error } = await supabase
@@ -27,7 +28,7 @@ const profileQueryOptions = defineQueryOptions<Params, ProfileRow | null>(
         .select(
           "id, display_name, avatar_url, timezone, pronouns, bio, city, visibility",
         )
-        .eq("id", params?.userId)
+        .eq("id", params.userId)
         .maybeSingle();
 
       if (error) throw error;

@@ -1,8 +1,12 @@
 <script setup lang="ts">
+import { useRequestHeaders } from "#app";
 import { useLocationFormatter } from "~/composables/useLocationFormatter";
 import TheaterFollowHomeButtons from "~/components/TheaterFollowHomeButtons.vue";
 import { useHomeTheaterState } from "~/composables/useHomeTheaterState";
-import { useTheaterDetails } from "~/composables/useTheaterDetails";
+import {
+  type TheaterDetails,
+  useTheaterDetails,
+} from "~/composables/useTheaterDetails";
 
 const route = useRoute();
 const slug = computed(() => route.params.slug as string);
@@ -10,7 +14,17 @@ const slug = computed(() => route.params.slug as string);
 const { formatLocation } = useLocationFormatter();
 const { homeId } = useHomeTheaterState();
 
-const { data, isLoading, error } = useTheaterDetails(slug);
+// Fetch once during SSR so the first paint already has theater data.
+const { data: initialTheater } = await useAsyncData(
+  () =>
+    $fetch<TheaterDetails>(`/api/theaters/${slug.value}`, {
+      headers: import.meta.server ? useRequestHeaders(["cookie"]) : undefined,
+      credentials: "include",
+    }),
+  { server: true },
+);
+
+const { data, isLoading, error } = useTheaterDetails(slug, initialTheater);
 
 const theater = computed(() => data.value?.theater || null);
 const membership = computed(() => data.value?.membership || null);

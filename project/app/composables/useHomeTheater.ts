@@ -4,7 +4,7 @@ import { useRequestHeaders } from "#app";
 import { useHomeTheaterStore } from "~/stores/homeTheater";
 import { queryKeys } from "~/composables/queryKeys";
 
-type HomePayload = {
+export type HomePayload = {
   theater: any | null;
   shows: any[];
   candidates?: any[];

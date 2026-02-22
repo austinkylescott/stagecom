@@ -1,7 +1,7 @@
 import { computed } from "vue";
 import { useMutation, useQueryCache } from "@pinia/colada";
 import { queryKeys } from "~/composables/queryKeys";
-import { useHomeTheater } from "~/composables/useHomeTheater";
+import { type HomePayload, useHomeTheater } from "~/composables/useHomeTheater";
 import { useHomeTheaterStore } from "~/stores/homeTheater";
 
 export const useHomeTheaterState = () => {
@@ -34,7 +34,9 @@ export const useHomeTheaterState = () => {
         body: { theaterId },
       }),
     onMutate: ({ theaterId }) => {
-      const previous = queryCache.getQueryData(queryKeys.homeTheater());
+      const previous = queryCache.getQueryData(queryKeys.homeTheater()) as
+        | HomePayload
+        | undefined;
 
       if (theaterId === null) {
         queryCache.setQueryData(queryKeys.homeTheater(), (value: any) => {

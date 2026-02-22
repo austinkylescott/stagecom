@@ -1,10 +1,25 @@
 <script setup lang="ts">
 import { useMutation, useQueryCache } from "@pinia/colada";
+import { useRequestHeaders } from "#app";
 import { queryKeys } from "~/composables/queryKeys";
+import {
+  type ReviewQueue,
+  useTheaterReviewQueue,
+} from "~/composables/useTheaterReviewQueue";
 const route = useRoute();
 const slug = computed(() => route.params.slug as string);
 
-const { data, isLoading, error } = useTheaterReviewQueue(slug);
+const { data: initialReviewQueue } = await useAsyncData(() =>
+  $fetch<ReviewQueue>(`/api/theaters/${slug.value}/review`, {
+    headers: import.meta.server ? useRequestHeaders(["cookie"]) : undefined,
+    credentials: "include",
+  }),
+);
+
+const { data, isLoading, error } = useTheaterReviewQueue(
+  slug,
+  initialReviewQueue,
+);
 
 const message = ref("");
 const queryCache = useQueryCache();

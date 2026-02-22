@@ -18,14 +18,13 @@ type QueryParams = {
   pageSize: number;
 };
 
-const theaterQueryOptions = defineQueryOptions<
-  QueryParams,
-  {
-    theaters: Theater[];
-    myTheaters: Theater[];
-    totalPages?: number;
-  }
->(
+export type TheatersResponse = {
+  theaters: Theater[];
+  myTheaters: Theater[];
+  totalPages?: number;
+};
+
+const theaterQueryOptions = defineQueryOptions<QueryParams, TheatersResponse>(
   (params) =>
     ({
       key: queryKeys.theaters(params),
@@ -48,11 +47,14 @@ const theaterQueryOptions = defineQueryOptions<
     }) as const,
 );
 
-export const useTheaterSearch = (params: {
-  search: Ref<string>;
-  sort: Ref<"name_asc" | "recent" | "next_show">;
-  page: Ref<number>;
-}) => {
+export const useTheaterSearch = (
+  params: {
+    search: Ref<string>;
+    sort: Ref<"name_asc" | "recent" | "next_show">;
+    page: Ref<number>;
+  },
+  initialData?: Ref<TheatersResponse | null | undefined>,
+) => {
   const { search, sort, page } = params;
 
   const queryParams = computed<QueryParams>(() => ({
@@ -62,8 +64,12 @@ export const useTheaterSearch = (params: {
     pageSize: 20,
   }));
 
-  const query = useQuery(theaterQueryOptions, queryParams);
   const queryCache = useQueryCache();
+  if (import.meta.server && initialData?.value) {
+    const key = queryKeys.theaters(queryParams.value);
+    queryCache.setQueryData(key, initialData.value);
+  }
+  const query = useQuery(theaterQueryOptions, queryParams);
   const invalidate = async () => {
     await queryCache.invalidateQueries({
       key: queryKeys.theaters(),

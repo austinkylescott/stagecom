@@ -2,7 +2,10 @@ import { computed } from "vue";
 import type { ComputedRef, Ref } from "vue";
 import { useQueryCache } from "@pinia/colada";
 import { useSearchQuery } from "~/composables/useSearchQuery";
-import { useTheaterSearch } from "~/composables/useTheaterSearch";
+import {
+  type TheatersResponse,
+  useTheaterSearch,
+} from "~/composables/useTheaterSearch";
 import { queryKeys } from "~/composables/queryKeys";
 
 type Theater = {
@@ -17,7 +20,10 @@ type Theater = {
   isHome?: boolean;
 };
 
-export const useTheaterSearchPage = (homeId: ComputedRef<string | null>) => {
+export const useTheaterSearchPage = (
+  homeId: ComputedRef<string | null>,
+  initialData?: Ref<TheatersResponse | null | undefined>,
+) => {
   const {
     searchInput: search,
     search: debouncedSearch,
@@ -29,11 +35,14 @@ export const useTheaterSearchPage = (homeId: ComputedRef<string | null>) => {
     maxWait: 800,
   });
 
-  const { data, isLoading, error, refresh } = useTheaterSearch({
-    search: debouncedSearch,
-    sort,
-    page,
-  });
+  const { data, isLoading, error, refresh } = useTheaterSearch(
+    {
+      search: debouncedSearch,
+      sort,
+      page,
+    },
+    initialData,
+  );
 
   const queryCache = useQueryCache();
   const mutateMembership = (theater: any, isMember: boolean) => {

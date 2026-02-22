@@ -1,7 +1,18 @@
 <script setup lang="ts">
-import { useMemberShows } from "~/composables/useMemberShows";
+import { useRequestHeaders } from "#app";
+import {
+  type MemberShowsResponse,
+  useMemberShows,
+} from "~/composables/useMemberShows";
 
-const { data, isLoading, error } = useMemberShows();
+const { data: initialShows } = await useAsyncData(() =>
+  $fetch<MemberShowsResponse>("/api/shows", {
+    headers: import.meta.server ? useRequestHeaders(["cookie"]) : undefined,
+    credentials: "include",
+  }),
+);
+
+const { data, isLoading, error } = useMemberShows(initialShows);
 
 const sortedShows = computed(() =>
   (data.value?.shows || []).slice().sort((a, b) => {
