@@ -1,23 +1,45 @@
 <script setup lang="ts">
+import { useMutation, useQueryCache } from "@pinia/colada";
+import { queryKeys } from "~/composables/queryKeys";
 const route = useRoute();
 const slug = computed(() => route.params.slug as string);
 
-const { data, refresh, pending, error } = useAsyncData(
-  () =>
-    $fetch<{
-      shows: {
-        id: string;
-        title: string;
-        status: string;
-        startsAt: string | null;
-      }[];
-    }>(`/api/theaters/${slug.value}/review`, {
-      credentials: "include",
-    }),
-  { watch: [slug], server: false },
-);
+const { data, isLoading, error } = useTheaterReviewQueue(slug);
 
 const message = ref("");
+const queryCache = useQueryCache();
+const updateStatusMutation = useMutation<
+  void,
+  {
+    showId: string;
+    action: "approve" | "reject" | "changes_requested";
+    reason?: string;
+    note?: string;
+  }
+>({
+  mutation: ({ showId, action, reason, note }) =>
+    $fetch(`/api/shows/${showId}/status`, {
+      method: "POST",
+      credentials: "include",
+      body: { action, reason, note },
+    }),
+  onSuccess: async () => {
+    await Promise.all([
+      queryCache.invalidateQueries({
+        key: queryKeys.theaterReview(slug.value || ""),
+        exact: false,
+      }),
+      queryCache.invalidateQueries({
+        key: queryKeys.theater(slug.value || ""),
+        exact: false,
+      }),
+      queryCache.invalidateQueries({
+        key: queryKeys.memberShows(),
+        exact: true,
+      }),
+    ]);
+  },
+});
 
 const reasons = [
   { label: "Missing description", value: "missing_description" },
@@ -49,15 +71,15 @@ const updateStatus = async (
     payload.note = fb.note || null;
   }
 
-  await $fetch(`/api/shows/${showId}/status`, {
-    method: "POST",
-    credentials: "include",
-    body: payload,
+  await updateStatusMutation.mutateAsync({
+    showId,
+    action,
+    reason: payload.reason,
+    note: payload.note,
   });
   if (action === "approve") message.value = "Approved";
   else if (action === "reject") message.value = "Rejected";
   else message.value = "Changes requested";
-  await refresh();
 };
 </script>
 
@@ -77,7 +99,7 @@ const updateStatus = async (
     </p>
     <UTable
       :rows="data?.shows || []"
-      :loading="pending"
+      :loading="isLoading"
       :columns="[
         { key: 'title', label: 'Title' },
         { key: 'startsAt', label: 'Next occurrence' },

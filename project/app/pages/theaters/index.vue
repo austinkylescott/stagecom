@@ -8,23 +8,15 @@ import { useHomeTheaterState } from "~/composables/useHomeTheaterState";
 import { useTheaterSearchPage } from "~/composables/useTheaterSearchPage";
 import { useTheaterMembershipManager } from "~/composables/useTheaterMembershipManager";
 
-const {
-  homeTheater,
-  homeShows,
-  homeCandidates,
-  homeId,
-  hasHome,
-  refreshHome,
-  saveHome,
-} = useHomeTheaterState();
+const { homeTheater, homeShows, homeCandidates, homeId, hasHome, saveHome } =
+  useHomeTheaterState();
 
 const {
   search,
   sort,
   page,
-  pending,
+  isLoading,
   error,
-  refresh: refreshSearch,
   myTheaters,
   allTheaters,
   totalPages,
@@ -33,11 +25,6 @@ const {
 } = useTheaterSearchPage(homeId);
 
 const { toggleMembership } = useMembershipToggle();
-
-const refreshLists = async () => {
-  // Keep both search results and home theater data in sync after membership changes
-  await Promise.all([refreshSearch(), refreshHome()]);
-};
 
 const {
   membershipBusyIds,
@@ -58,7 +45,6 @@ const {
   homeId,
   toggleMembership,
   setHome: saveHome,
-  refreshAll: refreshLists,
   mutateMembership,
 });
 
@@ -69,7 +55,6 @@ const handleMembershipChanged = (payload: {
 }) => {
   const theater = { id: payload.theaterId } as any;
   mutateMembership(theater, payload.isMember);
-  refreshLists();
 };
 </script>
 
@@ -102,7 +87,7 @@ const handleMembershipChanged = (payload: {
       <TheaterList
         title="Following"
         :theaters="myTheaters"
-        :pending="pending"
+        :pending="isLoading"
         empty-message="You're not a member yet. Follow or create a theater to see it here."
         primary-label="Open"
         :show-follow="true"
@@ -116,7 +101,7 @@ const handleMembershipChanged = (payload: {
       <TheaterList
         title="All theaters"
         :theaters="allTheaters"
-        :pending="pending"
+        :pending="isLoading"
         primary-label="View"
         :show-follow="true"
         :loading-ids="membershipBusyIds"
@@ -156,7 +141,7 @@ const handleMembershipChanged = (payload: {
               :page="page"
               :total="totalPages"
               :items-per-page="1"
-              :disabled="pending"
+              :disabled="isLoading"
               :show-controls="true"
               @update:page="(p) => (page = p)"
             />

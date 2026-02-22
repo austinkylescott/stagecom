@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { useMutation, useQueryCache } from "@pinia/colada";
 import type { FetchError } from "ofetch";
+import { queryKeys } from "~/composables/queryKeys";
 
 const router = useRouter();
 
@@ -30,29 +32,42 @@ const notice = ref("");
 
 type TheaterResponse = { id: string; slug: string };
 
-const handleSubmit = async () => {
-  loading.value = true;
-  error.value = "";
-  notice.value = "";
-
-  try {
-    const theater = await $fetch<TheaterResponse>("/api/theaters", {
+const queryCache = useQueryCache();
+const createTheater = useMutation<TheaterResponse, typeof form>({
+  mutation: (payload) =>
+    $fetch<TheaterResponse>("/api/theaters", {
       method: "POST",
-      // ✅ pass the object; $fetch will JSON-encode it
-      body: { ...form },
-      // ✅ include if your /api route relies on cookies/session
+      body: { ...payload },
       credentials: "include",
-    });
-
+    }),
+  onSuccess: async (theater) => {
     notice.value = "Theater created";
+    await Promise.all([
+      queryCache.invalidateQueries({ key: queryKeys.theaters(), exact: false }),
+      queryCache.invalidateQueries({
+        key: queryKeys.homeTheater(),
+        exact: true,
+      }),
+    ]);
     await router.push(`/theaters/${theater.slug}/shows/new`);
-  } catch (e) {
+  },
+  onError: (e: any) => {
     const err = e as FetchError<any>;
     error.value =
       err?.data?.statusMessage ||
       err?.data?.message ||
       err?.message ||
       "Failed to create theater";
+  },
+});
+
+const handleSubmit = async () => {
+  loading.value = true;
+  error.value = "";
+  notice.value = "";
+
+  try {
+    await createTheater.mutateAsync(form);
   } finally {
     loading.value = false;
   }

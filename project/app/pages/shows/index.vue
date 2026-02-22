@@ -1,8 +1,7 @@
 <script setup lang="ts">
-const { data, pending, error } = useAsyncData(
-  () => $fetch<{ shows: any[] }>("/api/shows", { credentials: "include" }),
-  { server: false },
-);
+import { useMemberShows } from "~/composables/useMemberShows";
+
+const { data, isLoading, error } = useMemberShows();
 
 const sortedShows = computed(() =>
   (data.value?.shows || []).slice().sort((a, b) => {
@@ -74,7 +73,7 @@ const occurrencesByDay = computed(() => {
           <div class="font-semibold">Upcoming</div>
         </template>
 
-        <div v-if="pending" class="text-sm text-slate-600">Loading...</div>
+        <div v-if="isLoading" class="text-sm text-slate-600">Loading...</div>
         <div
           v-else-if="sortedShows.length === 0"
           class="text-sm text-slate-600"

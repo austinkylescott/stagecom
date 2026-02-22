@@ -1,27 +1,6 @@
 <script setup lang="ts">
-const supabase = useSupabaseClient();
 const user = useSupabaseUser();
-
-const { data, pending, error, refresh } = useAsyncData(
-  async () => {
-    const [profilesRes, membershipsRes] = await Promise.all([
-      supabase.from("profiles").select("id,display_name,avatar_url"),
-      supabase
-        .from("theater_memberships")
-        .select("user_id,theater_id,status")
-        .eq("status", "active"),
-    ]);
-
-    if (profilesRes.error) throw profilesRes.error;
-    if (membershipsRes.error) throw membershipsRes.error;
-
-    return {
-      profiles: profilesRes.data || [],
-      memberships: membershipsRes.data || [],
-    };
-  },
-  { server: false },
-);
+const { data, isLoading, error, refresh } = usePerformers();
 
 const search = ref("");
 
@@ -83,7 +62,7 @@ const filteredProfiles = computed(() => {
       {{ error?.message || error?.data?.message }}
     </div>
 
-    <div v-if="pending" class="text-sm text-slate-600">
+    <div v-if="isLoading" class="text-sm text-slate-600">
       Loading performers...
     </div>
 

@@ -1,10 +1,52 @@
-import { useRequestHeaders, useNuxtData } from "#app";
+import { defineQueryOptions, useQuery, useQueryCache } from "@pinia/colada";
+import { computed } from "vue";
+import type { Ref } from "vue";
+import { useRequestHeaders } from "#app";
 import type { Tables } from "~/types/database.types";
+import { queryKeys } from "~/composables/queryKeys";
 
+// Keep this composable simple: inline $fetch with the few options we need.
 type Theater = Pick<
   Tables<"theaters">,
   "id" | "name" | "slug" | "tagline" | "city" | "state_region" | "country"
 > & { isMember?: boolean };
+
+type QueryParams = {
+  search: string;
+  sort: "name_asc" | "recent" | "next_show";
+  page: number;
+  pageSize: number;
+};
+
+const theaterQueryOptions = defineQueryOptions<
+  QueryParams,
+  {
+    theaters: Theater[];
+    myTheaters: Theater[];
+    totalPages?: number;
+  }
+>(
+  (params) =>
+    ({
+      key: queryKeys.theaters(params),
+      query: () => {
+        const headers = import.meta.server
+          ? useRequestHeaders(["cookie"])
+          : undefined;
+        return $fetch("/api/theaters", {
+          credentials: "include",
+          headers,
+          params: {
+            search: params?.search || undefined,
+            sort: params?.sort || "name_asc",
+            page: params?.page || 1,
+            pageSize: params?.pageSize || 20,
+          },
+        });
+      },
+      staleTime: 30_000,
+    }) as const,
+);
 
 export const useTheaterSearch = (params: {
   search: Ref<string>;
@@ -12,34 +54,22 @@ export const useTheaterSearch = (params: {
   page: Ref<number>;
 }) => {
   const { search, sort, page } = params;
-  const key = () =>
-    `theater-search:${search.value}:${sort.value}:${page.value}`;
 
-  const query = () => {
-    const headers = import.meta.server
-      ? useRequestHeaders(["cookie"])
-      : undefined;
-    return $fetch<{
-      theaters: Theater[];
-      myTheaters: Theater[];
-      totalPages?: number;
-    }>("/api/theaters", {
-      credentials: "include",
-      headers,
-      params: {
-        search: search.value || undefined,
-        sort: sort.value,
-        page: page.value,
-        pageSize: 20,
-      },
+  const queryParams = computed<QueryParams>(() => ({
+    search: search.value.trim(),
+    sort: sort.value,
+    page: page.value,
+    pageSize: 20,
+  }));
+
+  const query = useQuery(theaterQueryOptions, queryParams);
+  const queryCache = useQueryCache();
+  const invalidate = async () => {
+    await queryCache.invalidateQueries({
+      key: queryKeys.theaters(),
+      exact: false,
     });
   };
 
-  const asyncData = useAsyncData(key, query, {
-    getCachedData: (k) => useNuxtData(k)?.data?.value,
-    server: true,
-    immediate: true,
-  });
-
-  return asyncData;
+  return { ...query, invalidate };
 };

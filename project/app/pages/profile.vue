@@ -3,8 +3,7 @@ const supabase = useSupabaseClient();
 const user = useSupabaseUser();
 
 // Keep the reactive profile in sync with the canonical row we control.
-const { profile, profilePending, profileError, refreshProfile } =
-  useUserIdentity();
+const { profile, profileError, refreshProfile } = useUserIdentity();
 
 const form = reactive({
   displayName: "",

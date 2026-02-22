@@ -1,3 +1,7 @@
+import { defineQueryOptions, useQuery } from "@pinia/colada";
+import { computed } from "vue";
+import { queryKeys } from "~/composables/queryKeys";
+
 type ProfileRow = {
   id: string;
   display_name: string | null;
@@ -9,38 +13,44 @@ type ProfileRow = {
   visibility?: "public" | "private" | "theater_only";
 };
 
-export const useUserIdentity = () => {
-  const user = useSupabaseUser();
-  const supabase = useSupabaseClient();
+type Params = { userId: string };
 
-  const {
-    data: profile,
-    refresh: refreshProfile,
-    pending: profilePending,
-    error: profileError,
-  } = useAsyncData<ProfileRow | null>(
-    () => `current-profile-${user.value?.id || "anon"}`,
-    async () => {
-      const userId = user.value?.id;
-      // Supabase sometimes hydrates a user shell before the id is available on the client.
-      // Skip querying until we have a definite id to avoid "id=undefined" requests.
-      if (!userId) return null;
+const profileQueryOptions = defineQueryOptions<Params, ProfileRow | null>(
+  (params) => ({
+    key: queryKeys.profile(params?.userId || ""),
+    query: async () => {
+      if (import.meta.server) return null;
+
+      const supabase = useSupabaseClient();
       const { data, error } = await supabase
         .from("profiles")
         .select(
           "id, display_name, avatar_url, timezone, pronouns, bio, city, visibility",
         )
-        .eq("id", userId)
+        .eq("id", params?.userId)
         .maybeSingle();
 
       if (error) throw error;
       return data;
     },
-    {
-      server: false,
-      watch: [() => user.value?.id],
-    },
-  );
+    enabled: Boolean(params?.userId),
+    staleTime: 30_000,
+  }),
+);
+
+export const useUserIdentity = () => {
+  const user = useSupabaseUser();
+
+  const params = computed<Params>(() => ({
+    userId: user.value?.id || "",
+  }));
+
+  const {
+    data: profile,
+    refresh: refreshProfile,
+    isLoading,
+    error: profileError,
+  } = useQuery(profileQueryOptions, params);
 
   const displayName = computed(() => {
     const meta = user.value?.user_metadata || {};
@@ -84,7 +94,7 @@ export const useUserIdentity = () => {
     email,
     isAuthed,
     profile,
-    profilePending,
+    isLoading,
     profileError,
     refreshProfile,
   };

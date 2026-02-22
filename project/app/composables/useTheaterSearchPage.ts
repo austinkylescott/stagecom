@@ -1,7 +1,9 @@
 import { computed } from "vue";
 import type { ComputedRef, Ref } from "vue";
+import { useQueryCache } from "@pinia/colada";
 import { useSearchQuery } from "~/composables/useSearchQuery";
 import { useTheaterSearch } from "~/composables/useTheaterSearch";
+import { queryKeys } from "~/composables/queryKeys";
 
 type Theater = {
   id: string;
@@ -27,39 +29,49 @@ export const useTheaterSearchPage = (homeId: ComputedRef<string | null>) => {
     maxWait: 800,
   });
 
-  const { data, pending, error, refresh } = useTheaterSearch({
+  const { data, isLoading, error, refresh } = useTheaterSearch({
     search: debouncedSearch,
     sort,
     page,
   });
 
+  const queryCache = useQueryCache();
   const mutateMembership = (theater: any, isMember: boolean) => {
-    if (!theater?.id || !data.value) return;
+    if (!theater?.id) return;
 
-    const updatedAll =
-      data.value.theaters?.map((t: any) =>
-        t.id === theater.id ? { ...t, isMember } : t,
-      ) ?? [];
+    queryCache.setQueriesData(
+      { key: queryKeys.theaters(), exact: false },
+      (previous: any) => {
+        if (!previous) return previous;
 
-    let updatedMine = data.value.myTheaters ?? [];
-    if (isMember) {
-      const alreadyThere = updatedMine.some((t: any) => t.id === theater.id);
-      if (!alreadyThere) {
-        updatedMine = [{ ...theater, isMember: true }, ...updatedMine];
-      } else {
-        updatedMine = updatedMine.map((t: any) =>
-          t.id === theater.id ? { ...t, isMember: true } : t,
-        );
-      }
-    } else {
-      updatedMine = updatedMine.filter((t: any) => t.id !== theater.id);
-    }
+        const updatedAll =
+          previous.theaters?.map((t: any) =>
+            t.id === theater.id ? { ...t, isMember } : t,
+          ) ?? [];
 
-    data.value = {
-      ...data.value,
-      theaters: updatedAll,
-      myTheaters: updatedMine,
-    };
+        let updatedMine = previous.myTheaters ?? [];
+        if (isMember) {
+          const alreadyThere = updatedMine.some(
+            (t: any) => t.id === theater.id,
+          );
+          if (!alreadyThere) {
+            updatedMine = [{ ...theater, isMember: true }, ...updatedMine];
+          } else {
+            updatedMine = updatedMine.map((t: any) =>
+              t.id === theater.id ? { ...t, isMember: true } : t,
+            );
+          }
+        } else {
+          updatedMine = updatedMine.filter((t: any) => t.id !== theater.id);
+        }
+
+        return {
+          ...previous,
+          theaters: updatedAll,
+          myTheaters: updatedMine,
+        };
+      },
+    );
   };
 
   const myTheaters: Ref<Theater[]> = computed(() =>
@@ -85,7 +97,7 @@ export const useTheaterSearchPage = (homeId: ComputedRef<string | null>) => {
     sort,
     page,
     data,
-    pending,
+    isLoading,
     error,
     refresh,
     myTheaters,

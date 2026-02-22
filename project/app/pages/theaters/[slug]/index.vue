@@ -2,52 +2,15 @@
 import { useLocationFormatter } from "~/composables/useLocationFormatter";
 import TheaterFollowHomeButtons from "~/components/TheaterFollowHomeButtons.vue";
 import { useHomeTheaterState } from "~/composables/useHomeTheaterState";
+import { useTheaterDetails } from "~/composables/useTheaterDetails";
 
 const route = useRoute();
 const slug = computed(() => route.params.slug as string);
 
 const { formatLocation } = useLocationFormatter();
-const { homeId, refreshHome } = useHomeTheaterState();
+const { homeId } = useHomeTheaterState();
 
-const { data, pending, error, refresh } = useAsyncData(
-  () =>
-    $fetch<{
-      theater: {
-        id: string;
-        name: string;
-        slug: string;
-        tagline: string | null;
-        street: string | null;
-        city: string | null;
-        state_region: string | null;
-        postal_code: string | null;
-        country: string | null;
-      };
-      membership: {
-        status: string | null;
-        roles: string[];
-        isHome: boolean;
-      };
-      permissions: {
-        canReview: boolean;
-      };
-      stats: {
-        memberCount: number;
-        totalShows: number;
-        pendingReviewCount: number;
-        publicShowCount: number;
-      };
-      shows: {
-        public: {
-          id: string;
-          title: string;
-          description: string | null;
-          startsAt: string | null;
-        }[];
-      };
-    }>(`/api/theaters/${slug.value}`),
-  { watch: [slug] },
-);
+const { data, isLoading, error } = useTheaterDetails(slug);
 
 const theater = computed(() => data.value?.theater || null);
 const membership = computed(() => data.value?.membership || null);
@@ -56,10 +19,6 @@ const isHome = computed(
   () => membership.value?.isHome || homeId.value === theater.value?.id || false,
 );
 const canReview = computed(() => data.value?.permissions?.canReview ?? false);
-
-const refreshAll = async () => {
-  await Promise.all([refresh(), refreshHome()]);
-};
 </script>
 
 <template>
@@ -101,7 +60,6 @@ const refreshAll = async () => {
             :is-member="isMember"
             :is-home="isHome"
             size="sm"
-            @updated="refreshAll"
           />
           <UButton
             v-if="canReview"
@@ -137,11 +95,11 @@ const refreshAll = async () => {
             Approved and publicly listed shows with their next occurrence.
           </p>
         </div>
-        <p v-if="pending" class="text-sm text-slate-600">Loading…</p>
+        <p v-if="isLoading" class="text-sm text-slate-600">Loading…</p>
       </div>
 
       <div
-        v-if="!pending && data?.shows.public?.length"
+        v-if="!isLoading && data?.shows.public?.length"
         class="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
       >
         <UCard v-for="show in data?.shows.public" :key="show.id" class="h-full">
@@ -157,7 +115,7 @@ const refreshAll = async () => {
           </p>
         </UCard>
       </div>
-      <div v-else-if="!pending" class="text-sm text-slate-600">
+      <div v-else-if="!isLoading" class="text-sm text-slate-600">
         No public shows yet.
       </div>
     </section>

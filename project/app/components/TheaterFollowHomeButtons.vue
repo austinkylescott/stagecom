@@ -26,7 +26,7 @@ const emit = defineEmits<{
 }>();
 
 const { toggleMembership } = useMembershipToggle();
-const { saveHome, homeId, refreshHome } = useHomeTheaterState();
+const { saveHome, homeId } = useHomeTheaterState();
 
 const localMember = ref(props.isMember);
 const localHome = ref(props.isHome);
@@ -67,7 +67,6 @@ const handleFollow = async () => {
       await saveHome(null);
       localHome.value = false;
     }
-    await refreshHome();
     emitUpdate();
   } finally {
     loading.value = false;
@@ -88,7 +87,6 @@ const handleHome = async () => {
       await saveHome(props.theater.id);
       localHome.value = true;
     }
-    await refreshHome();
     emitUpdate();
   } finally {
     loading.value = false;
