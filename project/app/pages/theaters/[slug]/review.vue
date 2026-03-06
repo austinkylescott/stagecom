@@ -117,6 +117,7 @@ const updateStatus = async (
       :loading="isLoading"
       :columns="[
         { key: 'title', label: 'Title' },
+        { key: 'eventType', label: 'Type' },
         { key: 'startsAt', label: 'Next occurrence' },
         { key: 'status', label: 'Status' },
         { key: 'actions', label: 'Actions' },

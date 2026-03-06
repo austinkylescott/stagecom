@@ -2,23 +2,9 @@ import { computed } from "vue";
 import type { ComputedRef, Ref } from "vue";
 import { useQueryCache } from "@pinia/colada";
 import { useSearchQuery } from "~/composables/useSearchQuery";
-import {
-  type TheatersResponse,
-  useTheaterSearch,
-} from "~/composables/useTheaterSearch";
+import { useTheaterSearch } from "~/composables/useTheaterSearch";
 import { queryKeys } from "~/composables/queryKeys";
-
-type Theater = {
-  id: string;
-  name: string;
-  slug: string;
-  tagline?: string | null;
-  city?: string | null;
-  state_region?: string | null;
-  country?: string | null;
-  isMember?: boolean;
-  isHome?: boolean;
-};
+import type { TheatersResponse, Theater } from "~/queries/theaters";
 
 export const useTheaterSearchPage = (
   homeId: ComputedRef<string | null>,
@@ -78,7 +64,7 @@ export const useTheaterSearchPage = (
           ...previous,
           theaters: updatedAll,
           myTheaters: updatedMine,
-        };
+        } as TheatersResponse;
       },
     );
   };

@@ -1,83 +1,38 @@
 import { computed } from "vue";
 import { useMutation, useQueryCache } from "@pinia/colada";
-import { queryKeys } from "~/composables/queryKeys";
-import { type HomePayload, useHomeTheater } from "~/composables/useHomeTheater";
-import { useHomeTheaterStore } from "~/stores/homeTheater";
+import { useHomeTheater } from "~/composables/useHomeTheater";
+import {
+  applyOptimisticHomeTheaterUpdate,
+  invalidateHomeTheaterRelatedQueries,
+  rollbackHomeTheaterUpdate,
+  saveHomeTheater,
+  type HomePayload,
+  type SaveHomeInput,
+} from "~/queries/home";
 
 export const useHomeTheaterState = () => {
   const { data, refresh } = useHomeTheater();
-  const store = useHomeTheaterStore();
   const queryCache = useQueryCache();
 
-  const homeTheater = computed(
-    () => data.value?.theater || store.theater || null,
-  );
-  const homeShows = computed(() => data.value?.shows || store.shows || []);
-  const homeCandidates = computed(
-    () => data.value?.candidates || store.candidates || [],
-  );
-  const homeId = computed(
-    () => homeTheater.value?.id || store.theater?.id || null,
-  );
-  const hasHome = computed(() => Boolean(homeId.value || store.theater?.id));
+  const homeTheater = computed(() => data.value?.theater || null);
+  const homeShows = computed(() => data.value?.shows || []);
+  const homeCandidates = computed(() => data.value?.candidates || []);
+  const homeId = computed(() => homeTheater.value?.id || null);
+  const hasHome = computed(() => Boolean(homeId.value));
 
   const mutation = useMutation<
     void,
-    { theaterId: string | null },
+    SaveHomeInput,
     any,
-    { previous: any }
+    { previous?: HomePayload }
   >({
-    mutation: ({ theaterId }) =>
-      $fetch("/api/me/home-theater", {
-        method: "POST",
-        credentials: "include",
-        body: { theaterId },
-      }),
-    onMutate: ({ theaterId }) => {
-      const previous = queryCache.getQueryData(queryKeys.homeTheater()) as
-        | HomePayload
-        | undefined;
-
-      if (theaterId === null) {
-        queryCache.setQueryData(queryKeys.homeTheater(), (value: any) => {
-          if (!value) return value;
-          return { ...value, theater: null, shows: [] };
-        });
-      } else if (previous?.candidates) {
-        const candidate = previous.candidates.find(
-          (c: any) => c.id === theaterId,
-        );
-        if (candidate) {
-          queryCache.setQueryData(queryKeys.homeTheater(), {
-            ...previous,
-            theater: candidate,
-            shows: [],
-          });
-        }
-      }
-
-      return { previous };
-    },
-    onSuccess: async () => {
-      await Promise.all([
-        queryCache.invalidateQueries({
-          key: queryKeys.homeTheater(),
-          exact: true,
-        }),
-        queryCache.invalidateQueries({
-          key: queryKeys.theaters(),
-          exact: false,
-        }),
-        queryCache.invalidateQueries({
-          key: queryKeys.theaterPrefix(),
-          exact: false,
-        }),
-      ]);
-    },
+    mutation: saveHomeTheater,
+    onMutate: ({ theaterId }) => ({
+      previous: applyOptimisticHomeTheaterUpdate(queryCache, theaterId),
+    }),
+    onSuccess: () => invalidateHomeTheaterRelatedQueries(queryCache),
     onError: (_err, _vars, ctx) => {
-      if (ctx?.previous) {
-        queryCache.setQueryData(queryKeys.homeTheater(), ctx.previous);
-      }
+      rollbackHomeTheaterUpdate(queryCache, ctx?.previous);
     },
   });
 

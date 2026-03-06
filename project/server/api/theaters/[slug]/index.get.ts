@@ -17,14 +17,15 @@ export default defineEventHandler(async (event) => {
   const slug = String(event.context.params?.slug || "");
 
   if (!slug) {
-    throw createError({ statusCode: 400, statusMessage: "Missing theater slug" });
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Missing theater slug",
+    });
   }
 
   const { data: theater, error: theaterError } = await supabase
     .from("theaters")
-    .select(
-      "id,name,slug,tagline,street,city,state_region,postal_code,country",
-    )
+    .select("id,name,slug,tagline,street,city,state_region,postal_code,country")
     .eq("slug", slug)
     .maybeSingle();
 
@@ -36,7 +37,10 @@ export default defineEventHandler(async (event) => {
   }
 
   // Membership + home state (optional for anonymous users)
-  let membership: { status: Enums<"membership_status">; roles: Enums<"theater_role">[] } | null = null;
+  let membership: {
+    status: Enums<"membership_status">;
+    roles: Enums<"theater_role">[];
+  } | null = null;
   let isHome = false;
 
   if (userId) {
@@ -48,7 +52,10 @@ export default defineEventHandler(async (event) => {
       .maybeSingle();
 
     if (membershipError) {
-      throw createError({ statusCode: 500, statusMessage: membershipError.message });
+      throw createError({
+        statusCode: 500,
+        statusMessage: membershipError.message,
+      });
     }
 
     if (membershipRow) {
@@ -78,7 +85,10 @@ export default defineEventHandler(async (event) => {
     .eq("status", "active");
 
   if (memberCountError) {
-    throw createError({ statusCode: 500, statusMessage: memberCountError.message });
+    throw createError({
+      statusCode: 500,
+      statusMessage: memberCountError.message,
+    });
   }
 
   const { count: totalShows, error: totalShowsError } = await supabase
@@ -87,7 +97,10 @@ export default defineEventHandler(async (event) => {
     .eq("theater_id", theater.id);
 
   if (totalShowsError) {
-    throw createError({ statusCode: 500, statusMessage: totalShowsError.message });
+    throw createError({
+      statusCode: 500,
+      statusMessage: totalShowsError.message,
+    });
   }
 
   const { count: pendingReviewCount, error: pendingCountError } = await supabase
@@ -97,13 +110,16 @@ export default defineEventHandler(async (event) => {
     .eq("status", "pending_review");
 
   if (pendingCountError) {
-    throw createError({ statusCode: 500, statusMessage: pendingCountError.message });
+    throw createError({
+      statusCode: 500,
+      statusMessage: pendingCountError.message,
+    });
   }
 
   // Public shows + earliest occurrences
   const { data: shows, error: showsError } = await supabase
     .from("shows")
-    .select("id,title,description")
+    .select("id,title,description,event_type")
     .eq("theater_id", theater.id)
     .eq("status", "approved")
     .eq("is_public_listed", true);
@@ -113,7 +129,12 @@ export default defineEventHandler(async (event) => {
   }
 
   const publicShows: PublicShowRow[] = shows ?? [];
-  let publicShowsWithDates: { id: string; title: string; description: string | null; startsAt: string | null }[] = [];
+  let publicShowsWithDates: {
+    id: string;
+    title: string;
+    description: string | null;
+    startsAt: string | null;
+  }[] = [];
 
   if (publicShows.length > 0) {
     const showIds = publicShows.map((s) => s.id);
@@ -142,13 +163,16 @@ export default defineEventHandler(async (event) => {
       id: s.id,
       title: s.title,
       description: s.description,
+      eventType: s.event_type,
       startsAt: earliestByShow.get(s.id) ?? null,
     }));
   }
 
   return {
     theater,
-    membership: membership ? { ...membership, isHome } : { isHome, roles: [], status: null },
+    membership: membership
+      ? { ...membership, isHome }
+      : { isHome, roles: [], status: null },
     permissions: { canReview: isStaff },
     stats: {
       memberCount: memberCount ?? 0,

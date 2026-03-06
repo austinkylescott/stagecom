@@ -7,8 +7,14 @@ type OccurrenceRow = Pick<Tables<"show_occurrences">, "show_id" | "starts_at">;
 export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient(event);
   const user = await serverSupabaseUser(event);
+  const userId =
+    user?.id ||
+    (await supabase.auth
+      .getUser()
+      .then((r) => r.data.user?.id)
+      .catch(() => null));
 
-  if (!user) {
+  if (!userId) {
     throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
   }
 
@@ -39,7 +45,7 @@ export default defineEventHandler(async (event) => {
     .from("theater_memberships")
     .select("roles,status")
     .eq("theater_id", theater.id)
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .eq("status", "active");
 
   if (membershipError) {
@@ -61,7 +67,7 @@ export default defineEventHandler(async (event) => {
   // 3) Fetch pending shows
   const { data: shows, error: showsError } = await supabase
     .from("shows")
-    .select("id,title,status")
+    .select("id,title,status,event_type")
     .eq("theater_id", theater.id)
     .eq("status", "pending_review");
 
@@ -100,6 +106,7 @@ export default defineEventHandler(async (event) => {
       id: s.id,
       title: s.title,
       status: s.status,
+      eventType: (s as any).event_type,
       startsAt: earliestByShow.get(s.id) ?? null,
     })),
   };

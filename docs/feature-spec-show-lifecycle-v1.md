@@ -15,6 +15,8 @@ This is the first complete vertical slice.
 - Creator is automatically assigned as Producer
 - Producer is **not automatically cast**
 - Shows begin in Draft state
+- Each show chooses an **event_type** (show, practice, meeting, audition, workshop). Default: show.
+- Event type drives scheduling context (e.g., practices and meetings stay private unless approved/listed).
 
 ---
 

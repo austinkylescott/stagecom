@@ -26,7 +26,7 @@ There is no single, purpose-built tool that reflects how improv communities actu
 Stagecom is a community management platform for theater ensembles that centralizes:
 
 - Performer rosters and contextual roles
-- Show and practice scheduling
+- Show, practice, meeting, workshop, and audition scheduling
 - Lineup building and changes
 - Notifications and show-day information
 - Theater-level oversight and approvals

@@ -100,7 +100,9 @@ const occurrencesByDay = computed(() => {
             <div class="flex items-center justify-between gap-2">
               <div>
                 <p class="font-semibold">{{ show.title }}</p>
-                <p class="text-xs text-slate-600">{{ show.theaterName }}</p>
+                <p class="text-xs text-slate-600">
+                  {{ show.theaterName }} · {{ show.eventType || "show" }}
+                </p>
               </div>
               <UBadge :color="show.status === 'approved' ? 'emerald' : 'gray'">
                 {{ show.status }}

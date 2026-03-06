@@ -1,73 +1,24 @@
-import { defineQueryOptions, useQuery, useQueryCache } from "@pinia/colada";
+import { useQuery, useQueryCache } from "@pinia/colada";
 import { computed } from "vue";
 import type { Ref } from "vue";
-import { useRequestHeaders } from "#app";
-import { queryKeys } from "~/composables/queryKeys";
+import {
+  theaterDetailsQueryOptions,
+  type TheaterDetails,
+} from "~/queries/theaters";
 
-export type TheaterDetails = {
-  theater: {
-    id: string;
-    name: string;
-    slug: string;
-    tagline: string | null;
-    street: string | null;
-    city: string | null;
-    state_region: string | null;
-    postal_code: string | null;
-    country: string | null;
-  };
-  membership: {
-    status: string | null;
-    roles: string[];
-    isHome: boolean;
-  };
-  permissions: {
-    canReview: boolean;
-  };
-  stats: {
-    memberCount: number;
-    totalShows: number;
-    pendingReviewCount: number;
-    publicShowCount: number;
-  };
-  shows: {
-    public: {
-      id: string;
-      title: string;
-      description: string | null;
-      startsAt: string | null;
-    }[];
-  };
-};
-
-type Params = { slug: string };
-
-const theaterDetailsQueryOptions = defineQueryOptions<Params, TheaterDetails>(
-  (params) =>
-    ({
-      key: queryKeys.theater(params?.slug || ""),
-      query: () => {
-        const headers = import.meta.server
-          ? useRequestHeaders(["cookie"])
-          : undefined;
-        return $fetch<TheaterDetails>(`/api/theaters/${params?.slug}`, {
-          headers,
-          credentials: "include",
-        });
-      },
-      enabled: Boolean(params?.slug),
-      staleTime: 20_000,
-    }) as const,
-);
+export type { TheaterDetails } from "~/queries/theaters";
 
 export const useTheaterDetails = (
   slug: Ref<string>,
   initialData?: Ref<TheaterDetails | null | undefined>,
 ) => {
-  const params = computed<Params>(() => ({ slug: slug.value }));
+  const params = computed(() => ({ slug: slug.value }));
   const queryCache = useQueryCache();
   if (import.meta.server && initialData?.value) {
-    queryCache.setQueryData(queryKeys.theater(slug.value), initialData.value);
+    queryCache.setQueryData(
+      theaterDetailsQueryOptions(params.value).key,
+      initialData.value,
+    );
   }
   const query = useQuery(theaterDetailsQueryOptions, params);
   return { ...query };

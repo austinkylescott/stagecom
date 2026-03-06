@@ -118,6 +118,9 @@ const canReview = computed(() => data.value?.permissions?.canReview ?? false);
       >
         <UCard v-for="show in data?.shows.public" :key="show.id" class="h-full">
           <h3 class="text-lg font-semibold">{{ show.title }}</h3>
+          <p class="text-xs uppercase tracking-wide text-slate-500 mt-1">
+            {{ show.eventType || "show" }}
+          </p>
           <p v-if="show.description" class="text-slate-600 text-sm mt-1">
             {{ show.description }}
           </p>

@@ -33,7 +33,7 @@ Postgres-first, Supabase-friendly schema blueprint.
 - status (draft, pending_review, approved, rejected, cancelled)
 - title
 - description
-- is_practice (boolean)
+- event_type (show, practice, meeting, audition, workshop)
 
 Casting:
 - casting_mode (direct_invite, theater_casting, public_casting)

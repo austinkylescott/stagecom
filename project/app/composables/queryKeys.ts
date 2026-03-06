@@ -14,6 +14,8 @@ export const queryKeys = {
 
   theaterReviewPrefix: () => ["theater-review"] as const,
 
+  reviewInbox: () => ["review-inbox"] as const,
+
   homeTheater: () => ["home-theater"] as const,
 
   memberShows: () => ["member-shows"] as const,

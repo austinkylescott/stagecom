@@ -3,7 +3,7 @@ import type { Tables } from "~/types/database.types";
 
 type ShowRow = Pick<
   Tables<"shows">,
-  "id" | "title" | "description" | "status" | "theater_id"
+  "id" | "title" | "description" | "status" | "theater_id" | "event_type"
 >;
 
 type OccRow = Pick<
@@ -14,8 +14,14 @@ type OccRow = Pick<
 export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient(event);
   const user = await serverSupabaseUser(event);
+  const userId =
+    user?.id ||
+    (await supabase.auth
+      .getUser()
+      .then((r) => r.data.user?.id)
+      .catch(() => null));
 
-  if (!user) {
+  if (!userId) {
     return { shows: [] };
   }
 
@@ -23,7 +29,7 @@ export default defineEventHandler(async (event) => {
   const { data: memberships, error: membershipError } = await supabase
     .from("theater_memberships")
     .select("theater_id")
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .eq("status", "active");
 
   if (membershipError) {
@@ -51,7 +57,7 @@ export default defineEventHandler(async (event) => {
   // Shows for those theaters
   const { data: shows, error: showsError } = await supabase
     .from("shows")
-    .select("id,title,description,status,theater_id")
+    .select("id,title,description,status,theater_id,event_type")
     .in("theater_id", theaterIds);
 
   if (showsError) {

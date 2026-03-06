@@ -3,6 +3,7 @@ const navItems = [
   { label: "Home", to: "/" },
   { label: "Theaters", to: "/theaters" },
   { label: "Shows", to: "/shows" },
+  { label: "Review", to: "/review" },
   { label: "Performers", to: "/performers" },
   { label: "Profile", to: "/profile" },
 ];

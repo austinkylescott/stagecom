@@ -4,8 +4,14 @@ import type { Enums } from "~/types/database.types";
 export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient(event);
   const user = await serverSupabaseUser(event);
+  const userId =
+    user?.id ||
+    (await supabase.auth
+      .getUser()
+      .then((r) => r.data.user?.id)
+      .catch(() => null));
 
-  if (!user) {
+  if (!userId) {
     throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
   }
 
@@ -41,7 +47,7 @@ export default defineEventHandler(async (event) => {
     .from("theater_memberships")
     .select("roles,status")
     .eq("theater_id", show.theater_id)
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .eq("status", "active");
 
   if (membershipError) {
@@ -90,7 +96,7 @@ export default defineEventHandler(async (event) => {
   const { error: logError } = await supabase.from("show_review_events").insert({
     show_id: showId,
     action: reviewAction,
-    actor_user_id: user.id,
+    actor_user_id: userId,
     note: note || reason || null,
   });
 
