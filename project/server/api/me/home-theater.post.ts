@@ -6,16 +6,10 @@ const bodySchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
+  const { theaterId: parsedTheaterId } = await parseBody(event, bodySchema);
   const supabase = await serverSupabaseClient(event);
   const userId = await requireUserId(event, supabase);
-  const parsedBody = bodySchema.safeParse(await readBody(event));
-  if (!parsedBody.success) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Invalid request body",
-    });
-  }
-  const theaterId = parsedBody.data.theaterId ?? null;
+  const theaterId = parsedTheaterId ?? null;
 
   // Clear home
   if (!theaterId) {

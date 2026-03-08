@@ -10,16 +10,9 @@ type OccurrenceRow = Pick<Tables<"show_occurrences">, "show_id" | "starts_at">;
 const paramsSchema = z.object({ slug: z.string().trim().min(1) });
 
 export default defineEventHandler(async (event) => {
+  const { slug } = parseParams(event, paramsSchema);
   const supabase = await serverSupabaseClient(event);
   const userId = await requireUserId(event, supabase);
-  const parsedParams = paramsSchema.safeParse(event.context.params);
-  if (!parsedParams.success) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Missing theater slug",
-    });
-  }
-  const { slug } = parsedParams.data;
 
   // 1) Theater lookup
   const { data: theater, error: theaterError } = await supabase

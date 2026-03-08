@@ -73,29 +73,7 @@ const bodySchema = z
   );
 
 export default defineEventHandler(async (event) => {
-  const supabase = await serverSupabaseClient(event);
-  const userId = await requireUserId(event, supabase);
-  const parsedParams = paramsSchema.safeParse(event.context.params);
-  if (!parsedParams.success) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Missing theater slug",
-    });
-  }
-
-  const parsedBody = bodySchema.safeParse(await readBody(event));
-  if (!parsedBody.success) {
-    const firstIssue = parsedBody.error.issues[0];
-    const field = firstIssue?.path?.[0];
-    throw createError({
-      statusCode: 400,
-      statusMessage: field
-        ? `Invalid ${String(field)}: ${firstIssue.message}`
-        : "Invalid request body",
-    });
-  }
-
-  const { slug } = parsedParams.data;
+  const { slug } = parseParams(event, paramsSchema);
   const {
     title,
     description,
@@ -107,7 +85,9 @@ export default defineEventHandler(async (event) => {
     startsAt,
     endsAt,
     submitForReview,
-  } = parsedBody.data;
+  } = await parseBody(event, bodySchema);
+  const supabase = await serverSupabaseClient(event);
+  const userId = await requireUserId(event, supabase);
 
   // Lookup theater
   const { data: theater, error: theaterError } = await supabase

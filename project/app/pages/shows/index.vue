@@ -134,7 +134,7 @@ const occurrencesByDay = computed(() => {
                 variant="soft"
                 :to="`/theaters/${show.theaterSlug}/shows/new`"
               >
-                Add occurrence
+                Create show
               </UButton>
             </div>
           </div>

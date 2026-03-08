@@ -41,12 +41,16 @@ const sortedShows = computed(
   () => (data.value?.shows || []) as ReviewInboxShow[],
 );
 const columns = [
-  { id: "title", key: "title", label: "Title" },
-  { id: "theaterName", key: "theaterName", label: "Theater" },
-  { id: "eventType", key: "eventType", label: "Type" },
-  { id: "status", key: "status", label: "Status" },
-  { id: "nextStartsAt", key: "nextStartsAt", label: "Next occurrence" },
-  { id: "actions", key: "actions", label: "Actions" },
+  { id: "title", accessorKey: "title", header: "Title" },
+  { id: "theaterName", accessorKey: "theaterName", header: "Theater" },
+  { id: "eventType", accessorKey: "eventType", header: "Type" },
+  { id: "status", accessorKey: "status", header: "Status" },
+  {
+    id: "nextStartsAt",
+    accessorKey: "nextStartsAt",
+    header: "Next occurrence",
+  },
+  { id: "actions", accessorKey: "id", header: "Actions" },
 ] as const;
 
 const getFeedback = (showId: string) => {
@@ -152,44 +156,49 @@ const updateStatus = async (
     </p>
 
     <UCard>
-      <UTable :rows="sortedShows" :loading="isLoading" :columns="columns">
-        <template #title-data="{ row }">
+      <UTable :data="sortedShows" :loading="isLoading" :columns="columns">
+        <template #title-cell="{ row }">
           <div>
-            <p class="font-medium">{{ row.title }}</p>
-            <p v-if="row.createdByMe" class="text-xs text-slate-500">
+            <p class="font-medium">{{ row.original.title }}</p>
+            <p v-if="row.original.createdByMe" class="text-xs text-slate-500">
               Created by you
             </p>
           </div>
         </template>
 
-        <template #theaterName-data="{ row }">
+        <template #theaterName-cell="{ row }">
           <NuxtLink
             class="text-primary hover:underline"
-            :to="`/theaters/${row.theaterSlug}`"
+            :to="`/theaters/${row.original.theaterSlug}`"
           >
-            {{ row.theaterName }}
+            {{ row.original.theaterName }}
           </NuxtLink>
         </template>
 
-        <template #status-data="{ row }">
-          <UBadge :color="statusColors[row.status] || 'neutral'" variant="soft">
-            {{ row.status }}
+        <template #status-cell="{ row }">
+          <UBadge
+            :color="statusColors[row.original.status] || 'neutral'"
+            variant="soft"
+          >
+            {{ row.original.status }}
           </UBadge>
         </template>
 
-        <template #nextStartsAt-data="{ row }">
+        <template #nextStartsAt-cell="{ row }">
           <span>
             {{
-              row.nextStartsAt
-                ? new Date(row.nextStartsAt).toLocaleString()
+              row.original.nextStartsAt
+                ? new Date(row.original.nextStartsAt).toLocaleString()
                 : "TBD"
             }}
           </span>
         </template>
 
-        <template #actions-data="{ row }">
+        <template #actions-cell="{ row }">
           <div
-            v-if="row.canReview && row.status === 'pending_review'"
+            v-if="
+              row.original.canReview && row.original.status === 'pending_review'
+            "
             class="space-y-2"
           >
             <div class="flex gap-2 flex-wrap">
@@ -197,7 +206,7 @@ const updateStatus = async (
                 size="xs"
                 color="emerald"
                 :loading="statusMutating"
-                @click="updateStatus(row.id, 'approve')"
+                @click="updateStatus(row.original.id, 'approve')"
               >
                 Approve
               </UButton>
@@ -206,7 +215,7 @@ const updateStatus = async (
                 color="red"
                 variant="soft"
                 :loading="statusMutating"
-                @click="updateStatus(row.id, 'reject')"
+                @click="updateStatus(row.original.id, 'reject')"
               >
                 Reject
               </UButton>
@@ -215,7 +224,7 @@ const updateStatus = async (
                 color="orange"
                 variant="soft"
                 :loading="statusMutating"
-                @click="updateStatus(row.id, 'changes_requested')"
+                @click="updateStatus(row.original.id, 'changes_requested')"
               >
                 Needs work
               </UButton>
@@ -226,11 +235,11 @@ const updateStatus = async (
                 :options="reasons"
                 option-attribute="label"
                 value-attribute="value"
-                v-model="getFeedback(row.id).reason"
+                v-model="getFeedback(row.original.id).reason"
               />
               <UInput
                 size="xs"
-                v-model="getFeedback(row.id).note"
+                v-model="getFeedback(row.original.id).note"
                 placeholder="Optional note"
               />
             </div>

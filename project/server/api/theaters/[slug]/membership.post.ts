@@ -10,6 +10,8 @@ const paramsSchema = z.object({ slug: z.string().trim().min(1) });
 const bodySchema = z.object({ action: z.enum(["join", "leave"]) });
 
 export default defineEventHandler(async (event) => {
+  const { slug } = parseParams(event, paramsSchema);
+  const { action } = await parseBody(event, bodySchema);
   const supabase = await serverSupabaseClient(event);
   const user = await requireUser(event, supabase);
   const userId = user.id;
@@ -27,24 +29,6 @@ export default defineEventHandler(async (event) => {
     },
     { onConflict: "id" },
   );
-
-  const parsedParams = paramsSchema.safeParse(event.context.params);
-  if (!parsedParams.success) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Missing theater slug",
-    });
-  }
-
-  const parsedBody = bodySchema.safeParse(await readBody(event));
-  if (!parsedBody.success) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Invalid request body",
-    });
-  }
-  const { slug } = parsedParams.data;
-  const { action } = parsedBody.data;
 
   const { data: theater, error: theaterError } = await supabase
     .from("theaters")

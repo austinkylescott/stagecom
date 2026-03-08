@@ -1,5 +1,4 @@
 <script setup lang="ts">
-const supabase = useSupabaseClient();
 const user = useSupabaseUser();
 
 // Keep the reactive profile in sync with the canonical row we control.
@@ -91,22 +90,22 @@ const save = async () => {
   notice.value = "";
   error.value = "";
 
-  const { error: upsertError } = await supabase.from("profiles").upsert({
-    id: user.value.id,
-    display_name: form.displayName,
-    avatar_url: form.avatarUrl || null,
-    timezone: form.timezone || "UTC",
-    pronouns: form.pronouns || null,
-    bio: form.bio || null,
-    city: form.city || null,
-    visibility: form.visibility || "theater_only",
-  });
-
-  if (upsertError) {
-    error.value = upsertError.message;
-  } else {
+  try {
+    await $fetch("/api/me/profile", {
+      method: "POST",
+      credentials: "include",
+      body: {
+        displayName: form.displayName,
+        avatarUrl: form.avatarUrl || null,
+        timezone: form.timezone || "UTC",
+        pronouns: form.pronouns || null,
+        bio: form.bio || null,
+        city: form.city || null,
+        visibility: form.visibility || "theater_only",
+      },
+    });
     notice.value = "Profile updated";
-    refreshProfile();
+    await refreshProfile();
     initial.displayName = form.displayName;
     initial.avatarUrl = form.avatarUrl;
     initial.timezone = form.timezone;
@@ -114,6 +113,12 @@ const save = async () => {
     initial.bio = form.bio;
     initial.city = form.city;
     initial.visibility = form.visibility;
+  } catch (upsertError: any) {
+    error.value =
+      upsertError?.data?.statusMessage ||
+      upsertError?.data?.message ||
+      upsertError?.message ||
+      "Failed to update profile";
   }
   loading.value = false;
 };

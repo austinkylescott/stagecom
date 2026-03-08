@@ -64,11 +64,11 @@ const reasons = [
   { label: "Other", value: "other" },
 ] as const;
 const columns = [
-  { id: "title", key: "title", label: "Title" },
-  { id: "eventType", key: "eventType", label: "Type" },
-  { id: "startsAt", key: "startsAt", label: "Next occurrence" },
-  { id: "status", key: "status", label: "Status" },
-  { id: "actions", key: "actions", label: "Actions" },
+  { id: "title", accessorKey: "title", header: "Title" },
+  { id: "eventType", accessorKey: "eventType", header: "Type" },
+  { id: "startsAt", accessorKey: "startsAt", header: "Next occurrence" },
+  { id: "status", accessorKey: "status", header: "Status" },
+  { id: "actions", accessorKey: "id", header: "Actions" },
 ] as const;
 
 const feedback = reactive<Record<string, { reason: string; note: string }>>({});
@@ -119,33 +119,35 @@ const updateStatus = async (
     <p v-if="error" class="text-sm text-red-600">
       {{ error?.data?.message || error?.message }}
     </p>
-    <UTable :rows="data?.shows || []" :loading="isLoading" :columns="columns">
-      <template #startsAt-data="{ row }">
+    <UTable :data="data?.shows || []" :loading="isLoading" :columns="columns">
+      <template #startsAt-cell="{ row }">
         <span>{{
-          row.startsAt ? new Date(row.startsAt).toLocaleString() : "TBD"
+          row.original.startsAt
+            ? new Date(row.original.startsAt).toLocaleString()
+            : "TBD"
         }}</span>
       </template>
-      <template #actions-data="{ row }">
+      <template #actions-cell="{ row }">
         <div class="space-y-2">
           <div class="flex gap-2 flex-wrap">
             <UButton
               size="xs"
               color="emerald"
-              @click="updateStatus(row.id, 'approve')"
+              @click="updateStatus(row.original.id, 'approve')"
               >Approve</UButton
             >
             <UButton
               size="xs"
               color="red"
               variant="soft"
-              @click="updateStatus(row.id, 'reject')"
+              @click="updateStatus(row.original.id, 'reject')"
               >Reject</UButton
             >
             <UButton
               size="xs"
               color="orange"
               variant="soft"
-              @click="updateStatus(row.id, 'changes_requested')"
+              @click="updateStatus(row.original.id, 'changes_requested')"
               >Needs work</UButton
             >
           </div>
@@ -155,11 +157,11 @@ const updateStatus = async (
               :options="reasons"
               option-attribute="label"
               value-attribute="value"
-              v-model="getFeedback(row.id).reason"
+              v-model="getFeedback(row.original.id).reason"
             />
             <UInput
               size="xs"
-              v-model="getFeedback(row.id).note"
+              v-model="getFeedback(row.original.id).note"
               placeholder="Optional note"
             />
           </div>

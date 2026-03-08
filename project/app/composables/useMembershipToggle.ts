@@ -17,7 +17,7 @@ type UseMembershipToggleOptions = {
 export const useMembershipToggle = (
   options: UseMembershipToggleOptions = {},
 ) => {
-  const toast = useToast?.();
+  const toast = useToast();
   const queryCache = useQueryCache();
 
   const mutation = useMutation<

@@ -10,18 +10,10 @@ const bodySchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
+  const { id: showId } = parseParams(event, paramsSchema);
+  const { action, reason, note } = await parseBody(event, bodySchema);
   const supabase = await serverSupabaseClient(event);
   const userId = await requireUserId(event, supabase);
-  const parsedParams = paramsSchema.safeParse(event.context.params);
-  if (!parsedParams.success) {
-    throw createError({ statusCode: 400, statusMessage: "Missing show id" });
-  }
-  const parsedBody = bodySchema.safeParse(await readBody(event));
-  if (!parsedBody.success) {
-    throw createError({ statusCode: 400, statusMessage: "Invalid action" });
-  }
-  const { id: showId } = parsedParams.data;
-  const { action, reason, note } = parsedBody.data;
 
   // 1) Load show (need theater_id for permission check)
   const { data: show, error: showError } = await supabase

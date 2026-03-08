@@ -42,13 +42,13 @@ const querySchema = z.object({
 
 export default defineEventHandler(
   async (event): Promise<PerformersResponse> => {
+    const {
+      search: rawSearch,
+      page,
+      pageSize,
+    } = parseQueryParams(event, querySchema);
     const supabase = await serverSupabaseClient(event);
     const userId = await requireUserId(event, supabase);
-    const parsedQuery = querySchema.safeParse(getQuery(event));
-    if (!parsedQuery.success) {
-      throw createError({ statusCode: 400, statusMessage: "Invalid query" });
-    }
-    const { search: rawSearch, page, pageSize } = parsedQuery.data;
     const search = rawSearch.trim();
     const from = (page - 1) * pageSize;
     const to = from + pageSize - 1;

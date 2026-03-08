@@ -10,15 +10,9 @@ const querySchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
+  const { search, sort, page, pageSize } = parseQueryParams(event, querySchema);
   const supabase = await serverSupabaseClient(event);
   const userId = await getOptionalUserId(event, supabase);
-  const parsed = querySchema.safeParse(getQuery(event));
-
-  if (!parsed.success) {
-    throw createError({ statusCode: 400, statusMessage: "Invalid query" });
-  }
-
-  const { search, sort, page, pageSize } = parsed.data;
 
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;

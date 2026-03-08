@@ -1,12 +1,22 @@
 <script setup lang="ts">
-const navItems = [
-  { label: "Home", to: "/" },
-  { label: "Theaters", to: "/theaters" },
-  { label: "Shows", to: "/shows" },
-  { label: "Review", to: "/review" },
-  { label: "Performers", to: "/performers" },
-  { label: "Profile", to: "/profile" },
-];
+const { isAuthed } = useUserIdentity();
+const navItems = computed(() => {
+  const items = [
+    { label: "Home", to: "/" },
+    { label: "Theaters", to: "/theaters" },
+    { label: "Performers", to: "/performers" },
+  ];
+
+  if (isAuthed.value) {
+    items.push(
+      { label: "Shows", to: "/shows" },
+      { label: "Review", to: "/review" },
+      { label: "Profile", to: "/profile" },
+    );
+  }
+
+  return items;
+});
 </script>
 
 <template>

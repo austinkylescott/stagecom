@@ -26,6 +26,7 @@ const createTheaterSchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
+  const parsedBody = await parseBody(event, createTheaterSchema);
   const supabase = await serverSupabaseClient(event);
   const user = await requireUser(event, supabase);
   const userId = user.id;
@@ -44,13 +45,6 @@ export default defineEventHandler(async (event) => {
     { onConflict: "id" },
   );
 
-  const parsed = createTheaterSchema.safeParse(await readBody(event));
-  if (!parsed.success) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Invalid request body",
-    });
-  }
   const {
     name,
     slug: incomingSlug,
@@ -60,7 +54,7 @@ export default defineEventHandler(async (event) => {
     state_region = null,
     postal_code = null,
     country = null,
-  } = parsed.data;
+  } = parsedBody;
 
   // Compute slug if missing; ensure uniqueness
   let baseSlug = incomingSlug || slugify(name);

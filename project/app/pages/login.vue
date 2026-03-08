@@ -3,8 +3,15 @@ import * as z from "zod";
 import type { FormSubmitEvent, AuthFormField } from "@nuxt/ui";
 
 const supabase = useSupabaseClient();
+const route = useRoute();
 const authError = ref<string | null>(null);
 const isSubmitting = ref(false);
+const redirectTarget = computed(() => {
+  const redirect = route.query.redirect;
+  return typeof redirect === "string" && redirect.startsWith("/")
+    ? redirect
+    : "/";
+});
 
 const signInWithOAuth = async (provider: "google" | "github") => {
   authError.value = null;
@@ -80,7 +87,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
   if (error) {
     authError.value = error.message;
   } else {
-    await navigateTo("/");
+    await navigateTo(redirectTarget.value);
   }
 
   isSubmitting.value = false;
