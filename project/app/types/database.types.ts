@@ -345,7 +345,6 @@ export type Database = {
           description: string | null;
           id: string;
           is_cast_finalized: boolean;
-          is_practice: boolean;
           is_public_listed: boolean;
           on_sale_at: string | null;
           status: Database["public"]["Enums"]["show_status"];
@@ -364,7 +363,6 @@ export type Database = {
           description?: string | null;
           id?: string;
           is_cast_finalized?: boolean;
-          is_practice?: boolean;
           is_public_listed?: boolean;
           on_sale_at?: string | null;
           status?: Database["public"]["Enums"]["show_status"];
@@ -383,7 +381,6 @@ export type Database = {
           description?: string | null;
           id?: string;
           is_cast_finalized?: boolean;
-          is_practice?: boolean;
           is_public_listed?: boolean;
           on_sale_at?: string | null;
           status?: Database["public"]["Enums"]["show_status"];

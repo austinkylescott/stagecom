@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useMembershipToggle } from "~/composables/useMembershipToggle";
+import { useHomeTheaterMutation } from "~/composables/useHomeTheaterMutation";
 import { useHomeTheaterState } from "~/composables/useHomeTheaterState";
 
 type Theater = { id: string; slug: string; name?: string };
@@ -26,7 +27,8 @@ const emit = defineEmits<{
 }>();
 
 const { toggleMembership } = useMembershipToggle();
-const { saveHome, homeId } = useHomeTheaterState();
+const { saveHome } = useHomeTheaterMutation();
+const { homeId } = useHomeTheaterState();
 
 const localMember = ref(props.isMember);
 const localHome = ref(props.isHome);

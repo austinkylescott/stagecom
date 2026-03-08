@@ -1,18 +1,27 @@
-import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
+import { serverSupabaseClient } from "#supabase/server";
+import type { Tables } from "~/types/database.types";
 
-export default defineEventHandler(async (event) => {
+type HomeTheater = Pick<
+  Tables<"theaters">,
+  "id" | "name" | "slug" | "tagline" | "city" | "state_region" | "country"
+>;
+
+type HomeShow = {
+  id: string;
+  title: string;
+  description: string | null;
+  startsAt: string | null;
+};
+
+type HomePayload = {
+  theater: HomeTheater | null;
+  shows: HomeShow[];
+  candidates?: HomeTheater[];
+};
+
+export default defineEventHandler(async (event): Promise<HomePayload> => {
   const supabase = await serverSupabaseClient(event);
-  const user = await serverSupabaseUser(event);
-  const userId =
-    user?.id ||
-    (await supabase.auth
-      .getUser()
-      .then((r) => r.data.user?.id)
-      .catch(() => null));
-
-  if (!userId) {
-    throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
-  }
+  const userId = await requireUserId(event, supabase);
 
   // Determine home theater: prefer profile.home_theater_id. If missing, do NOT auto-pick;
   // instead return candidate theaters so UI can prompt.
@@ -28,19 +37,37 @@ export default defineEventHandler(async (event) => {
   if (!theaterId) {
     const { data: memberships, error: membershipError } = await supabase
       .from("theater_memberships")
-      .select(
-        "theater_id, theaters:theater_id (id,name,slug,tagline,city,state_region,country)",
-      )
+      .select("theater_id")
       .eq("user_id", userId)
       .eq("status", "active");
 
     if (membershipError) {
-      throw createError({ statusCode: 500, statusMessage: membershipError.message });
+      throw createError({
+        statusCode: 500,
+        statusMessage: membershipError.message,
+      });
     }
 
-    const candidates = (memberships || [])
-      .map((m: any) => m.theaters)
-      .filter(Boolean);
+    const theaterIds = (memberships || []).map(
+      (membership) => membership.theater_id,
+    );
+    if (theaterIds.length === 0) {
+      return { theater: null, shows: [], candidates: [] };
+    }
+
+    const { data: candidateRows, error: candidatesError } = await supabase
+      .from("theaters")
+      .select("id,name,slug,tagline,city,state_region,country")
+      .in("id", theaterIds);
+
+    if (candidatesError) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: candidatesError.message,
+      });
+    }
+
+    const candidates = candidateRows || [];
 
     return { theater: null, shows: [], candidates };
   }
@@ -87,7 +114,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const upcoming = (shows || [])
+  const upcoming: HomeShow[] = (shows || [])
     .map((s) => ({
       id: s.id,
       title: s.title,

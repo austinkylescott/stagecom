@@ -1,20 +1,19 @@
-import { useQuery, useQueryCache } from "@pinia/colada";
+import { useQuery } from "@pinia/colada";
 import type { Ref } from "vue";
 import {
   memberShowsQueryOptions,
   type MemberShowsResponse,
+  type ShowItem,
 } from "~/queries/shows";
-import { queryKeys } from "~/composables/queryKeys";
 
-export type { MemberShowsResponse } from "~/queries/shows";
+export type { MemberShowsResponse, ShowItem } from "~/queries/shows";
 
 export const useMemberShows = (
   initialData?: Ref<MemberShowsResponse | null | undefined>,
 ) => {
-  const queryCache = useQueryCache();
-  if (import.meta.server && initialData?.value) {
-    queryCache.setQueryData(queryKeys.memberShows(), initialData.value);
-  }
-  const query = useQuery(memberShowsQueryOptions);
+  const query = useQuery({
+    ...memberShowsQueryOptions(),
+    initialData: () => initialData?.value ?? undefined,
+  });
   return { ...query };
 };

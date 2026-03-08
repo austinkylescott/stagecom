@@ -1,11 +1,24 @@
 import { defineQueryOptions } from "@pinia/colada";
 import { useRequestHeaders } from "#app";
 import { queryKeys } from "~/composables/queryKeys";
+import type { Tables } from "~/types/database.types";
+
+export type HomeTheater = Pick<
+  Tables<"theaters">,
+  "id" | "name" | "slug" | "tagline" | "city" | "state_region" | "country"
+>;
+
+export type HomeShow = {
+  id: string;
+  title: string;
+  description: string | null;
+  startsAt: string | null;
+};
 
 export type HomePayload = {
-  theater: any | null;
-  shows: any[];
-  candidates?: any[];
+  theater: HomeTheater | null;
+  shows: HomeShow[];
+  candidates?: HomeTheater[];
 };
 
 export type SaveHomeInput = {
@@ -38,8 +51,9 @@ export const homeTheaterQueryOptions = defineQueryOptions<void, HomePayload>(
             credentials: "include",
             headers,
           });
-        } catch (err: any) {
-          if (err?.status === 401 || err?.statusCode === 401) {
+        } catch (err: unknown) {
+          const httpError = err as { status?: number; statusCode?: number };
+          if (httpError.status === 401 || httpError.statusCode === 401) {
             return { theater: null, shows: [], candidates: [] };
           }
           throw err;
@@ -72,7 +86,7 @@ export const applyOptimisticHomeTheaterUpdate = (
       return { ...payload, theater: null, shows: [] };
     });
   } else if (previous?.candidates) {
-    const candidate = previous.candidates.find((c: any) => c.id === theaterId);
+    const candidate = previous.candidates.find((c) => c.id === theaterId);
     if (candidate) {
       queryCache.setQueryData(queryKeys.homeTheater(), {
         ...previous,
@@ -110,4 +124,18 @@ export const invalidateHomeTheaterRelatedQueries = async (
       exact: false,
     }),
   ]);
+};
+
+export const applyOptimisticHomeClearOnLeave = (
+  queryCache: Pick<HomeQueryCache, "setQueryData">,
+  theaterId?: string,
+) => {
+  if (!theaterId) return;
+
+  queryCache.setQueryData(queryKeys.homeTheater(), (previous: unknown) => {
+    if (!previous) return previous;
+    const payload = previous as HomePayload;
+    if (!payload.theater || payload.theater.id !== theaterId) return payload;
+    return { ...payload, theater: null, shows: [] };
+  });
 };

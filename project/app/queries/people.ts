@@ -1,35 +1,57 @@
 import { defineQueryOptions } from "@pinia/colada";
-import { useSupabaseClient } from "#imports";
+import { useRequestHeaders } from "#app";
 import { queryKeys } from "~/composables/queryKeys";
 
-export type PerformersResponse = {
-  profiles: any[];
-  memberships: any[];
+export type PerformersQueryParams = {
+  search: string;
+  page: number;
+  pageSize: number;
 };
 
-export const performersQueryOptions = defineQueryOptions<void, PerformersResponse>(
-  () => ({
-    key: queryKeys.performers(),
-    query: async () => {
-      if (import.meta.server) return { profiles: [], memberships: [] };
+export type PerformersResponse = {
+  profiles: {
+    id: string;
+    display_name: string | null;
+    avatar_url: string | null;
+    visibility: "public" | "theater_only" | "private";
+  }[];
+  memberships: {
+    user_id: string;
+    theater_id: string;
+    status: "active";
+  }[];
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  total: number;
+};
 
-      const supabase = useSupabaseClient();
-      const [profilesRes, membershipsRes] = await Promise.all([
-        supabase.from("profiles").select("id,display_name,avatar_url"),
-        supabase
-          .from("theater_memberships")
-          .select("user_id,theater_id,status")
-          .eq("status", "active"),
-      ]);
+export const performersQueryOptions = defineQueryOptions<
+  PerformersQueryParams,
+  PerformersResponse
+>(
+  (params) =>
+    ({
+      key: queryKeys.performers({
+        search: params?.search || "",
+        page: params?.page || 1,
+        pageSize: params?.pageSize || 24,
+      }),
+      query: async () => {
+        const headers = import.meta.server
+          ? useRequestHeaders(["cookie"])
+          : undefined;
 
-      if (profilesRes.error) throw profilesRes.error;
-      if (membershipsRes.error) throw membershipsRes.error;
-
-      return {
-        profiles: profilesRes.data || [],
-        memberships: membershipsRes.data || [],
-      } satisfies PerformersResponse;
-    },
-    staleTime: 30_000,
-  }) as const,
+        return await $fetch<PerformersResponse>("/api/performers", {
+          credentials: "include",
+          headers,
+          params: {
+            search: params?.search || undefined,
+            page: params?.page || 1,
+            pageSize: params?.pageSize || 24,
+          },
+        });
+      },
+      staleTime: 30_000,
+    }) as const,
 );

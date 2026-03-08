@@ -24,6 +24,7 @@ drop type if exists show_cast_source cascade;
 drop type if exists show_occurrence_status cascade;
 drop type if exists show_role cascade;
 drop type if exists casting_mode cascade;
+drop type if exists event_type cascade;
 drop type if exists show_status cascade;
 drop type if exists membership_status cascade;
 drop type if exists theater_role cascade;
@@ -33,6 +34,7 @@ drop type if exists profile_visibility cascade;
 create type theater_role as enum ('admin', 'manager', 'staff', 'instructor', 'member');
 create type membership_status as enum ('active', 'inactive');
 create type show_status as enum ('draft', 'pending_review', 'approved', 'rejected', 'cancelled');
+create type event_type as enum ('show', 'practice', 'meeting', 'audition', 'workshop');
 create type casting_mode as enum ('direct_invite', 'theater_casting', 'public_casting');
 create type show_role as enum ('producer');
 create type show_occurrence_status as enum ('scheduled', 'changed', 'cancelled');
@@ -102,7 +104,7 @@ create table shows (
     status show_status not null default 'draft',
     title text not null,
     description text,
-    is_practice boolean not null default false,
+    event_type event_type not null default 'show',
     casting_mode casting_mode not null default 'direct_invite',
     cast_min integer,
     cast_max integer,

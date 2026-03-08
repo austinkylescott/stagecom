@@ -18,19 +18,18 @@ select id, name, tz from u
 on conflict (id) do update set display_name = excluded.display_name, timezone = excluded.timezone;
 
 -- Theater
-insert into theaters (id, name, slug, timezone)
+insert into theaters (id, name, slug)
 values (
   'aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaa1',
   'Downtown Improv Co',
-  'downtown-improv',
-  'America/Chicago'
+  'downtown-improv'
 ) on conflict (id) do nothing;
 
 -- Memberships
-insert into theater_memberships (theater_id, user_id, role, status) values
-  ('aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaa1', '11111111-1111-1111-1111-111111111111', 'manager', 'active'),
-  ('aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaa1', '22222222-2222-2222-2222-222222222222', 'staff', 'active'),
-  ('aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaa1', '33333333-3333-3333-3333-333333333333', 'member', 'active')
+insert into theater_memberships (theater_id, user_id, roles, status) values
+  ('aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaa1', '11111111-1111-1111-1111-111111111111', array['manager']::theater_role[], 'active'),
+  ('aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaa1', '22222222-2222-2222-2222-222222222222', array['staff']::theater_role[], 'active'),
+  ('aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaa1', '33333333-3333-3333-3333-333333333333', array['member']::theater_role[], 'active')
 on conflict do nothing;
 
 -- Show

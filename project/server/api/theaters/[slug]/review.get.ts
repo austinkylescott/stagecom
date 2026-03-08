@@ -1,30 +1,25 @@
-import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
-import type { Enums, Tables } from "~/types/database.types";
+import { serverSupabaseClient } from "#supabase/server";
+import { z } from "zod";
+import type { Tables } from "~/types/database.types";
 
-type ReviewShowRow = Pick<Tables<"shows">, "id" | "title" | "status">;
+type ReviewShowRow = Pick<
+  Tables<"shows">,
+  "id" | "title" | "status" | "event_type"
+>;
 type OccurrenceRow = Pick<Tables<"show_occurrences">, "show_id" | "starts_at">;
+const paramsSchema = z.object({ slug: z.string().trim().min(1) });
 
 export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient(event);
-  const user = await serverSupabaseUser(event);
-  const userId =
-    user?.id ||
-    (await supabase.auth
-      .getUser()
-      .then((r) => r.data.user?.id)
-      .catch(() => null));
-
-  if (!userId) {
-    throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
-  }
-
-  const slug = String(event.context.params?.slug || "");
-  if (!slug) {
+  const userId = await requireUserId(event, supabase);
+  const parsedParams = paramsSchema.safeParse(event.context.params);
+  if (!parsedParams.success) {
     throw createError({
       statusCode: 400,
       statusMessage: "Missing theater slug",
     });
   }
+  const { slug } = parsedParams.data;
 
   // 1) Theater lookup
   const { data: theater, error: theaterError } = await supabase
@@ -55,10 +50,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const staffRoles: Enums<"theater_role">[] = ["admin", "manager", "staff"];
-  const isStaff = (membershipRows ?? []).some((m) =>
-    (m.roles || []).some((r) => staffRoles.includes(r)),
-  );
+  const isStaff = (membershipRows ?? []).some((m) => hasStaffRole(m.roles));
 
   if (!isStaff) {
     throw createError({ statusCode: 403, statusMessage: "Not allowed" });
@@ -106,7 +98,7 @@ export default defineEventHandler(async (event) => {
       id: s.id,
       title: s.title,
       status: s.status,
-      eventType: (s as any).event_type,
+      eventType: s.event_type,
       startsAt: earliestByShow.get(s.id) ?? null,
     })),
   };

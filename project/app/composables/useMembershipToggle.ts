@@ -1,10 +1,22 @@
 import { useMutation, useQueryCache } from "@pinia/colada";
 import { useToast } from "#imports";
 import { queryKeys } from "~/composables/queryKeys";
+import { applyOptimisticHomeClearOnLeave } from "~/queries/home";
+import {
+  applyOptimisticMembershipToTheaterDetail,
+  applyOptimisticMembershipToTheaterLists,
+} from "~/queries/theaters";
 
 type ToggleAction = "join" | "leave";
 
-export const useMembershipToggle = () => {
+type UseMembershipToggleOptions = {
+  onSuccess?: (action: ToggleAction) => void;
+  onError?: (error: unknown) => void;
+};
+
+export const useMembershipToggle = (
+  options: UseMembershipToggleOptions = {},
+) => {
   const toast = useToast?.();
   const queryCache = useQueryCache();
 
@@ -19,66 +31,15 @@ export const useMembershipToggle = () => {
         body: { action },
       }),
     onMutate: ({ theater, action }) => {
-      if (!theater.id) return;
-
-      queryCache.setQueriesData(
-        { key: queryKeys.theaters(), exact: false },
-        (previous: any) => {
-          if (!previous) return previous;
-
-          const update = (t: any) =>
-            t.id === theater.id ? { ...t, isMember: action === "join" } : t;
-
-          const theaters = Array.isArray(previous.theaters)
-            ? previous.theaters.map(update)
-            : previous.theaters;
-
-          let myTheaters = Array.isArray(previous.myTheaters)
-            ? [...previous.myTheaters]
-            : previous.myTheaters;
-
-          if (Array.isArray(myTheaters)) {
-            if (action === "join") {
-              const exists = myTheaters.some((t) => t.id === theater.id);
-              if (!exists && Array.isArray(previous.theaters)) {
-                const full = previous.theaters.find(
-                  (t: any) => t.id === theater.id,
-                );
-                if (full) myTheaters = [update(full), ...myTheaters];
-              }
-            } else {
-              myTheaters = myTheaters.filter((t) => t.id !== theater.id);
-            }
-          }
-
-          return { ...previous, theaters, myTheaters };
-        },
-      );
-
-      queryCache.setQueryData(
-        queryKeys.theater(theater.slug),
-        (previous: any) => {
-          if (!previous) return previous;
-          return {
-            ...previous,
-            membership: {
-              ...previous.membership,
-              status: action === "join" ? "active" : null,
-              isHome: action === "leave" ? false : previous.membership?.isHome,
-            },
-          };
-        },
-      );
+      applyOptimisticMembershipToTheaterLists(queryCache, theater, action);
+      applyOptimisticMembershipToTheaterDetail(queryCache, theater, action);
 
       if (action === "leave") {
-        queryCache.setQueryData(queryKeys.homeTheater(), (previous: any) => {
-          if (!previous?.theater) return previous;
-          if (previous.theater.id !== theater.id) return previous;
-          return { ...previous, theater: null, shows: [] };
-        });
+        applyOptimisticHomeClearOnLeave(queryCache, theater.id);
       }
     },
     onSuccess: async (_data, vars) => {
+      options.onSuccess?.(vars.action);
       toast?.add({
         title: vars.action === "join" ? "Followed" : "Unfollowed",
         color: vars.action === "join" ? "primary" : "error",
@@ -103,6 +64,7 @@ export const useMembershipToggle = () => {
       ]);
     },
     onError: (e: any) => {
+      options.onError?.(e);
       queryCache.invalidateQueries({ key: queryKeys.theaters(), exact: false });
       queryCache.invalidateQueries({
         key: queryKeys.theaterPrefix(),

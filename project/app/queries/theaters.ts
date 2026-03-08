@@ -11,7 +11,7 @@ export type Theater = Pick<
 
 export type TheaterQueryParams = {
   search: string;
-  sort: "name_asc" | "recent" | "next_show";
+  sort: "name_asc" | "recent";
   page: number;
   pageSize: number;
 };
@@ -22,14 +22,14 @@ export type TheatersResponse = {
   totalPages?: number;
 };
 
-// Keep the request helper colocated with the query definition to avoid drift.
+const getRequestHeaders = () =>
+  import.meta.server ? useRequestHeaders(["cookie"]) : undefined;
+
 export const theatersQueryOptions = defineQueryOptions<
   TheaterQueryParams,
   TheatersResponse
 >((params) => {
-  const headers = import.meta.server
-    ? useRequestHeaders(["cookie"])
-    : undefined;
+  const headers = getRequestHeaders();
 
   return {
     key: queryKeys.theaters(params),
@@ -89,9 +89,7 @@ export const theaterDetailsQueryOptions = defineQueryOptions<
   { slug: string },
   TheaterDetails
 >((params) => {
-  const headers = import.meta.server
-    ? useRequestHeaders(["cookie"])
-    : undefined;
+  const headers = getRequestHeaders();
 
   return {
     key: queryKeys.theater(params?.slug || ""),
@@ -118,9 +116,7 @@ export const reviewQueueQueryOptions = defineQueryOptions<
   { slug: string },
   ReviewQueue
 >((params) => {
-  const headers = import.meta.server
-    ? useRequestHeaders(["cookie"])
-    : undefined;
+  const headers = getRequestHeaders();
 
   return {
     key: queryKeys.theaterReview(params?.slug || ""),
@@ -133,3 +129,84 @@ export const reviewQueueQueryOptions = defineQueryOptions<
     staleTime: 10_000,
   } as const;
 });
+
+type MembershipAction = "join" | "leave";
+
+type TheaterMembershipTarget = {
+  id?: string;
+  slug: string;
+};
+
+type TheatersQueryCache = {
+  setQueriesData: (
+    filters: { key: readonly unknown[]; exact: boolean },
+    updater: (previous: unknown) => unknown,
+  ) => unknown;
+  setQueryData: (
+    key: readonly unknown[],
+    updater: unknown | ((previous: unknown) => unknown),
+  ) => unknown;
+};
+
+export const applyOptimisticMembershipToTheaterLists = (
+  queryCache: Pick<TheatersQueryCache, "setQueriesData">,
+  theater: TheaterMembershipTarget,
+  action: MembershipAction,
+) => {
+  if (!theater.id) return;
+
+  queryCache.setQueriesData(
+    { key: queryKeys.theaters(), exact: false },
+    (previous: unknown) => {
+      if (!previous) return previous;
+      const payload = previous as TheatersResponse;
+
+      const update = (t: Theater) =>
+        t.id === theater.id ? { ...t, isMember: action === "join" } : t;
+
+      const theaters = Array.isArray(payload.theaters)
+        ? payload.theaters.map(update)
+        : payload.theaters;
+
+      let myTheaters = Array.isArray(payload.myTheaters)
+        ? [...payload.myTheaters]
+        : payload.myTheaters;
+
+      if (Array.isArray(myTheaters)) {
+        if (action === "join") {
+          const exists = myTheaters.some((t) => t.id === theater.id);
+          if (!exists && Array.isArray(payload.theaters)) {
+            const full = payload.theaters.find((t) => t.id === theater.id);
+            if (full) myTheaters = [update(full), ...myTheaters];
+          }
+        } else {
+          myTheaters = myTheaters.filter((t) => t.id !== theater.id);
+        }
+      }
+
+      return { ...payload, theaters, myTheaters };
+    },
+  );
+};
+
+export const applyOptimisticMembershipToTheaterDetail = (
+  queryCache: Pick<TheatersQueryCache, "setQueryData">,
+  theater: TheaterMembershipTarget,
+  action: MembershipAction,
+) => {
+  queryCache.setQueryData(
+    queryKeys.theater(theater.slug),
+    (previous: unknown) => {
+      if (!previous) return previous;
+      const payload = previous as TheaterDetails;
+      return {
+        ...payload,
+        membership: {
+          ...payload.membership,
+          status: action === "join" ? "active" : null,
+          isHome: action === "leave" ? false : payload.membership?.isHome,
+        },
+      };
+    },
+  );
+};

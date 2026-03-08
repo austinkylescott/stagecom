@@ -1,21 +1,24 @@
-import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
+import { serverSupabaseClient } from "#supabase/server";
+import { z } from "zod";
 import type { Tables } from "~/types/database.types";
+
+const querySchema = z.object({
+  search: z.string().optional().default(""),
+  sort: z.enum(["name_asc", "recent"]).optional().default("name_asc"),
+  page: z.coerce.number().int().min(1).optional().default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).optional().default(20),
+});
 
 export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient(event);
-  const user = await serverSupabaseUser(event);
-  const userId =
-    user?.id ||
-    (await supabase.auth
-      .getUser()
-      .then((r) => r.data.user?.id)
-      .catch(() => null));
+  const userId = await getOptionalUserId(event, supabase);
+  const parsed = querySchema.safeParse(getQuery(event));
 
-  const query = getQuery(event);
-  const search = (query.search as string | undefined) || "";
-  const sort = (query.sort as string | undefined) || "name_asc";
-  const page = Number(query.page || 1);
-  const pageSize = Number(query.pageSize || 20);
+  if (!parsed.success) {
+    throw createError({ statusCode: 400, statusMessage: "Invalid query" });
+  }
+
+  const { search, sort, page, pageSize } = parsed.data;
 
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
@@ -32,9 +35,6 @@ export default defineEventHandler(async (event) => {
 
   if (sort === "recent") {
     supa = supa.order("created_at", { ascending: false });
-  } else if (sort === "next_show") {
-    // placeholder; fallback to name for now
-    supa = supa.order("name");
   } else {
     supa = supa.order("name");
   }
@@ -62,9 +62,7 @@ export default defineEventHandler(async (event) => {
   if (userId) {
     const { data: memberships, error: membershipError } = await supabase
       .from("theater_memberships")
-      .select(
-        "theater_id, roles, status, theaters:theater_id (id,name,slug,tagline,city,state_region,country)",
-      )
+      .select("theater_id")
       .eq("user_id", userId)
       .eq("status", "active");
 
@@ -75,8 +73,25 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    myTheaters = memberships?.map((m: any) => m.theaters).filter(Boolean) ?? [];
-    membershipSet = new Set(memberships?.map((m: any) => m.theater_id) ?? []);
+    const membershipTheaterIds = (memberships || []).map((m) => m.theater_id);
+    membershipSet = new Set(membershipTheaterIds);
+
+    if (membershipTheaterIds.length > 0) {
+      const { data: myTheaterRows, error: myTheatersError } = await supabase
+        .from("theaters")
+        .select("id,name,slug,tagline,city,state_region,country")
+        .in("id", membershipTheaterIds)
+        .order("name");
+
+      if (myTheatersError) {
+        throw createError({
+          statusCode: 500,
+          statusMessage: myTheatersError.message,
+        });
+      }
+
+      myTheaters = myTheaterRows || [];
+    }
   }
 
   return {

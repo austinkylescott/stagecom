@@ -1,47 +1,50 @@
-import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
+import { serverSupabaseClient } from "#supabase/server";
+import { z } from "zod";
 import type { Enums } from "~/types/database.types";
 
 /**
  * POST /api/theaters/:slug/membership
  * body: { action: "join" | "leave" }
  */
+const paramsSchema = z.object({ slug: z.string().trim().min(1) });
+const bodySchema = z.object({ action: z.enum(["join", "leave"]) });
+
 export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient(event);
-  const user = await serverSupabaseUser(event);
-  const userId =
-    user?.id ||
-    (await supabase.auth
-      .getUser()
-      .then((r) => r.data.user?.id)
-      .catch(() => null));
-
-  if (!userId) {
-    throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
-  }
+  const user = await requireUser(event, supabase);
+  const userId = user.id;
+  const metadata = (user.user_metadata || {}) as Record<string, unknown>;
 
   // Ensure profile exists for FK
   await supabase.from("profiles").upsert(
     {
       id: userId,
       display_name:
-        user?.user_metadata?.full_name ||
-        user?.user_metadata?.name ||
-        user?.email ||
+        (typeof metadata.full_name === "string" ? metadata.full_name : null) ||
+        (typeof metadata.name === "string" ? metadata.name : null) ||
+        user.email ||
         "New user",
     },
     { onConflict: "id" },
   );
 
-  const slug = String(event.context.params?.slug || "");
-  const body = await readBody(event);
-  const action = body?.action as "join" | "leave";
-
-  if (!slug || !action) {
+  const parsedParams = paramsSchema.safeParse(event.context.params);
+  if (!parsedParams.success) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Missing slug or action",
+      statusMessage: "Missing theater slug",
     });
   }
+
+  const parsedBody = bodySchema.safeParse(await readBody(event));
+  if (!parsedBody.success) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Invalid request body",
+    });
+  }
+  const { slug } = parsedParams.data;
+  const { action } = parsedBody.data;
 
   const { data: theater, error: theaterError } = await supabase
     .from("theaters")

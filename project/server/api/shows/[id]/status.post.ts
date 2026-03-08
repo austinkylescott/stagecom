@@ -1,32 +1,27 @@
-import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
+import { serverSupabaseClient } from "#supabase/server";
+import { z } from "zod";
 import type { Enums } from "~/types/database.types";
+
+const paramsSchema = z.object({ id: z.string().trim().min(1) });
+const bodySchema = z.object({
+  action: z.enum(["approve", "reject", "changes_requested"]),
+  reason: z.string().trim().min(1).optional(),
+  note: z.string().trim().min(1).optional(),
+});
 
 export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient(event);
-  const user = await serverSupabaseUser(event);
-  const userId =
-    user?.id ||
-    (await supabase.auth
-      .getUser()
-      .then((r) => r.data.user?.id)
-      .catch(() => null));
-
-  if (!userId) {
-    throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
-  }
-
-  const showId = String(event.context.params?.id || "");
-  const body = await readBody(event);
-  const action = body?.action as "approve" | "reject" | "changes_requested";
-  const reason = body?.reason as string | undefined;
-  const note = body?.note as string | undefined;
-
-  if (!showId) {
+  const userId = await requireUserId(event, supabase);
+  const parsedParams = paramsSchema.safeParse(event.context.params);
+  if (!parsedParams.success) {
     throw createError({ statusCode: 400, statusMessage: "Missing show id" });
   }
-  if (!action || !["approve", "reject", "changes_requested"].includes(action)) {
+  const parsedBody = bodySchema.safeParse(await readBody(event));
+  if (!parsedBody.success) {
     throw createError({ statusCode: 400, statusMessage: "Invalid action" });
   }
+  const { id: showId } = parsedParams.data;
+  const { action, reason, note } = parsedBody.data;
 
   // 1) Load show (need theater_id for permission check)
   const { data: show, error: showError } = await supabase
@@ -57,10 +52,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const staffRoles: Enums<"theater_role">[] = ["admin", "manager", "staff"];
-  const isStaff = (memberships ?? []).some((m) =>
-    (m.roles || []).some((r) => staffRoles.includes(r)),
-  );
+  const isStaff = (memberships ?? []).some((m) => hasStaffRole(m.roles));
   if (!isStaff) {
     throw createError({ statusCode: 403, statusMessage: "Not allowed" });
   }

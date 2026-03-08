@@ -1,5 +1,5 @@
 import { defineQueryOptions } from "@pinia/colada";
-import { useSupabaseClient } from "#imports";
+import { useRequestHeaders } from "#app";
 import { queryKeys } from "~/composables/queryKeys";
 
 export type ProfileRow = {
@@ -19,20 +19,16 @@ export const profileQueryOptions = defineQueryOptions<
 >((params) => ({
   key: queryKeys.profile(params?.userId || ""),
   query: async () => {
-    if (import.meta.server) return null;
     if (!params?.userId) return null;
 
-    const supabase = useSupabaseClient();
-    const { data, error } = await supabase
-      .from("profiles")
-      .select(
-        "id, display_name, avatar_url, timezone, pronouns, bio, city, visibility",
-      )
-      .eq("id", params.userId)
-      .maybeSingle();
+    const headers = import.meta.server
+      ? useRequestHeaders(["cookie"])
+      : undefined;
 
-    if (error) throw error;
-    return data;
+    return await $fetch<ProfileRow | null>("/api/me/profile", {
+      credentials: "include",
+      headers,
+    });
   },
   enabled: Boolean(params?.userId),
   staleTime: 30_000,

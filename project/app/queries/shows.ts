@@ -1,8 +1,21 @@
 import { defineQueryOptions } from "@pinia/colada";
 import { useRequestHeaders } from "#app";
 import { queryKeys } from "~/composables/queryKeys";
+import type { Enums } from "~/types/database.types";
 
-export type MemberShowsResponse = { shows: any[] };
+export type ShowItem = {
+  id: string;
+  title: string;
+  description: string | null;
+  status: Enums<"show_status">;
+  eventType: Enums<"event_type"> | null;
+  theaterId: string;
+  theaterName: string;
+  theaterSlug: string;
+  nextStartsAt: string | null;
+};
+
+export type MemberShowsResponse = { shows: ShowItem[] };
 export type CreateShowPayload = {
   title: string;
   description: string;

@@ -6,12 +6,22 @@ import HomeTheaterPrompt from "~/components/HomeTheaterPrompt.vue";
 import HomeTheaterLeavePrompt from "~/components/HomeTheaterLeavePrompt.vue";
 import { useMembershipToggle } from "~/composables/useMembershipToggle";
 import { useHomeTheaterState } from "~/composables/useHomeTheaterState";
-import { useTheaterSearchPage } from "~/composables/useTheaterSearchPage";
-import type { TheatersResponse } from "~/composables/useTheaterSearch";
-import { useTheaterMembershipManager } from "~/composables/useTheaterMembershipManager";
+import { useHomeTheaterMutation } from "~/composables/useHomeTheaterMutation";
+import { useSearchQuery } from "~/composables/useSearchQuery";
+import { useTheaterSearch } from "~/composables/useTheaterSearch";
+import type { Theater, TheatersResponse } from "~/queries/theaters";
+import { ref } from "vue";
 
-const { homeTheater, homeShows, homeCandidates, homeId, hasHome, saveHome } =
+type TheaterLike = {
+  id?: string;
+  slug?: string;
+  name?: string;
+  isMember?: boolean;
+};
+
+const { homeTheater, homeShows, homeCandidates, homeId, hasHome } =
   useHomeTheaterState();
+const { saveHome } = useHomeTheaterMutation();
 
 const { data: initialTheaters } = await useAsyncData(() =>
   $fetch<TheatersResponse>("/api/theaters", {
@@ -26,49 +36,164 @@ const { data: initialTheaters } = await useAsyncData(() =>
 );
 
 const {
-  search,
+  searchInput: search,
+  search: debouncedSearch,
   sort,
   page,
-  isLoading,
-  error,
-  myTheaters,
-  allTheaters,
-  totalPages,
-  showPagination,
-  mutateMembership,
-} = useTheaterSearchPage(homeId, initialTheaters);
+} = useSearchQuery<"name_asc" | "recent">({
+  initialSort: "name_asc",
+  debounce: 300,
+  maxWait: 800,
+});
+
+const { data, isLoading, error, refresh } = useTheaterSearch(
+  {
+    search: debouncedSearch,
+    sort,
+    page,
+  },
+  initialTheaters,
+);
 
 const { toggleMembership } = useMembershipToggle();
 
-const {
-  membershipBusyIds,
-  homeBusyIds,
-  showHomeModal,
-  pendingHomeTheater,
-  settingHome,
-  showLeaveHomeModal,
-  pendingLeaveTheater,
-  leavingHome,
-  handleToggle,
-  handleHome,
-  confirmHomeChoice,
-  confirmLeaveHome,
-  cancelLeaveHome,
-} = useTheaterMembershipManager({
-  hasHome,
-  homeId,
-  toggleMembership,
-  setHome: saveHome,
-  mutateMembership,
-});
+const myTheaters = computed<Theater[]>(() =>
+  (data.value?.myTheaters || []).map((t) => ({
+    ...t,
+    isMember: true,
+    isHome: homeId.value === t.id,
+  })),
+);
 
-const handleMembershipChanged = (payload: {
-  theaterId: string;
-  isMember: boolean;
-  isHome: boolean;
-}) => {
-  const theater = { id: payload.theaterId } as any;
-  mutateMembership(theater, payload.isMember);
+const allTheaters = computed<Theater[]>(() =>
+  (data.value?.theaters || []).map((t) => ({
+    ...t,
+    isHome: homeId.value === t.id,
+  })),
+);
+
+const totalPages = computed(() => data.value?.totalPages ?? 1);
+const showPagination = computed(() => totalPages.value > 1);
+
+const membershipBusyIds = ref<Set<string>>(new Set());
+const homeBusyIds = ref<Set<string>>(new Set());
+const showHomeModal = ref(false);
+const pendingHomeTheater = ref<TheaterLike | null>(null);
+const showLeaveHomeModal = ref(false);
+const pendingLeaveTheater = ref<TheaterLike | null>(null);
+const settingHome = ref(false);
+const leavingHome = ref(false);
+
+const openHomePrompt = (theater: TheaterLike) => {
+  pendingHomeTheater.value = theater;
+  showHomeModal.value = true;
+};
+
+const openLeaveHomePrompt = (theater: TheaterLike) => {
+  pendingLeaveTheater.value = theater;
+  showLeaveHomeModal.value = true;
+};
+
+const handleToggle = async (action: "join" | "leave", theater: TheaterLike) => {
+  if (!theater?.id) return;
+  if (action === "leave" && homeId.value === theater.id) {
+    openLeaveHomePrompt(theater);
+    return;
+  }
+
+  const next = new Set(membershipBusyIds.value);
+  next.add(theater.id);
+  membershipBusyIds.value = next;
+
+  try {
+    await toggleMembership(theater as { slug: string; id?: string }, action);
+    await refresh();
+    if (action === "join" && !hasHome.value) openHomePrompt(theater);
+  } finally {
+    const after = new Set(membershipBusyIds.value);
+    after.delete(theater.id);
+    membershipBusyIds.value = after;
+  }
+};
+
+const handleHome = async (action: "set" | "clear", theater: TheaterLike) => {
+  if (!theater?.id) return;
+
+  const homeBusy = new Set(homeBusyIds.value);
+  homeBusy.add(theater.id);
+  homeBusyIds.value = homeBusy;
+
+  const needsJoin = action === "set" && !theater.isMember;
+  if (needsJoin) {
+    const memberBusy = new Set(membershipBusyIds.value);
+    memberBusy.add(theater.id);
+    membershipBusyIds.value = memberBusy;
+  }
+
+  try {
+    if (action === "set") {
+      if (needsJoin) {
+        await toggleMembership(
+          theater as { slug: string; id?: string },
+          "join",
+        );
+      }
+      await saveHome(theater.id);
+    } else if (homeId.value === theater.id) {
+      await saveHome(null);
+    }
+  } finally {
+    const afterHome = new Set(homeBusyIds.value);
+    afterHome.delete(theater.id);
+    homeBusyIds.value = afterHome;
+
+    if (needsJoin) {
+      const afterMember = new Set(membershipBusyIds.value);
+      afterMember.delete(theater.id);
+      membershipBusyIds.value = afterMember;
+    }
+  }
+};
+
+const confirmHomeChoice = async (makeHome: boolean) => {
+  if (!pendingHomeTheater.value) {
+    showHomeModal.value = false;
+    return;
+  }
+
+  settingHome.value = true;
+  try {
+    if (makeHome) {
+      await saveHome(pendingHomeTheater.value.id || null);
+    }
+  } finally {
+    settingHome.value = false;
+    showHomeModal.value = false;
+    pendingHomeTheater.value = null;
+  }
+};
+
+const confirmLeaveHome = async () => {
+  if (!pendingLeaveTheater.value?.id) {
+    showLeaveHomeModal.value = false;
+    return;
+  }
+
+  leavingHome.value = true;
+  try {
+    const theater = pendingLeaveTheater.value;
+    await toggleMembership(theater as { slug: string; id?: string }, "leave");
+    await saveHome(null);
+  } finally {
+    leavingHome.value = false;
+    showLeaveHomeModal.value = false;
+    pendingLeaveTheater.value = null;
+  }
+};
+
+const cancelLeaveHome = () => {
+  showLeaveHomeModal.value = false;
+  pendingLeaveTheater.value = null;
 };
 </script>
 
@@ -109,7 +234,6 @@ const handleMembershipChanged = (payload: {
         :home-loading-ids="homeBusyIds"
         @toggle="(action, theater) => handleToggle(action, theater)"
         @home="(action, theater) => handleHome(action, theater)"
-        @membership-changed="handleMembershipChanged"
       />
 
       <TheaterList
@@ -122,7 +246,6 @@ const handleMembershipChanged = (payload: {
         :home-loading-ids="homeBusyIds"
         @toggle="(action, theater) => handleToggle(action, theater)"
         @home="(action, theater) => handleHome(action, theater)"
-        @membership-changed="handleMembershipChanged"
       >
         <template #header>
           <div class="flex flex-col gap-3 w-full">
@@ -140,7 +263,6 @@ const handleMembershipChanged = (payload: {
                   :options="[
                     { label: 'Name A→Z', value: 'name_asc' },
                     { label: 'Recently added', value: 'recent' },
-                    { label: 'Next show soonest', value: 'next_show' },
                   ]"
                   class="w-full sm:w-48"
                 />

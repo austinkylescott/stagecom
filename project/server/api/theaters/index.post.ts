@@ -1,4 +1,5 @@
-import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
+import { serverSupabaseClient } from "#supabase/server";
+import { z } from "zod";
 
 /**
  * POST /api/theaters
@@ -13,34 +14,43 @@ const slugify = (value: string) =>
     .replace(/^-+|-+$/g, "")
     .slice(0, 60) || "theater";
 
+const createTheaterSchema = z.object({
+  name: z.string().trim().min(1, "name required"),
+  slug: z.string().trim().min(1).max(60).optional(),
+  tagline: z.string().trim().min(1).nullable().optional(),
+  street: z.string().trim().min(1).nullable().optional(),
+  city: z.string().trim().min(1).nullable().optional(),
+  state_region: z.string().trim().min(1).nullable().optional(),
+  postal_code: z.string().trim().min(1).nullable().optional(),
+  country: z.string().trim().min(1).nullable().optional(),
+});
+
 export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient(event);
-  const user = await serverSupabaseUser(event);
-  const userId =
-    user?.id ||
-    (await supabase.auth
-      .getUser()
-      .then((r) => r.data.user?.id)
-      .catch(() => null));
-
-  if (!userId) {
-    throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
-  }
+  const user = await requireUser(event, supabase);
+  const userId = user.id;
+  const metadata = (user.user_metadata || {}) as Record<string, unknown>;
 
   // Ensure profile exists (FK requirement)
   await supabase.from("profiles").upsert(
     {
       id: userId,
       display_name:
-        user?.user_metadata?.full_name ||
-        user?.user_metadata?.name ||
-        user?.email ||
+        (typeof metadata.full_name === "string" ? metadata.full_name : null) ||
+        (typeof metadata.name === "string" ? metadata.name : null) ||
+        user.email ||
         "New user",
     },
     { onConflict: "id" },
   );
 
-  const body = await readBody(event);
+  const parsed = createTheaterSchema.safeParse(await readBody(event));
+  if (!parsed.success) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Invalid request body",
+    });
+  }
   const {
     name,
     slug: incomingSlug,
@@ -50,14 +60,7 @@ export default defineEventHandler(async (event) => {
     state_region = null,
     postal_code = null,
     country = null,
-  } = body || {};
-
-  if (!name) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "name required",
-    });
-  }
+  } = parsed.data;
 
   // Compute slug if missing; ensure uniqueness
   let baseSlug = incomingSlug || slugify(name);

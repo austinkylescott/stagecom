@@ -40,6 +40,14 @@ const statusColors: Record<string, "gray" | "orange" | "emerald" | "red"> = {
 const sortedShows = computed(
   () => (data.value?.shows || []) as ReviewInboxShow[],
 );
+const columns = [
+  { id: "title", key: "title", label: "Title" },
+  { id: "theaterName", key: "theaterName", label: "Theater" },
+  { id: "eventType", key: "eventType", label: "Type" },
+  { id: "status", key: "status", label: "Status" },
+  { id: "nextStartsAt", key: "nextStartsAt", label: "Next occurrence" },
+  { id: "actions", key: "actions", label: "Actions" },
+] as const;
 
 const getFeedback = (showId: string) => {
   if (!feedback[showId]) {
@@ -144,18 +152,7 @@ const updateStatus = async (
     </p>
 
     <UCard>
-      <UTable
-        :rows="sortedShows"
-        :loading="isLoading"
-        :columns="[
-          { key: 'title', label: 'Title' },
-          { key: 'theaterName', label: 'Theater' },
-          { key: 'eventType', label: 'Type' },
-          { key: 'status', label: 'Status' },
-          { key: 'nextStartsAt', label: 'Next occurrence' },
-          { key: 'actions', label: 'Actions' },
-        ]"
-      >
+      <UTable :rows="sortedShows" :loading="isLoading" :columns="columns">
         <template #title-data="{ row }">
           <div>
             <p class="font-medium">{{ row.title }}</p>

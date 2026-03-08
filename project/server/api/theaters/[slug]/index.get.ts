@@ -1,27 +1,25 @@
-import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
+import { serverSupabaseClient } from "#supabase/server";
+import { z } from "zod";
 import type { Enums, Tables } from "~/types/database.types";
 
-type PublicShowRow = Pick<Tables<"shows">, "id" | "title" | "description">;
+type PublicShowRow = Pick<
+  Tables<"shows">,
+  "id" | "title" | "description" | "event_type"
+>;
 type OccurrenceRow = Pick<Tables<"show_occurrences">, "show_id" | "starts_at">;
+const paramsSchema = z.object({ slug: z.string().trim().min(1) });
 
 export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient(event);
-  const user = await serverSupabaseUser(event);
-  const userId =
-    user?.id ||
-    (await supabase.auth
-      .getUser()
-      .then((r) => r.data.user?.id)
-      .catch(() => null));
-
-  const slug = String(event.context.params?.slug || "");
-
-  if (!slug) {
+  const userId = await getOptionalUserId(event, supabase);
+  const parsedParams = paramsSchema.safeParse(event.context.params);
+  if (!parsedParams.success) {
     throw createError({
       statusCode: 400,
       statusMessage: "Missing theater slug",
     });
   }
+  const { slug } = parsedParams.data;
 
   const { data: theater, error: theaterError } = await supabase
     .from("theaters")
@@ -74,8 +72,7 @@ export default defineEventHandler(async (event) => {
     isHome = profile?.home_theater_id === theater.id;
   }
 
-  const staffRoles: Enums<"theater_role">[] = ["admin", "manager", "staff"];
-  const isStaff = (membership?.roles || []).some((r) => staffRoles.includes(r));
+  const isStaff = hasStaffRole(membership?.roles);
 
   // Stats
   const { count: memberCount, error: memberCountError } = await supabase
@@ -133,6 +130,7 @@ export default defineEventHandler(async (event) => {
     id: string;
     title: string;
     description: string | null;
+    eventType: Enums<"event_type"> | null;
     startsAt: string | null;
   }[] = [];
 

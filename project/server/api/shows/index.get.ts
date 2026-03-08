@@ -1,5 +1,5 @@
-import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
-import type { Tables } from "~/types/database.types";
+import { serverSupabaseClient } from "#supabase/server";
+import type { Enums, Tables } from "~/types/database.types";
 
 type ShowRow = Pick<
   Tables<"shows">,
@@ -11,15 +11,21 @@ type OccRow = Pick<
   "show_id" | "starts_at" | "status"
 >;
 
+type ShowItem = {
+  id: string;
+  title: string;
+  description: string | null;
+  status: Enums<"show_status">;
+  eventType: Enums<"event_type"> | null;
+  theaterId: string;
+  theaterName: string;
+  theaterSlug: string;
+  nextStartsAt: string | null;
+};
+
 export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient(event);
-  const user = await serverSupabaseUser(event);
-  const userId =
-    user?.id ||
-    (await supabase.auth
-      .getUser()
-      .then((r) => r.data.user?.id)
-      .catch(() => null));
+  const userId = await getOptionalUserId(event, supabase);
 
   if (!userId) {
     return { shows: [] };
@@ -91,13 +97,14 @@ export default defineEventHandler(async (event) => {
     (theaters ?? []).map((t) => [t.id, { name: t.name, slug: t.slug }]),
   );
 
-  const result = (shows ?? []).map((s) => {
+  const result: ShowItem[] = (shows ?? []).map((s) => {
     const theater = theaterById.get(s.theater_id);
     return {
       id: s.id,
       title: s.title,
       description: s.description,
       status: s.status,
+      eventType: s.event_type,
       theaterId: s.theater_id,
       theaterName: theater?.name ?? "Unknown theater",
       theaterSlug: theater?.slug ?? "",

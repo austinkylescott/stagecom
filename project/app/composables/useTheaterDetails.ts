@@ -1,4 +1,4 @@
-import { useQuery, useQueryCache } from "@pinia/colada";
+import { useQuery } from "@pinia/colada";
 import { computed } from "vue";
 import type { Ref } from "vue";
 import {
@@ -13,13 +13,14 @@ export const useTheaterDetails = (
   initialData?: Ref<TheaterDetails | null | undefined>,
 ) => {
   const params = computed(() => ({ slug: slug.value }));
-  const queryCache = useQueryCache();
-  if (import.meta.server && initialData?.value) {
-    queryCache.setQueryData(
-      theaterDetailsQueryOptions(params.value).key,
-      initialData.value,
-    );
-  }
-  const query = useQuery(theaterDetailsQueryOptions, params);
+  const queryOptions = computed(() => theaterDetailsQueryOptions(params.value));
+
+  const query = useQuery({
+    key: () => queryOptions.value.key,
+    query: (context) => queryOptions.value.query(context),
+    enabled: () => queryOptions.value.enabled ?? true,
+    staleTime: () => queryOptions.value.staleTime,
+    initialData: () => initialData?.value ?? undefined,
+  });
   return { ...query };
 };

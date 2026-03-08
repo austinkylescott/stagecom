@@ -1,21 +1,21 @@
-import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
+import { serverSupabaseClient } from "#supabase/server";
+import { z } from "zod";
+
+const bodySchema = z.object({
+  theaterId: z.string().trim().min(1).nullable().optional(),
+});
 
 export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient(event);
-  const user = await serverSupabaseUser(event);
-  const userId =
-    user?.id ||
-    (await supabase.auth
-      .getUser()
-      .then((r) => r.data.user?.id)
-      .catch(() => null));
-
-  if (!userId) {
-    throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
+  const userId = await requireUserId(event, supabase);
+  const parsedBody = bodySchema.safeParse(await readBody(event));
+  if (!parsedBody.success) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Invalid request body",
+    });
   }
-
-  const body = await readBody(event);
-  const theaterId = body?.theaterId as string | null;
+  const theaterId = parsedBody.data.theaterId ?? null;
 
   // Clear home
   if (!theaterId) {

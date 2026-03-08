@@ -1,4 +1,4 @@
-import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
+import { serverSupabaseClient } from "#supabase/server";
 import type { Enums } from "~/types/database.types";
 
 type InboxShow = {
@@ -15,11 +15,6 @@ type InboxShow = {
   canReview: boolean;
 };
 
-const staffRoles: Enums<"theater_role">[] = ["admin", "manager", "staff"];
-
-const hasStaffRole = (roles: Enums<"theater_role">[] | null | undefined) =>
-  (roles || []).some((role) => staffRoles.includes(role));
-
 const getTheater = (value: any) => {
   if (!value) return null;
   if (Array.isArray(value)) return value[0] || null;
@@ -28,17 +23,7 @@ const getTheater = (value: any) => {
 
 export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient(event);
-  const user = await serverSupabaseUser(event);
-  const userId =
-    user?.id ||
-    (await supabase.auth
-      .getUser()
-      .then((r) => r.data.user?.id)
-      .catch(() => null));
-
-  if (!userId) {
-    throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
-  }
+  const userId = await requireUserId(event, supabase);
 
   const { data: memberships, error: membershipsError } = await supabase
     .from("theater_memberships")

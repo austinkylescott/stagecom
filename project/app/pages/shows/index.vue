@@ -2,6 +2,7 @@
 import { useRequestHeaders } from "#app";
 import {
   type MemberShowsResponse,
+  type ShowItem,
   useMemberShows,
 } from "~/composables/useMemberShows";
 
@@ -47,7 +48,7 @@ const monthDays = computed(() => {
 });
 
 const occurrencesByDay = computed(() => {
-  const map = new Map<string, any[]>();
+  const map = new Map<string, ShowItem[]>();
   for (const show of data.value?.shows || []) {
     if (!show.nextStartsAt) continue;
     const key = new Date(show.nextStartsAt).toISOString().slice(0, 10);

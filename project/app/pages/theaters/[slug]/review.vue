@@ -63,6 +63,13 @@ const reasons = [
   { label: "Content policy", value: "content_policy" },
   { label: "Other", value: "other" },
 ] as const;
+const columns = [
+  { id: "title", key: "title", label: "Title" },
+  { id: "eventType", key: "eventType", label: "Type" },
+  { id: "startsAt", key: "startsAt", label: "Next occurrence" },
+  { id: "status", key: "status", label: "Status" },
+  { id: "actions", key: "actions", label: "Actions" },
+] as const;
 
 const feedback = reactive<Record<string, { reason: string; note: string }>>({});
 
@@ -112,17 +119,7 @@ const updateStatus = async (
     <p v-if="error" class="text-sm text-red-600">
       {{ error?.data?.message || error?.message }}
     </p>
-    <UTable
-      :rows="data?.shows || []"
-      :loading="isLoading"
-      :columns="[
-        { key: 'title', label: 'Title' },
-        { key: 'eventType', label: 'Type' },
-        { key: 'startsAt', label: 'Next occurrence' },
-        { key: 'status', label: 'Status' },
-        { key: 'actions', label: 'Actions' },
-      ]"
-    >
+    <UTable :rows="data?.shows || []" :loading="isLoading" :columns="columns">
       <template #startsAt-data="{ row }">
         <span>{{
           row.startsAt ? new Date(row.startsAt).toLocaleString() : "TBD"

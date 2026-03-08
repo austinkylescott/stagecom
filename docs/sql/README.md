@@ -2,6 +2,7 @@
 
 - `001-init.sql` — drops and recreates core tables/enums/triggers per `docs/data-model.md`.
 - `002-seed.sql` — optional demo seed data; replace UUIDs with your Supabase auth user IDs.
+- `003-event-type-migration.sql` — converts legacy `shows.is_practice` to `shows.event_type` and removes `is_practice`.
 
 ## Usage
 
@@ -9,6 +10,8 @@
 ```
 psql "$DATABASE_URL" -f docs/sql/001-init.sql
 psql "$DATABASE_URL" -f docs/sql/002-seed.sql
+# Optional for existing databases that still have shows.is_practice:
+psql "$DATABASE_URL" -f docs/sql/003-event-type-migration.sql
 ```
 
 ### Supabase SQL editor

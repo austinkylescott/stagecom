@@ -1,8 +1,25 @@
 <script setup lang="ts">
-const user = useSupabaseUser();
-const { data, isLoading, error, refresh } = usePerformers();
+import { watchDebounced } from "@vueuse/core";
 
+const user = useSupabaseUser();
+const searchInput = ref("");
 const search = ref("");
+const page = ref(1);
+
+watchDebounced(
+  searchInput,
+  (value) => {
+    search.value = value.trim();
+    page.value = 1;
+  },
+  { debounce: 300, maxWait: 800 },
+);
+
+const { data, isLoading, error, refresh } = usePerformers({
+  search,
+  page,
+  pageSize: 24,
+});
 
 const sharedCounts = computed(() => {
   const myId = user.value?.id;
@@ -26,14 +43,8 @@ const sharedCounts = computed(() => {
 
   return map;
 });
-
-const filteredProfiles = computed(() => {
-  const term = search.value.toLowerCase();
-  return (data.value?.profiles || []).filter((p: any) => {
-    const name = p.display_name || p.id;
-    return name.toLowerCase().includes(term);
-  });
-});
+const totalPages = computed(() => data.value?.totalPages ?? 1);
+const showPagination = computed(() => totalPages.value > 1);
 </script>
 
 <template>
@@ -52,7 +63,7 @@ const filteredProfiles = computed(() => {
     </div>
 
     <UInput
-      v-model="search"
+      v-model="searchInput"
       placeholder="Search performers by name"
       icon="i-heroicons-magnifying-glass"
       class="max-w-md"
@@ -67,7 +78,7 @@ const filteredProfiles = computed(() => {
     </div>
 
     <div v-else class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      <UCard v-for="performer in filteredProfiles" :key="performer.id">
+      <UCard v-for="performer in data?.profiles || []" :key="performer.id">
         <div class="flex items-center gap-3">
           <UAvatar
             :src="performer.avatar_url"
@@ -91,6 +102,18 @@ const filteredProfiles = computed(() => {
           </div>
         </template>
       </UCard>
+    </div>
+
+    <div class="pt-2">
+      <UPagination
+        v-if="showPagination"
+        :page="page"
+        :total="totalPages"
+        :items-per-page="1"
+        :disabled="isLoading"
+        :show-controls="true"
+        @update:page="(p) => (page = p)"
+      />
     </div>
 
     <div class="text-xs text-slate-500">

@@ -1,7 +1,7 @@
 export const queryKeys = {
   theaters: (params?: {
     search: string;
-    sort: "name_asc" | "recent" | "next_show";
+    sort: "name_asc" | "recent";
     page: number;
     pageSize: number;
   }) => (params ? (["theaters", params] as const) : (["theaters"] as const)),
@@ -20,7 +20,8 @@ export const queryKeys = {
 
   memberShows: () => ["member-shows"] as const,
 
-  performers: () => ["performers"] as const,
+  performers: (params?: { search: string; page: number; pageSize: number }) =>
+    params ? (["performers", params] as const) : (["performers"] as const),
 
   profile: (userId: string) => ["profile", { userId }] as const,
 };
