@@ -33,6 +33,8 @@ const newShowLink = computed(() =>
     ? `/theaters/${firstTheaterSlug.value}/shows/new`
     : "/theaters",
 );
+const showDetailLink = (show: ShowItem) =>
+  `/theaters/${show.theaterSlug}/shows/${show.id}`;
 
 const today = new Date();
 const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -93,10 +95,11 @@ const occurrencesByDay = computed(() => {
           No shows yet. Join or create a theater, then add a show.
         </div>
         <div v-else class="space-y-3">
-          <div
+          <NuxtLink
             v-for="show in sortedShows"
             :key="show.id"
-            class="rounded-lg border border-slate-200 px-4 py-3"
+            :to="showDetailLink(show)"
+            class="block rounded-lg border border-slate-200 px-4 py-3 transition-colors hover:border-blue-300 hover:bg-blue-50/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <div class="flex items-center justify-between gap-2">
               <div>
@@ -120,24 +123,7 @@ const occurrencesByDay = computed(() => {
                   : "TBD"
               }}
             </p>
-            <div class="mt-2 flex gap-2">
-              <UButton
-                size="xs"
-                variant="ghost"
-                :to="`/theaters/${show.theaterSlug}/review`"
-              >
-                Review queue
-              </UButton>
-              <UButton
-                size="xs"
-                color="primary"
-                variant="soft"
-                :to="`/theaters/${show.theaterSlug}/shows/new`"
-              >
-                Create show
-              </UButton>
-            </div>
-          </div>
+          </NuxtLink>
         </div>
       </UCard>
 
@@ -166,9 +152,19 @@ const occurrencesByDay = computed(() => {
                 ) || []"
                 :key="occ.id"
               >
-                <UBadge size="xs" color="blue" variant="soft" class="truncate">
-                  {{ occ.title }}
-                </UBadge>
+                <NuxtLink
+                  :to="showDetailLink(occ)"
+                  class="focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                >
+                  <UBadge
+                    size="xs"
+                    color="blue"
+                    variant="soft"
+                    class="truncate cursor-pointer"
+                  >
+                    {{ occ.title }}
+                  </UBadge>
+                </NuxtLink>
               </template>
             </div>
           </div>

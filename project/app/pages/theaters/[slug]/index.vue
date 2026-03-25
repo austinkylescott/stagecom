@@ -116,21 +116,30 @@ const canReview = computed(() => data.value?.permissions?.canReview ?? false);
         v-if="!isLoading && data?.shows.public?.length"
         class="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
       >
-        <UCard v-for="show in data?.shows.public" :key="show.id" class="h-full">
-          <h3 class="text-lg font-semibold">{{ show.title }}</h3>
-          <p class="text-xs uppercase tracking-wide text-slate-500 mt-1">
-            {{ show.eventType || "show" }}
-          </p>
-          <p v-if="show.description" class="text-slate-600 text-sm mt-1">
-            {{ show.description }}
-          </p>
-          <p class="text-sm text-slate-700 mt-2">
-            Next:
-            {{
-              show.startsAt ? new Date(show.startsAt).toLocaleString() : "TBD"
-            }}
-          </p>
-        </UCard>
+        <NuxtLink
+          v-for="show in data?.shows.public"
+          :key="show.id"
+          :to="`/theaters/${slug}/shows/${show.id}`"
+          class="block"
+        >
+          <UCard
+            class="h-full transition-colors hover:border-blue-300 hover:bg-blue-50/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <h3 class="text-lg font-semibold">{{ show.title }}</h3>
+            <p class="text-xs uppercase tracking-wide text-slate-500 mt-1">
+              {{ show.eventType || "show" }}
+            </p>
+            <p v-if="show.description" class="text-slate-600 text-sm mt-1">
+              {{ show.description }}
+            </p>
+            <p class="text-sm text-slate-700 mt-2">
+              Next:
+              {{
+                show.startsAt ? new Date(show.startsAt).toLocaleString() : "TBD"
+              }}
+            </p>
+          </UCard>
+        </NuxtLink>
       </div>
       <div v-else-if="!isLoading" class="text-sm text-slate-600">
         No public shows yet.

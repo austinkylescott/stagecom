@@ -89,20 +89,29 @@ const { formatLocation } = useLocationFormatter();
         </NuxtLink>
       </div>
       <div class="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        <UCard v-for="show in shows" :key="show.id" class="h-full">
-          <p class="font-semibold">{{ show.title }}</p>
-          <p class="text-xs text-slate-600 mt-1">
-            {{
-              show.startsAt ? new Date(show.startsAt).toLocaleString() : "TBD"
-            }}
-          </p>
-          <p
-            v-if="show.description"
-            class="text-xs text-slate-700 mt-1 line-clamp-2"
+        <NuxtLink
+          v-for="show in shows"
+          :key="show.id"
+          :to="theater ? `/theaters/${theater.slug}/shows/${show.id}` : undefined"
+          class="block"
+        >
+          <UCard
+            class="h-full transition-colors hover:border-blue-300 hover:bg-blue-50/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            {{ show.description }}
-          </p>
-        </UCard>
+            <p class="font-semibold">{{ show.title }}</p>
+            <p class="text-xs text-slate-600 mt-1">
+              {{
+                show.startsAt ? new Date(show.startsAt).toLocaleString() : "TBD"
+              }}
+            </p>
+            <p
+              v-if="show.description"
+              class="text-xs text-slate-700 mt-1 line-clamp-2"
+            >
+              {{ show.description }}
+            </p>
+          </UCard>
+        </NuxtLink>
         <p v-if="!shows?.length" class="text-sm text-slate-600">
           No upcoming shows yet.
         </p>
