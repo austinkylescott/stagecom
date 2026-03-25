@@ -107,12 +107,48 @@ function buildSql(config, configPath) {
   lines.push("-- This file is deterministic for a given config.");
   lines.push("");
 
+  pushCleanup(lines, users, theaters);
   pushTheaterUpserts(lines, theaters);
   pushProfileUpserts(lines, users, theaterByKey);
   pushMembershipUpserts(lines, theaters, userByKey);
   pushShowData(lines, shows, userByKey, theaterByKey);
 
   return `${lines.join("\n")}\n`;
+}
+
+function pushCleanup(lines, users, theaters) {
+  const theaterIds = theaters.map((theater) => asSqlUuid(resolveTheaterId(theater)));
+  const userIds = users.map((user) => asSqlUuid(requireUuid(user.id, `users[${user.key}].id`)));
+  const handles = users
+    .map((user) => optionalString(user.handle))
+    .filter((handle) => typeof handle === "string" && handle.length > 0)
+    .map((handle) => asSqlString(handle.toLowerCase()));
+
+  if (theaterIds.length === 0 && userIds.length === 0 && handles.length === 0) {
+    return;
+  }
+
+  lines.push("-- Cleanup existing mock rows for this config");
+
+  if (theaterIds.length > 0) {
+    lines.push(`delete from theaters where id in (${theaterIds.join(", ")});`);
+  }
+
+  if (userIds.length > 0 || handles.length > 0) {
+    const conditions = [];
+
+    if (userIds.length > 0) {
+      conditions.push(`id in (${userIds.join(", ")})`);
+    }
+
+    if (handles.length > 0) {
+      conditions.push(`lower(handle) in (${handles.join(", ")})`);
+    }
+
+    lines.push(`delete from profiles where ${conditions.join(" or ")};`);
+  }
+
+  lines.push("");
 }
 
 function pushProfileUpserts(lines, users, theaterByKey) {
@@ -123,7 +159,15 @@ function pushProfileUpserts(lines, users, theaterByKey) {
   const rows = users.map((user) => {
     const userId = requireUuid(user.id, `users[${user.key}].id`);
     const homeTheaterId = user.homeTheater
-      ? asSqlUuid(entityId("theater", requireRef(user.homeTheater, user.key, "homeTheater"), theaterByKey))
+      ? asSqlUuid(
+          resolveTheaterId(
+            requireTheater(
+              theaterByKey,
+              requireRef(user.homeTheater, user.key, "homeTheater"),
+              user.key,
+            ),
+          ),
+        )
       : "null";
 
     return `  (${[
@@ -180,7 +224,7 @@ function pushTheaterUpserts(lines, theaters) {
   }
 
   const rows = theaters.map((theater) => `  (${[
-    asSqlUuid(entityId("theater", theater.key)),
+    asSqlUuid(resolveTheaterId(theater)),
     asSqlString(requireString(theater.name, `theaters[${theater.key}].name`)),
     asSqlString(requireString(theater.slug, `theaters[${theater.key}].slug`)),
     asSqlNullableString(optionalString(theater.tagline)),
@@ -215,7 +259,7 @@ function pushMembershipUpserts(lines, theaters, userByKey) {
 
   for (const theater of theaters) {
     const memberships = assertArray(theater.memberships ?? [], `theaters[${theater.key}].memberships`);
-    const theaterId = entityId("theater", theater.key);
+    const theaterId = resolveTheaterId(theater);
 
     for (const membership of memberships) {
       assertObject(membership, "Each membership must be an object.");
@@ -272,10 +316,7 @@ function pushShowData(lines, shows, userByKey, theaterByKey) {
     const showKey = requireString(show.key, "shows[].key");
     const showId = entityId("show", showKey);
     const theaterKey = requireRef(show.theater, showKey, "theater");
-    const theater = theaterByKey.get(theaterKey);
-    if (!theater) {
-      throw new Error(`Unknown theater key "${theaterKey}" for show "${showKey}".`);
-    }
+    const theater = requireTheater(theaterByKey, theaterKey, showKey);
 
     const createdByKey = requireRef(show.createdBy, showKey, "createdBy");
     const createdBy = userByKey.get(createdByKey);
@@ -285,7 +326,7 @@ function pushShowData(lines, shows, userByKey, theaterByKey) {
 
     showRows.push(`  (${[
       asSqlUuid(showId),
-      asSqlUuid(entityId("theater", theater.key)),
+      asSqlUuid(resolveTheaterId(theater)),
       asSqlUuid(createdBy.id),
       asSqlEnum(optionalString(show.status) ?? "draft", "show_status"),
       asSqlString(requireString(show.title, `shows[${showKey}].title`)),
@@ -501,6 +542,24 @@ function resolveEntityId(entity, showKey) {
   }
 
   throw new Error(`Unsupported notification entity type "${type}" in show "${showKey}".`);
+}
+
+function requireTheater(theaterByKey, theaterKey, ownerKey) {
+  const theater = theaterByKey.get(theaterKey);
+  if (!theater) {
+    throw new Error(`Unknown theater key "${theaterKey}" in "${ownerKey}".`);
+  }
+
+  return theater;
+}
+
+function resolveTheaterId(theater) {
+  const explicitId = optionalString(theater.id);
+  if (explicitId) {
+    return requireUuid(explicitId, `theaters[${theater.key}].id`);
+  }
+
+  return entityId("theater", theater.key);
 }
 
 function entityId(scope, key, registry) {

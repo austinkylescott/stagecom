@@ -7,6 +7,18 @@ This repo now has a deterministic mock-data workflow for local/dev databases.
 - Keep Stagecom aligned with the existing SQL-first schema docs.
 - Seed richer test scenarios than the old one-off demo SQL file.
 - Make it easy to rebuild or wipe the dev database without hand-editing SQL.
+- Keep dev/test data trustworthy as the product and schema evolve.
+
+## Maintenance Rule
+
+Any change to database schema, enums, relationships, DB-backed product assumptions, or seeded workflow expectations must update the mock-data assets in the same change. At minimum, review and update as needed:
+
+- `project/mock-data.config.example.json`
+- local `project/mock-data.config.json` when using it for active dev work
+- seed/auth scripts under `project/scripts/`
+- this document
+
+Mock data is part of the contract for testing the product. If the schema changes but the seeded scenarios do not, the seed becomes misleading and should be treated as stale until updated.
 
 ## Files
 
