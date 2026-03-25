@@ -1,26 +1,30 @@
 # Current Feature
 
-Show Detail Navigation And Producer Gating
+Mock Data Workflow
 
 ## Status
 
-Completed
+In Progress
 
 ## Goals
 
-- Make show cards navigate to the show detail page when selected.
-- Surface regular show details to viewers on the show page.
-- Keep producer/admin controls hidden unless the current user is a producer for that specific show.
-- Preserve the contextual role model from the PRD where producers are scoped per show and are not implied cast.
+- Add a deterministic mock-data framework for local/dev databases.
+- Support generating mock SQL from a config of real Supabase auth user IDs.
+- Support seeding mock data, wiping the dev schema, and rebuilding from scratch with one command path.
+- Keep the workflow aligned with the current SQL-first schema and Stagecom role invariants.
+- Audit the live Supabase schema before baking in a local/dev workflow.
+- Start moving from docs-only SQL toward a Supabase CLI-backed project structure.
+- Support creating or syncing mock auth users through the Supabase Admin API so app-data seeding no longer depends on manual user UUID lookup.
 
 ## Notes
 
-- This feature maps to the locked MVP in `docs/PRD.md`, especially the contextual show-level producer role.
-- The existing show detail API already computes `permissions.isProducer`; the UI should treat that as the gate for producer-only controls.
-- Producers remain distinct from cast and are never assumed to be performers.
-- Show detail now supports request-to-join flows, producer approval/removal actions, and producer-only inactive-cast management without collapsing producers into cast membership.
-- Cast request notifications now support repeat request cycles and requester approval notifications through `emitEvent()`.
-- Nuxt UI select usage was updated to the current prop API so dropdown options render correctly across the affected pages.
+- This change maps to the MVP need for producers, performers, theater staff, review states, casting modes, and notifications to be testable in realistic combinations.
+- The generator never treats producers as cast automatically; mock cast membership still requires explicit `show_cast` entries.
+- The config requires real auth user IDs because app tables still reference `auth.users`.
+- The current example scenario includes approved, pending-review, and draft events plus notification/email rows.
+- Live schema audit now confirms the deployed public tables/enums/functions match the repo baseline after accounting for `public.is_active_member_of_theater`.
+- The repo now supports split DB env vars and a Node-based SQL runner so dev scripts do not depend on URL-encoded passwords or a local `psql` install.
+- Mock auth seeding now writes a resolved config with real auth user IDs before seeding app tables.
 
 ## History
 
@@ -29,3 +33,6 @@ Completed
 - Show detail navigation from show listings with producer-only admin gating on the detail flow
 - Expanded show cast workflow with request approval, reinvite handling, producer display, and notification fixes
 - Updated Nuxt UI select props to restore dropdown option rendering
+- Added deterministic mock-data generation, seed, reset, and rebuild workflow for local/dev databases
+- Added split DB env support, live schema audit tooling, and a baseline Supabase CLI schema scaffold
+- Added Supabase Admin API-based mock auth seeding and full seed/rebuild wrappers

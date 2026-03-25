@@ -7,10 +7,12 @@ These rules exist to keep Stagecom aligned with the current product docs, data m
 - Every feature must map back to `docs/PRD.md`.
 - Follow `docs/ai-interaction.md` for AI workflow, branching, commit, and collaboration expectations.
 - Do not introduce schema-level entities or change table meaning without updating `docs/data-model.md`.
+- Do not change schema, DB-backed assumptions, or seed expectations without updating the mock-data workflow and example config in the same change.
 - Significant behavior changes must update the relevant docs in the same change:
   - `docs/PRD.md` for product or role changes
   - `docs/data-model.md` for schema or relationship changes
   - `docs/events-and-notifications.md` for event or recipient changes
+  - `docs/mock-data-workflow.md` and the mock-data configs/scripts when database-backed test expectations change
   - feature specs in `docs/` when behavior is spec-driven
 
 ## 2. Stack requirements
@@ -96,6 +98,7 @@ These rules exist to keep Stagecom aligned with the current product docs, data m
 - Keep the project Postgres-first and Supabase-friendly, as described in `docs/data-model.md`.
 - Prefer Supabase client access plus generated database types over introducing a parallel ORM abstraction.
 - Respect existing naming and enum values in the schema docs and SQL files under `docs/sql/`.
+- Keep `project/mock-data.config.example.json` aligned with the current schema and product expectations so seeded data remains a trustworthy dev/test fixture.
 - Do not bypass documented role, cast, review, or notification invariants for convenience in UI code.
 
 ## 11. Testing and verification
@@ -109,6 +112,7 @@ These rules exist to keep Stagecom aligned with the current product docs, data m
 ## 12. Change discipline
 
 - Keep docs in version control and update them as part of the same change.
+- Treat mock-data configs and seed scripts as part of the database contract; update them whenever schema or seeded workflows change.
 - Prefer small, targeted changes that match existing repo patterns.
 - Ask before large refactors or architectural changes.
 - Do not add out-of-spec "nice to have" features without permission.

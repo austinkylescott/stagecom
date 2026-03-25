@@ -35,3 +35,6 @@ pnpm-debug.log*
 .env
 .env.*
 !.env.example
+project/mock-data.resolved.json
+project/mock-data.config.json
+project/tmp

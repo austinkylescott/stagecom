@@ -32,6 +32,7 @@ Read these before making behavior changes:
 - Every feature change must map back to `docs/PRD.md`.
 - Follow `docs/ai-interaction.md` for communication, workflow, branching, and commit behavior.
 - Do not add tables or schema-level entities without updating `docs/data-model.md`.
+- Any change to database schema, enums, relationships, seeded assumptions, or DB-backed product expectations must update the mock-data workflow and configs so seeded data still reflects the current model.
 - All notifications must go through the notification service via `emitEvent()`.
 - Producers are never assumed to be cast.
 - Cast membership requires an explicit `show_cast` entry.
@@ -76,4 +77,9 @@ Run commands from `project/` unless there is a clear reason not to.
 - Preserve uncommitted user changes; do not revert unrelated work.
 - If something is still failing after 2 to 3 serious attempts, stop and explain the blocker instead of continuing with random fixes.
 - Update docs in the same change when behavior, schema, roles, or events shift.
+- When database or data-model behavior changes, update the relevant mock-data assets in the same change:
+  - `project/mock-data.config.example.json`
+  - `project/mock-data.config.json` if it exists locally for the active workflow
+  - `docs/mock-data-workflow.md`
+  - related seed/auth scripts under `project/scripts/` when expectations change
 - If a feature touches notifications, permissions, roles, or show/cast behavior, verify the change against the PRD and data model docs before finishing.

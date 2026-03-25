@@ -3,12 +3,24 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "auth:seed:mock": "node ./scripts/seed-auth-users.mjs",
     "build": "nuxt build",
+    "db:audit:live": "node ./scripts/db-audit-live.mjs",
+    "db:rebuild:mock:full": "bash ./scripts/db-rebuild-mock-full.sh",
+    "db:rebuild:mock": "bash ./scripts/db-rebuild-mock.sh",
+    "db:reset": "bash ./scripts/db-reset.sh",
+    "db:seed:mock:full": "bash ./scripts/db-seed-mock-full.sh",
+    "db:seed:mock": "bash ./scripts/db-seed-mock.sh",
+    "db:trash": "bash ./scripts/db-reset.sh",
+    "mock-data:generate": "node ./scripts/mock-data.mjs generate",
     "check:server-conventions": "bash ./scripts/check-server-conventions.sh",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
+    "supabase:start": "npx supabase start",
+    "supabase:status": "npx supabase status",
+    "supabase:stop": "npx supabase stop",
     "test": "vitest"
   },
   "dependencies": {
@@ -29,6 +41,8 @@
     "@types/node": "^25.0.3",
     "@vueuse/core": "^14.2.1",
     "@vueuse/nuxt": "^14.2.1",
+    "pg": "^8.20.0",
+    "supabase": "^2.84.1",
     "vitest": "^4.0.16"
   }
 }
