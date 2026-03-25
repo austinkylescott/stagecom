@@ -1,0 +1,282 @@
+{
+  "users": [
+    {
+      "key": "maya_manager",
+      "id": "11111111-1111-4111-8111-111111111111",
+      "auth": {
+        "email": "maya.manager@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Maya Manager",
+      "timezone": "America/New_York",
+      "pronouns": "she/her",
+      "city": "New York, NY",
+      "handle": "maya-manager",
+      "bio": "Theater manager keeping review queues moving.",
+      "visibility": "theater_only",
+      "homeTheater": "stage_hub",
+      "notificationPreferences": {
+        "email": true,
+        "inApp": true
+      }
+    },
+    {
+      "key": "peter_producer",
+      "id": "22222222-2222-4222-8222-222222222222",
+      "auth": {
+        "email": "peter.producer@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Peter Producer",
+      "timezone": "America/New_York",
+      "pronouns": "he/him",
+      "city": "Brooklyn, NY",
+      "handle": "peter-producer",
+      "bio": "Produces house teams and festival slots.",
+      "visibility": "public",
+      "homeTheater": "stage_hub"
+    },
+    {
+      "key": "cora_cast",
+      "id": "33333333-3333-4333-8333-333333333333",
+      "auth": {
+        "email": "cora.cast@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Cora Cast",
+      "timezone": "America/Chicago",
+      "pronouns": "they/them",
+      "city": "Chicago, IL",
+      "handle": "cora-cast",
+      "bio": "Performer open to travel weekends.",
+      "visibility": "public",
+      "homeTheater": "stage_hub"
+    },
+    {
+      "key": "riley_requester",
+      "id": "44444444-4444-4444-8444-444444444444",
+      "auth": {
+        "email": "riley.requester@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Riley Requester",
+      "timezone": "America/Los_Angeles",
+      "pronouns": "she/they",
+      "city": "Los Angeles, CA",
+      "handle": "riley-requester",
+      "bio": "Requests into public and theater casting calls.",
+      "visibility": "public"
+    },
+    {
+      "key": "sam_staff",
+      "id": "55555555-5555-4555-8555-555555555555",
+      "auth": {
+        "email": "sam.staff@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Sam Staff",
+      "timezone": "America/New_York",
+      "pronouns": "he/they",
+      "city": "Queens, NY",
+      "handle": "sam-staff",
+      "bio": "Handles theater operations and approvals.",
+      "visibility": "theater_only",
+      "homeTheater": "stage_hub"
+    }
+  ],
+  "theaters": [
+    {
+      "key": "stage_hub",
+      "name": "Stage Hub Theater",
+      "slug": "stage-hub-theater",
+      "tagline": "Neighborhood improv with a busy review queue.",
+      "street": "120 W 29th St",
+      "city": "New York",
+      "stateRegion": "NY",
+      "postalCode": "10001",
+      "country": "USA",
+      "memberships": [
+        {
+          "user": "maya_manager",
+          "roles": ["manager"]
+        },
+        {
+          "user": "sam_staff",
+          "roles": ["staff"]
+        },
+        {
+          "user": "peter_producer",
+          "roles": ["member"]
+        },
+        {
+          "user": "cora_cast",
+          "roles": ["member"]
+        }
+      ]
+    }
+  ],
+  "shows": [
+    {
+      "key": "friday-house-show",
+      "theater": "stage_hub",
+      "createdBy": "peter_producer",
+      "status": "approved",
+      "eventType": "show",
+      "title": "Friday House Show",
+      "description": "Approved weekly flagship set with a finalized cast.",
+      "castingMode": "direct_invite",
+      "castMin": 4,
+      "castMax": 6,
+      "isCastFinalized": true,
+      "isPublicListed": true,
+      "ticketUrl": "https://example.com/friday-house-show",
+      "onSaleAt": "2026-03-22T14:00:00Z",
+      "producers": ["peter_producer"],
+      "occurrences": [
+        {
+          "key": "week-1",
+          "startsAt": "2026-03-27T00:00:00Z",
+          "endsAt": "2026-03-27T01:30:00Z"
+        }
+      ],
+      "cast": [
+        {
+          "user": "cora_cast",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 1
+        },
+        {
+          "user": "sam_staff",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 2,
+          "note": "Staff member filling in as a performer."
+        }
+      ],
+      "reviewEvents": [
+        {
+          "key": "approved",
+          "action": "approved",
+          "actor": "maya_manager",
+          "note": "Mock approval for an on-sale show."
+        }
+      ],
+      "notifications": [
+        {
+          "key": "accepted-cast",
+          "user": "cora_cast",
+          "type": "show_invite",
+          "entityType": "cast",
+          "entity": {
+            "type": "cast",
+            "key": "cora_cast"
+          },
+          "payload": {
+            "message": "You are in the Friday House Show lineup."
+          },
+          "dedupeKey": "friday-house-show:cora_cast:invite"
+        }
+      ],
+      "emailOutbox": [
+        {
+          "key": "accepted-cast",
+          "user": "cora_cast",
+          "template": "invite_email",
+          "payload": {
+            "subject": "Friday House Show lineup confirmed"
+          },
+          "dedupeKey": "friday-house-show:cora_cast:invite"
+        }
+      ]
+    },
+    {
+      "key": "sunday-jam",
+      "theater": "stage_hub",
+      "createdBy": "peter_producer",
+      "status": "pending_review",
+      "eventType": "show",
+      "title": "Sunday Jam",
+      "description": "Public casting example waiting on theater approval.",
+      "castingMode": "public_casting",
+      "castMin": 5,
+      "castMax": 8,
+      "isCastFinalized": false,
+      "isPublicListed": false,
+      "producers": ["peter_producer"],
+      "occurrences": [
+        {
+          "key": "week-1",
+          "startsAt": "2026-03-29T23:00:00Z",
+          "endsAt": "2026-03-30T00:30:00Z"
+        }
+      ],
+      "cast": [
+        {
+          "user": "riley_requester",
+          "source": "requested",
+          "status": "pending"
+        }
+      ],
+      "reviewEvents": [
+        {
+          "key": "submitted",
+          "action": "submitted",
+          "actor": "peter_producer",
+          "note": "Queued for review."
+        }
+      ],
+      "notifications": [
+        {
+          "key": "producer-review",
+          "user": "peter_producer",
+          "type": "show_submitted",
+          "entityType": "show",
+          "entity": {
+            "type": "show",
+            "key": "sunday-jam"
+          },
+          "payload": {
+            "message": "Sunday Jam is waiting for review."
+          },
+          "dedupeKey": "sunday-jam:submitted"
+        }
+      ]
+    },
+    {
+      "key": "open-practice",
+      "theater": "stage_hub",
+      "createdBy": "sam_staff",
+      "status": "draft",
+      "eventType": "practice",
+      "title": "Open Practice",
+      "description": "Draft practice for exercising non-show event types.",
+      "castingMode": "theater_casting",
+      "castMin": 2,
+      "castMax": 12,
+      "isCastFinalized": false,
+      "isPublicListed": false,
+      "producers": ["sam_staff"],
+      "occurrences": [
+        {
+          "key": "week-1",
+          "startsAt": "2026-04-01T23:30:00Z",
+          "endsAt": "2026-04-02T01:00:00Z"
+        }
+      ],
+      "cast": [
+        {
+          "user": "cora_cast",
+          "source": "invited",
+          "status": "pending",
+          "note": "Awaiting RSVP."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+-- Local Supabase CLI seed placeholder.
+-- Current shared/dev mock seeding is handled by:
+--   npm run db:seed:mock -- ./mock-data.config.json
+--
+-- This file stays intentionally empty until local auth-user seeding is
+-- formalized. That keeps `supabase db reset` focused on schema rebuilds.
