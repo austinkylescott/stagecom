@@ -232,9 +232,9 @@ const updateStatus = async (
             <div class="flex flex-wrap items-center gap-2">
               <USelect
                 size="xs"
-                :options="reasons"
-                option-attribute="label"
-                value-attribute="value"
+                :items="reasons"
+                label-key="label"
+                value-key="value"
                 v-model="getFeedback(row.original.id).reason"
               />
               <UInput

@@ -138,7 +138,7 @@ const submit = async (submitForReview: boolean) => {
           >
             <USelect
               v-model="form.castingMode"
-              :options="[
+              :items="[
                 { label: 'Direct invite', value: 'direct_invite' },
                 { label: 'Theater casting', value: 'theater_casting' },
                 { label: 'Public casting', value: 'public_casting' },

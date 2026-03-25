@@ -260,7 +260,7 @@ const cancelLeaveHome = () => {
                 />
                 <USelect
                   v-model="sort"
-                  :options="[
+                  :items="[
                     { label: 'Name A→Z', value: 'name_asc' },
                     { label: 'Recently added', value: 'recent' },
                   ]"
