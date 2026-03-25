@@ -13,6 +13,7 @@ export const usePerformers = (params: {
   search: Ref<string>;
   page: Ref<number>;
   pageSize?: number;
+  theaterId?: Ref<string | undefined>;
 }) => {
   const { search, page } = params;
   const pageSize = params.pageSize ?? 24;
@@ -21,6 +22,7 @@ export const usePerformers = (params: {
     search: search.value.trim(),
     page: page.value,
     pageSize,
+    theaterId: params.theaterId?.value,
   }));
 
   const query = useQuery(performersQueryOptions, queryParams);

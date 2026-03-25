@@ -16,6 +16,7 @@ export type ShowItem = {
 };
 
 export type MemberShowsResponse = { shows: ShowItem[] };
+
 export type CreateShowPayload = {
   title: string;
   description: string;
@@ -31,6 +32,42 @@ export type CreateShowPayload = {
 export type CreateShowInput = {
   submitForReview: boolean;
   payload: CreateShowPayload;
+};
+
+export type ShowDetailResponse = {
+  show: {
+    id: string;
+    title: string;
+    description: string | null;
+    status: Enums<"show_status">;
+    eventType: Enums<"event_type">;
+    castingMode: Enums<"casting_mode">;
+    castMin: number | null;
+    castMax: number | null;
+    isCastFinalized: boolean;
+    isPublicListed: boolean;
+    ticketUrl: string | null;
+    onSaleAt: string | null;
+    theaterId: string;
+    theaterName: string | null;
+    theaterSlug: string | null;
+  };
+  occurrences: {
+    id: string;
+    starts_at: string;
+    ends_at: string | null;
+    status: Enums<"show_occurrence_status">;
+  }[];
+  cast: {
+    userId: string;
+    source: Enums<"show_cast_source">;
+    status: Enums<"show_cast_status">;
+    programOrder: number | null;
+    note: string | null;
+    displayName: string | null;
+    avatarUrl: string | null;
+  }[];
+  permissions: { isProducer: boolean };
 };
 
 export const memberShowsQueryOptions = defineQueryOptions<
@@ -52,6 +89,26 @@ export const memberShowsQueryOptions = defineQueryOptions<
   } as const;
 });
 
+export const showDetailQueryOptions = defineQueryOptions<
+  { id: string },
+  ShowDetailResponse
+>((params) => {
+  const headers = import.meta.server
+    ? useRequestHeaders(["cookie"])
+    : undefined;
+
+  return {
+    key: queryKeys.showDetail(params?.id ?? ""),
+    query: () =>
+      $fetch<ShowDetailResponse>(`/api/shows/${params?.id}`, {
+        credentials: "include",
+        headers,
+      }),
+    enabled: Boolean(params?.id),
+    staleTime: 20_000,
+  } as const;
+});
+
 export const invalidateShowRelatedQueries = async (
   queryCache: {
     invalidateQueries: (filters: {
@@ -67,11 +124,11 @@ export const invalidateShowRelatedQueries = async (
       exact: true,
     }),
     queryCache.invalidateQueries({
-      key: queryKeys.theaterReview(slug || ""),
+      key: queryKeys.theaterReview(slug ?? ""),
       exact: false,
     }),
     queryCache.invalidateQueries({
-      key: queryKeys.theater(slug || ""),
+      key: queryKeys.theater(slug ?? ""),
       exact: false,
     }),
   ]);

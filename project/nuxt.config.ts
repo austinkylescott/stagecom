@@ -26,6 +26,7 @@ export default defineNuxtConfig({
       { name: "Fira Code", global: true },
     ],
   },
+  pinia: {},
   supabase: {
     types: "~/types/database.types.ts",
     redirect: false,

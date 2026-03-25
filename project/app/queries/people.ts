@@ -6,6 +6,7 @@ export type PerformersQueryParams = {
   search: string;
   page: number;
   pageSize: number;
+  theaterId?: string;
 };
 
 export type PerformersResponse = {
@@ -33,9 +34,10 @@ export const performersQueryOptions = defineQueryOptions<
   (params) =>
     ({
       key: queryKeys.performers({
-        search: params?.search || "",
-        page: params?.page || 1,
-        pageSize: params?.pageSize || 24,
+        search: params?.search ?? "",
+        page: params?.page ?? 1,
+        pageSize: params?.pageSize ?? 24,
+        theaterId: params?.theaterId,
       }),
       query: async () => {
         const headers = import.meta.server
@@ -47,8 +49,9 @@ export const performersQueryOptions = defineQueryOptions<
           headers,
           params: {
             search: params?.search || undefined,
-            page: params?.page || 1,
-            pageSize: params?.pageSize || 24,
+            page: params?.page ?? 1,
+            pageSize: params?.pageSize ?? 24,
+            theaterId: params?.theaterId || undefined,
           },
         });
       },

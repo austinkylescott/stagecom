@@ -2,9 +2,11 @@ const protectedRouteMatchers = [
   /^\/profile$/,
   /^\/shows$/,
   /^\/review$/,
+  /^\/notifications$/,
   /^\/theaters\/new$/,
   /^\/theaters\/[^/]+\/review$/,
   /^\/theaters\/[^/]+\/shows\/new$/,
+  /^\/theaters\/[^/]+\/shows\/[^/]+$/,
 ];
 
 export default defineNuxtRouteMiddleware((to) => {

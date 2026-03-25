@@ -20,8 +20,20 @@ export const queryKeys = {
 
   memberShows: () => ["member-shows"] as const,
 
-  performers: (params?: { search: string; page: number; pageSize: number }) =>
+  performers: (params?: {
+    search: string;
+    page: number;
+    pageSize: number;
+    theaterId?: string;
+  }) =>
     params ? (["performers", params] as const) : (["performers"] as const),
 
   profile: (userId: string) => ["profile", { userId }] as const,
+
+  showDetail: (id: string) => ["show-detail", { id }] as const,
+
+  notifications: () => ["notifications"] as const,
+
+  notificationsPage: (params: { filter: string; page: number }) =>
+    ["notifications-page", params] as const,
 };

@@ -38,6 +38,7 @@ const querySchema = z.object({
   search: z.string().optional().default(""),
   page: z.coerce.number().int().min(1).optional().default(1),
   pageSize: z.coerce.number().int().min(1).max(50).optional().default(24),
+  theaterId: z.string().uuid().optional(),
 });
 
 export default defineEventHandler(
@@ -46,12 +47,35 @@ export default defineEventHandler(
       search: rawSearch,
       page,
       pageSize,
+      theaterId,
     } = parseQueryParams(event, querySchema);
     const supabase = await serverSupabaseClient(event);
     const userId = await requireUserId(event, supabase);
     const search = rawSearch.trim();
     const from = (page - 1) * pageSize;
     const to = from + pageSize - 1;
+
+    let allowedUserIds: string[] | null = null;
+    if (theaterId) {
+      const { data: members } = await supabase
+        .from("theater_memberships")
+        .select("user_id")
+        .eq("theater_id", theaterId)
+        .eq("status", "active");
+
+      allowedUserIds = (members ?? []).map((m) => m.user_id);
+
+      if (allowedUserIds.length === 0) {
+        return {
+          profiles: [],
+          memberships: [],
+          page,
+          pageSize,
+          total: 0,
+          totalPages: 1,
+        };
+      }
+    }
 
     let profileQuery = supabase
       .from("profiles")
@@ -60,6 +84,9 @@ export default defineEventHandler(
 
     if (search) {
       profileQuery = profileQuery.ilike("display_name", `%${search}%`);
+    }
+    if (allowedUserIds) {
+      profileQuery = profileQuery.in("id", allowedUserIds);
     }
 
     const {
@@ -76,8 +103,9 @@ export default defineEventHandler(
     }
 
     const profileIds = [
-      ...new Set([...(profiles || []).map((p) => p.id), userId]),
+      ...new Set([...(profiles ?? []).map((p) => p.id), userId]),
     ];
+
     const { data: memberships, error: membershipsError } = await supabase
       .from("theater_memberships")
       .select("user_id,theater_id,status")
@@ -91,19 +119,19 @@ export default defineEventHandler(
       });
     }
 
-    const visibleMemberships = (memberships || []).map((membership) => ({
-      user_id: membership.user_id,
-      theater_id: membership.theater_id,
+    const visibleMemberships = (memberships ?? []).map((m) => ({
+      user_id: m.user_id,
+      theater_id: m.theater_id,
       status: "active" as const,
     }));
 
     return {
-      profiles: sortProfiles(profiles || []),
+      profiles: sortProfiles(profiles ?? []),
       memberships: visibleMemberships,
       page,
       pageSize,
-      total: count || 0,
-      totalPages: Math.max(1, Math.ceil((count || 0) / pageSize)),
+      total: count ?? 0,
+      totalPages: Math.max(1, Math.ceil((count ?? 0) / pageSize)),
     };
   },
 );

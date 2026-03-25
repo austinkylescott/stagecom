@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import AppNotificationsBell from "~/components/AppNotificationsBell.vue";
+
 const { isAuthed } = useUserIdentity();
+
 const navItems = computed(() => {
   const items = [
     { label: "Home", to: "/" },
@@ -11,6 +14,7 @@ const navItems = computed(() => {
     items.push(
       { label: "Shows", to: "/shows" },
       { label: "Review", to: "/review" },
+      { label: "Notifications", to: "/notifications" },
       { label: "Profile", to: "/profile" },
     );
   }
@@ -33,6 +37,7 @@ const navItems = computed(() => {
 
     <template #right>
       <div class="flex items-center gap-2">
+        <AppNotificationsBell v-if="isAuthed" />
         <AppAccountMenu />
       </div>
     </template>
