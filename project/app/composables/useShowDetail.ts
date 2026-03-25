@@ -49,7 +49,7 @@ export const usePatchCast = (showId: Ref<string>) => {
   return useMutation<
     void,
     {
-      action: "accept" | "decline" | "withdraw" | "remove";
+      action: "accept" | "approve" | "decline" | "withdraw" | "remove";
       targetUserId?: string;
     }
   >({
@@ -58,6 +58,28 @@ export const usePatchCast = (showId: Ref<string>) => {
         method: "PATCH",
         credentials: "include",
         body,
+      }),
+    onSuccess: () => {
+      queryCache.invalidateQueries({
+        key: queryKeys.showDetail(showId.value),
+        exact: true,
+      });
+      queryCache.invalidateQueries({
+        key: queryKeys.notifications(),
+        exact: true,
+      });
+    },
+  });
+};
+
+export const useRequestCast = (showId: Ref<string>) => {
+  const queryCache = useQueryCache();
+
+  return useMutation<void, void>({
+    mutation: () =>
+      $fetch(`/api/shows/${showId.value}/cast/request`, {
+        method: "POST",
+        credentials: "include",
       }),
     onSuccess: () => {
       queryCache.invalidateQueries({

@@ -14,6 +14,7 @@ Producers must receive operational notifications even when they are not part of 
 - show.rejected
 - cast.invited
 - cast.requested
+- cast.request_approved
 - cast.accepted
 - cast.declined
 - cast.withdrawn
@@ -43,6 +44,7 @@ Note: Producers are included by show_roles and do NOT need to be cast.
 ### Performers
 - For invitations, confirmations, and schedule changes:
   - cast.invited
+  - cast.request_approved
   - occurrence.time_changed, occurrence.cancelled
   - occurrence.reminder_24h (accepted performers only)
 
@@ -60,6 +62,7 @@ Note: Producers are included by show_roles and do NOT need to be cast.
 ### In-app only (default)
 - show_submitted
 - cast_request_received
+- cast_request_approved
 - cast_response_received
 - cast_declined
 - cast_withdrawn
@@ -84,4 +87,5 @@ No notification is created outside this service.
 ## Implementation Notes
 - Prefer application-level triggers (service called after DB writes) for v1
 - Use deterministic dedupe keys to prevent spam on retries
+- `cast.requested` dedupes per request cycle per requester per show per recipient so repeat requests still notify producers
 - Never infer cast membership from producer role

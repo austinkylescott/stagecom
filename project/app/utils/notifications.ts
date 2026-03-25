@@ -30,6 +30,10 @@ export const formatNotification = (
     switch (type) {
       case "cast.invited":
         return `${actor} invited you to perform in ${show}`;
+      case "cast.requested":
+        return `${actor} requested to perform in ${show}`;
+      case "cast.request_approved":
+        return `${actor} approved your request to perform in ${show}`;
       case "cast.accepted":
         return `${actor} accepted their invite to ${show}`;
       case "cast.declined":

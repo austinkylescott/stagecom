@@ -58,6 +58,11 @@ export type ShowDetailResponse = {
     ends_at: string | null;
     status: Enums<"show_occurrence_status">;
   }[];
+  producers: {
+    userId: string;
+    displayName: string | null;
+    avatarUrl: string | null;
+  }[];
   cast: {
     userId: string;
     source: Enums<"show_cast_source">;
@@ -67,7 +72,10 @@ export type ShowDetailResponse = {
     displayName: string | null;
     avatarUrl: string | null;
   }[];
-  permissions: { isProducer: boolean };
+  permissions: {
+    isProducer: boolean;
+    canRequestToJoin: boolean;
+  };
 };
 
 export const memberShowsQueryOptions = defineQueryOptions<

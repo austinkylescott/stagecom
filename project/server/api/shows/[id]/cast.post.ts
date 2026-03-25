@@ -50,10 +50,10 @@ export default defineEventHandler(async (event) => {
     .eq("user_id", targetUserId)
     .maybeSingle();
 
-  if (existing && existing.status !== "removed") {
+  if (existing && ["pending", "accepted"].includes(existing.status)) {
     throw createError({
       statusCode: 409,
-      statusMessage: "Performer is already in cast",
+      statusMessage: "Performer already has an active cast entry",
     });
   }
 
@@ -67,7 +67,11 @@ export default defineEventHandler(async (event) => {
     ? show.theaters[0]?.slug
     : (show.theaters as any)?.slug;
 
-  if (existing?.status === "removed") {
+  if (
+    existing?.status === "removed" ||
+    existing?.status === "declined" ||
+    existing?.status === "withdrawn"
+  ) {
     const { error } = await supabase
       .from("show_cast")
       .update({ status: "pending", source: "invited" })

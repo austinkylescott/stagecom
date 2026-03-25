@@ -3,6 +3,8 @@ import type { Database } from "~/types/database.types";
 
 export type CastEventType =
   | "cast.invited"
+  | "cast.requested"
+  | "cast.request_approved"
   | "cast.accepted"
   | "cast.declined"
   | "cast.withdrawn"
@@ -14,8 +16,10 @@ type CastEventBase = {
   showId: string;
   showTitle: string;
   theaterSlug: string;
+  actorId?: string;
   actorName: string;
   recipientId: string;
+  requestCycleId?: string;
 };
 
 type ShowEventBase = {
@@ -49,39 +53,50 @@ const getServiceClient = () => {
 };
 
 export const emitEvent = async (event: NotifyEvent): Promise<void> => {
-  const supabase = getServiceClient();
-  const dedupeKey = `${event.type}:${event.showId}:${event.recipientId}`;
+  try {
+    const supabase = getServiceClient();
+    const dedupeKey =
+      event.type === "cast.requested" &&
+      event.actorId &&
+      event.requestCycleId
+        ? `${event.type}:${event.showId}:${event.recipientId}:${event.actorId}:${event.requestCycleId}`
+        : event.type === "cast.requested" && event.actorId
+          ? `${event.type}:${event.showId}:${event.recipientId}:${event.actorId}`
+          : `${event.type}:${event.showId}:${event.recipientId}`;
 
-  const { error: notifError } = await supabase.from("notifications").upsert(
-    {
-      user_id: event.recipientId,
-      type: event.type,
-      entity_type: "show" as const,
-      entity_id: event.showId,
-      payload: { ...event },
-      dedupe_key: dedupeKey,
-    },
-    { onConflict: "user_id,dedupe_key", ignoreDuplicates: true },
-  );
-
-  if (notifError) {
-    console.error("[emitEvent] notification insert failed", notifError);
-  }
-
-  if (EMAIL_TYPES.has(event.type)) {
-    const { error: emailError } = await supabase.from("email_outbox").upsert(
+    const { error: notifError } = await supabase.from("notifications").upsert(
       {
         user_id: event.recipientId,
-        template: event.type,
+        type: event.type,
+        entity_type: "show" as const,
+        entity_id: event.showId,
         payload: { ...event },
         dedupe_key: dedupeKey,
-        status: "queued" as const,
       },
       { onConflict: "user_id,dedupe_key", ignoreDuplicates: true },
     );
 
-    if (emailError) {
-      console.error("[emitEvent] email_outbox insert failed", emailError);
+    if (notifError) {
+      console.error("[emitEvent] notification insert failed", notifError);
     }
+
+    if (EMAIL_TYPES.has(event.type)) {
+      const { error: emailError } = await supabase.from("email_outbox").upsert(
+        {
+          user_id: event.recipientId,
+          template: event.type,
+          payload: { ...event },
+          dedupe_key: dedupeKey,
+          status: "queued" as const,
+        },
+        { onConflict: "user_id,dedupe_key", ignoreDuplicates: true },
+      );
+
+      if (emailError) {
+        console.error("[emitEvent] email_outbox insert failed", emailError);
+      }
+    }
+  } catch (error) {
+    console.error("[emitEvent] unexpected failure", error, event);
   }
 };

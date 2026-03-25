@@ -33,7 +33,14 @@ export default defineEventHandler(async (event) => {
     .eq("show_id", showId)
     .order("starts_at", { ascending: true });
 
+  const { data: producerRows } = await supabase
+    .from("show_roles")
+    .select("user_id,profiles(display_name,avatar_url)")
+    .eq("show_id", showId)
+    .eq("role", "producer");
+
   let isProducer = false;
+  let canRequestToJoin = false;
   if (userId) {
     const { data: roleRow } = await supabase
       .from("show_roles")
@@ -42,6 +49,22 @@ export default defineEventHandler(async (event) => {
       .eq("user_id", userId)
       .maybeSingle();
     isProducer = roleRow?.role === "producer";
+
+    if (!isProducer && show.casting_mode !== "direct_invite") {
+      if (show.casting_mode === "public_casting") {
+        canRequestToJoin = true;
+      } else {
+        const { data: membershipRow } = await supabase
+          .from("theater_memberships")
+          .select("status")
+          .eq("theater_id", show.theater_id)
+          .eq("user_id", userId)
+          .eq("status", "active")
+          .maybeSingle();
+
+        canRequestToJoin = membershipRow?.status === "active";
+      }
+    }
   }
 
   let castQuery = supabase
@@ -77,6 +100,17 @@ export default defineEventHandler(async (event) => {
     };
   });
 
+  const producers = (producerRows ?? []).map((row) => {
+    const profile = Array.isArray(row.profiles)
+      ? row.profiles[0]
+      : row.profiles;
+    return {
+      userId: row.user_id,
+      displayName: profile?.display_name ?? null,
+      avatarUrl: profile?.avatar_url ?? null,
+    };
+  });
+
   return {
     show: {
       id: show.id,
@@ -96,7 +130,8 @@ export default defineEventHandler(async (event) => {
       theaterSlug: theater?.slug ?? null,
     },
     occurrences: occurrences ?? [],
+    producers,
     cast,
-    permissions: { isProducer },
+    permissions: { isProducer, canRequestToJoin },
   };
 });

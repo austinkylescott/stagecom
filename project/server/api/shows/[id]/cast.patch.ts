@@ -8,18 +8,11 @@ import {
 
 const paramsSchema = z.object({ id: z.string().trim().min(1) });
 const bodySchema = z.object({
-  action: z.enum(["accept", "decline", "withdraw", "remove"]),
+  action: z.enum(["accept", "approve", "decline", "withdraw", "remove"]),
   targetUserId: z.string().trim().min(1).optional(),
 });
 
-const VALID_TRANSITIONS: Record<string, string[]> = {
-  accept: ["pending"],
-  decline: ["pending"],
-  withdraw: ["accepted"],
-  remove: ["pending", "accepted"],
-};
-
-const ACTION_TO_EVENT: Record<string, CastEventType> = {
+const ACTION_TO_EVENT: Partial<Record<string, CastEventType>> = {
   accept: "cast.accepted",
   decline: "cast.declined",
   withdraw: "cast.withdrawn",
@@ -32,15 +25,16 @@ export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient(event);
   const actorId = await requireUserId(event, supabase);
 
-  const subjectId = action === "remove" ? targetUserId : actorId;
+  const subjectId =
+    action === "remove" || action === "approve" ? targetUserId : actorId;
   if (!subjectId) {
     throw createError({
       statusCode: 400,
-      statusMessage: "targetUserId required for remove",
+      statusMessage: "targetUserId required for producer cast actions",
     });
   }
 
-  if (action === "remove") {
+  if (action === "remove" || action === "approve") {
     const { data: roleRow } = await supabase
       .from("show_roles")
       .select("role")
@@ -50,14 +44,14 @@ export default defineEventHandler(async (event) => {
     if (roleRow?.role !== "producer") {
       throw createError({
         statusCode: 403,
-        statusMessage: "Only producers can remove performers",
+        statusMessage: "Only producers can manage performers",
       });
     }
   }
 
   const { data: castRow } = await supabase
     .from("show_cast")
-    .select("status")
+    .select("status,source")
     .eq("show_id", showId)
     .eq("user_id", subjectId)
     .maybeSingle();
@@ -68,7 +62,23 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Cast entry not found",
     });
 
-  if (!VALID_TRANSITIONS[action].includes(castRow.status)) {
+  const isValidTransition =
+    (action === "accept" &&
+      castRow.status === "pending" &&
+      castRow.source === "invited") ||
+    (action === "approve" &&
+      castRow.status === "pending" &&
+      castRow.source === "requested") ||
+    (action === "decline" &&
+      castRow.status === "pending" &&
+      castRow.source === "invited") ||
+    (action === "withdraw" &&
+      (castRow.status === "accepted" ||
+        (castRow.status === "pending" && castRow.source === "requested"))) ||
+    (action === "remove" &&
+      (castRow.status === "pending" || castRow.status === "accepted"));
+
+  if (!isValidTransition) {
     throw createError({
       statusCode: 409,
       statusMessage: `Cannot ${action} from status ${castRow.status}`,
@@ -76,7 +86,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const newStatus =
-    action === "accept"
+    action === "accept" || action === "approve"
       ? "accepted"
       : action === "decline"
         ? "declined"
@@ -116,13 +126,21 @@ export default defineEventHandler(async (event) => {
     actorName: actorProfile?.display_name ?? "Someone",
   };
 
-  const eventType = ACTION_TO_EVENT[action];
-
   if (action === "remove") {
     await emitEvent(
-      buildCastEvent(eventType, { ...eventBase, recipientId: subjectId }),
+      buildCastEvent("cast.removed_by_producer", {
+        ...eventBase,
+        recipientId: subjectId,
+      }),
     );
-  } else {
+  } else if (action === "approve") {
+    await emitEvent(
+      buildCastEvent("cast.request_approved", {
+        ...eventBase,
+        recipientId: subjectId,
+      }),
+    );
+  } else if (action !== "approve") {
     const { data: producerRows } = await supabase
       .from("show_roles")
       .select("user_id")
@@ -131,7 +149,7 @@ export default defineEventHandler(async (event) => {
 
     for (const producer of producerRows ?? []) {
       await emitEvent(
-        buildCastEvent(eventType, {
+        buildCastEvent(ACTION_TO_EVENT[action]!, {
           ...eventBase,
           recipientId: producer.user_id,
         }),

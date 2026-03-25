@@ -16,10 +16,11 @@ const { data: initialData } = await useAsyncData(
   { server: true },
 );
 
-const { data, isLoading, error } = useShowDetail(id, initialData);
+const { data, isLoading, error, refresh } = useShowDetail(id, initialData);
 
 const show = computed(() => data.value?.show ?? null);
 const occurrences = computed(() => data.value?.occurrences ?? []);
+const producers = computed(() => data.value?.producers ?? []);
 const cast = computed(() => data.value?.cast ?? []);
 const isProducer = computed(() => data.value?.permissions.isProducer ?? false);
 
@@ -129,8 +130,11 @@ const statusColors = {
         :show-id="show.id"
         :theater-id="show.theaterId"
         :theater-slug="show.theaterSlug ?? ''"
+        :producers="producers"
         :cast="cast"
         :is-producer="isProducer"
+        :can-request-to-join="data.permissions.canRequestToJoin"
+        :refresh-show="refresh"
       />
     </UCard>
   </div>

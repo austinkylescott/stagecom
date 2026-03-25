@@ -4,6 +4,7 @@ import { z } from "zod";
 const MY_SHOWS_TYPES = [
   "show.approved",
   "show.rejected",
+  "cast.requested",
   "cast.accepted",
   "cast.declined",
   "cast.withdrawn",
@@ -12,6 +13,7 @@ const MY_SHOWS_TYPES = [
 
 const OTHER_TYPES = [
   "cast.invited",
+  "cast.request_approved",
   "occurrence.time_changed",
   "occurrence.cancelled",
   "occurrence.reminder_24h",
