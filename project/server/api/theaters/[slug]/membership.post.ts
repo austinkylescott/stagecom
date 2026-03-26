@@ -1,6 +1,7 @@
 import { serverSupabaseClient } from "#supabase/server";
 import { z } from "zod";
 import type { Enums } from "~/types/database.types";
+import { getServiceRoleClient } from "~~/server/utils/service-role";
 
 /**
  * POST /api/theaters/:slug/membership
@@ -13,12 +14,13 @@ export default defineEventHandler(async (event) => {
   const { slug } = parseParams(event, paramsSchema);
   const { action } = await parseBody(event, bodySchema);
   const supabase = await serverSupabaseClient(event);
+  const serviceSupabase = getServiceRoleClient();
   const user = await requireUser(event, supabase);
   const userId = user.id;
   const metadata = (user.user_metadata || {}) as Record<string, unknown>;
 
   // Ensure profile exists for FK
-  await supabase.from("profiles").upsert(
+  await serviceSupabase.from("profiles").upsert(
     {
       id: userId,
       display_name:
@@ -45,7 +47,7 @@ export default defineEventHandler(async (event) => {
 
   if (action === "join") {
     const roles: Enums<"theater_role">[] = ["member"];
-    const { error: upsertError } = await supabase
+    const { error: upsertError } = await serviceSupabase
       .from("theater_memberships")
       .upsert(
         {
@@ -68,7 +70,7 @@ export default defineEventHandler(async (event) => {
   }
 
   if (action === "leave") {
-    const { error: deleteError } = await supabase
+    const { error: deleteError } = await serviceSupabase
       .from("theater_memberships")
       .delete()
       .eq("theater_id", theater.id)
@@ -82,14 +84,14 @@ export default defineEventHandler(async (event) => {
     }
 
     // If the user is leaving their current home theater, clear it.
-    const { data: profile } = await supabase
+    const { data: profile } = await serviceSupabase
       .from("profiles")
       .select("home_theater_id")
       .eq("id", userId)
       .maybeSingle();
 
     if (profile?.home_theater_id === theater.id) {
-      await supabase
+      await serviceSupabase
         .from("profiles")
         .update({ home_theater_id: null })
         .eq("id", userId);

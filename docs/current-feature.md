@@ -25,6 +25,7 @@ In Progress
 - Live schema audit now confirms the deployed public tables/enums/functions match the repo baseline after accounting for `public.is_active_member_of_theater`.
 - The repo now supports split DB env vars and a Node-based SQL runner so dev scripts do not depend on URL-encoded passwords or a local `psql` install.
 - Mock auth seeding now writes a resolved config with real auth user IDs before seeding app tables.
+- Home theater assignment currently fails when auto-following a theater through the authenticated request client because `theater_memberships` writes are subject to RLS.
 
 ## History
 

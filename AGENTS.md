@@ -27,6 +27,13 @@ Read these before making behavior changes:
 - `docs/ai-interaction.md`: workflow, branch, commit, and collaboration rules for AI-assisted work.
 - `docs/events-and-notifications.md` and feature specs when touching those areas.
 
+## Documentation Sources
+
+- Use repository docs in `docs/` as the source of truth for product behavior, architecture, and repo-specific constraints.
+- Use Context7 for current framework and library documentation when working with Nuxt, Nuxt UI, Vue, Supabase, and Vitest.
+- Prefer official or high-reputation Context7 libraries when multiple matches exist.
+- Use Supabase MCP for live database and project inspection rather than documentation lookups.
+
 ## Non-Negotiable Rules
 
 - Every feature change must map back to `docs/PRD.md`.

@@ -1,5 +1,6 @@
 import { serverSupabaseClient } from "#supabase/server";
 import { z } from "zod";
+import { getServiceRoleClient } from "~~/server/utils/service-role";
 
 const bodySchema = z.object({
   theaterId: z.string().trim().min(1).nullable().optional(),
@@ -8,12 +9,13 @@ const bodySchema = z.object({
 export default defineEventHandler(async (event) => {
   const { theaterId: parsedTheaterId } = await parseBody(event, bodySchema);
   const supabase = await serverSupabaseClient(event);
+  const serviceSupabase = getServiceRoleClient();
   const userId = await requireUserId(event, supabase);
   const theaterId = parsedTheaterId ?? null;
 
   // Clear home
   if (!theaterId) {
-    const { error: clearError } = await supabase
+    const { error: clearError } = await serviceSupabase
       .from("profiles")
       .update({ home_theater_id: null })
       .eq("id", userId);
@@ -62,7 +64,7 @@ export default defineEventHandler(async (event) => {
       status: "active" as const,
     };
 
-    const { error: followError } = await supabase
+    const { error: followError } = await serviceSupabase
       .from("theater_memberships")
       .upsert(upsertPayload, { onConflict: "theater_id,user_id" });
 
@@ -75,7 +77,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Update profile
-  const { error: updateError } = await supabase
+  const { error: updateError } = await serviceSupabase
     .from("profiles")
     .update({ home_theater_id: theater.id })
     .eq("id", userId);
