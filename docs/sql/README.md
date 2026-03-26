@@ -37,12 +37,12 @@ Run commands from `project/`.
 
 ```bash
 cp ./mock-data.config.example.json ./mock-data.config.json
-# Replace the example user IDs with real Supabase auth.users IDs first.
-
-npm run mock-data:generate -- --config ./mock-data.config.json --out ./tmp/mock-data.sql
-npm run db:seed:mock -- ./mock-data.config.json
+# Keep dedicated mock emails/passwords in the config, then resolve real auth IDs:
+npm run auth:seed:mock -- --config ./mock-data.config.json --out ./mock-data.resolved.json
+npm run mock-data:generate -- --config ./mock-data.resolved.json --out ./tmp/mock-data.sql
+npm run db:seed:mock:full -- ./mock-data.config.json
 npm run db:reset
-npm run db:rebuild:mock -- ./mock-data.config.json
+npm run db:rebuild:mock:full -- ./mock-data.config.json
 ```
 
 `db:reset` and `db:trash` both wipe and recreate the schema from `docs/sql/001-init.sql`.

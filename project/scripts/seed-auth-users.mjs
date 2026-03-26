@@ -64,14 +64,21 @@ for (const user of users) {
     avatar_url: user.avatarUrl ?? null,
     mock_user_key: user.key ?? null,
   };
+  const appMetadata = {
+    stagecom_mock_user: true,
+    mock_user_key: user.key ?? null,
+  };
 
   let resolvedAuthUser = existingByEmail.get(email);
 
   if (resolvedAuthUser) {
+    assertMockOwnership(resolvedAuthUser, user.key, email);
+
     const updatePayload = {
       email,
       email_confirm: emailConfirm,
       user_metadata: userMetadata,
+      app_metadata: appMetadata,
     };
 
     if (password) {
@@ -102,6 +109,7 @@ for (const user of users) {
       password,
       email_confirm: emailConfirm,
       user_metadata: userMetadata,
+      app_metadata: appMetadata,
     });
 
     if (error) {
@@ -257,4 +265,42 @@ function optionalString(value) {
   }
 
   return value;
+}
+
+function assertMockOwnership(user, expectedKey, email) {
+  const userMetadata = isRecord(user.user_metadata) ? user.user_metadata : {};
+  const appMetadata = isRecord(user.app_metadata) ? user.app_metadata : {};
+  const metadataMockKey = firstString(userMetadata.mock_user_key, appMetadata.mock_user_key);
+  const isMockUser =
+    metadataMockKey === expectedKey || appMetadata.stagecom_mock_user === true;
+
+  if (!isMockUser) {
+    throw new Error(
+      [
+        `Refusing to update existing auth user "${email}".`,
+        "A user with that email already exists but is not marked as a Stagecom mock user.",
+        "Use a dedicated mock email or delete the conflicting auth user before running auth:seed:mock.",
+      ].join(" "),
+    );
+  }
+
+  if (metadataMockKey && metadataMockKey !== expectedKey) {
+    throw new Error(
+      `Auth user "${email}" is already owned by mock user key "${metadataMockKey}", not "${expectedKey}".`,
+    );
+  }
+}
+
+function isRecord(value) {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function firstString(...values) {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim() !== "") {
+      return value.trim();
+    }
+  }
+
+  return null;
 }

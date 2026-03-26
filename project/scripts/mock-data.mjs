@@ -119,12 +119,9 @@ function buildSql(config, configPath) {
 function pushCleanup(lines, users, theaters) {
   const theaterIds = theaters.map((theater) => asSqlUuid(resolveTheaterId(theater)));
   const userIds = users.map((user) => asSqlUuid(requireUuid(user.id, `users[${user.key}].id`)));
-  const handles = users
-    .map((user) => optionalString(user.handle))
-    .filter((handle) => typeof handle === "string" && handle.length > 0)
-    .map((handle) => asSqlString(handle.toLowerCase()));
+  const mockUserKeys = users.map((user) => asSqlString(requireString(user.key, "users[].key")));
 
-  if (theaterIds.length === 0 && userIds.length === 0 && handles.length === 0) {
+  if (theaterIds.length === 0 && userIds.length === 0 && mockUserKeys.length === 0) {
     return;
   }
 
@@ -134,15 +131,15 @@ function pushCleanup(lines, users, theaters) {
     lines.push(`delete from theaters where id in (${theaterIds.join(", ")});`);
   }
 
-  if (userIds.length > 0 || handles.length > 0) {
+  if (userIds.length > 0 || mockUserKeys.length > 0) {
     const conditions = [];
 
     if (userIds.length > 0) {
       conditions.push(`id in (${userIds.join(", ")})`);
     }
 
-    if (handles.length > 0) {
-      conditions.push(`lower(handle) in (${handles.join(", ")})`);
+    if (mockUserKeys.length > 0) {
+      conditions.push(`trust_flags->>'mock_user_key' in (${mockUserKeys.join(", ")})`);
     }
 
     lines.push(`delete from profiles where ${conditions.join(" or ")};`);
@@ -170,6 +167,12 @@ function pushProfileUpserts(lines, users, theaterByKey) {
         )
       : "null";
 
+    const trustFlags = {
+      ...(user.trustFlags ?? {}),
+      mock_user_key: user.key,
+      mock_data: true,
+    };
+
     return `  (${[
       asSqlUuid(userId),
       asSqlString(requireString(user.displayName, `users[${user.key}].displayName`)),
@@ -186,7 +189,7 @@ function pushProfileUpserts(lines, users, theaterByKey) {
       asSqlNullableString(optionalString(user.castingNotes)),
       asSqlEnum(optionalString(user.visibility) ?? "theater_only", "profile_visibility"),
       user.verifiedAt ? asSqlTimestamp(requireString(user.verifiedAt, `users[${user.key}].verifiedAt`)) : "null",
-      asSqlJson(user.trustFlags ?? {}),
+      asSqlJson(trustFlags),
       user.deletedAt ? asSqlTimestamp(requireString(user.deletedAt, `users[${user.key}].deletedAt`)) : "null",
     ].join(", ")})`;
   });

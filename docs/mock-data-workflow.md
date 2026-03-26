@@ -55,6 +55,8 @@ Typical workflow:
 4. Run the auth seed script to create or sync users and produce `project/mock-data.resolved.json`.
 5. Seed app data from the resolved config.
 
+Use dedicated mock email addresses. If `auth:seed:mock` finds an existing auth user with the same email that is not already marked as a Stagecom mock account, it now fails instead of overwriting that user.
+
 ## Commands
 
 Run commands from `project/`.
@@ -80,7 +82,7 @@ npm run supabase:stop
 - Non-user entity IDs are generated deterministically from config keys, so the same config produces the same theater/show/occurrence IDs every time.
 - `db:reset` is destructive for the target database and is only safe for local/dev usage.
 - `db:seed:mock` is idempotent for the seeded records because the generated SQL uses upserts where possible.
-- `auth:seed:mock` creates missing auth users and updates existing ones by email using the Supabase Admin API.
+- `auth:seed:mock` creates missing auth users and only updates existing users that were previously created as Stagecom mock users.
 - `db:seed:mock:full` is the simplest shared-dev command: it resolves auth users first, writes `mock-data.resolved.json`, then seeds app data with the real user IDs.
 - `db:audit:live` is read-only and is the recommended first step before changing workflow files that assume the repo matches the remote database.
 - The SQL runner no longer depends on `psql`; project scripts execute SQL through the repo’s Node Postgres client instead.
