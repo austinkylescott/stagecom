@@ -918,6 +918,93 @@
       ]
     },
     {
+      "key": "focus-producer-lab",
+      "theater": "focus_theater",
+      "createdBy": "focus_producer_1",
+      "status": "approved",
+      "eventType": "show",
+      "title": "Producer Lab",
+      "description": "Public-casting show with accepted, pending, withdrawn, and declined cast states for producer testing.",
+      "castingMode": "public_casting",
+      "castMin": 5,
+      "castMax": 8,
+      "isCastFinalized": false,
+      "isPublicListed": true,
+      "ticketUrl": "https://example.com/producer-lab",
+      "onSaleAt": "2026-04-05T16:00:00Z",
+      "producers": ["focus_producer_1"],
+      "occurrences": [
+        { "key": "week-1", "startsAt": "2026-04-10T01:00:00Z", "endsAt": "2026-04-10T02:30:00Z" }
+      ],
+      "cast": [
+        { "user": "performer_7", "source": "requested", "status": "pending" },
+        { "user": "performer_8", "source": "requested", "status": "accepted", "programOrder": 1 },
+        { "user": "performer_9", "source": "requested", "status": "pending" },
+        { "user": "performer_10", "source": "requested", "status": "withdrawn" },
+        { "user": "performer_11", "source": "invited", "status": "accepted", "programOrder": 2 },
+        { "user": "performer_12", "source": "invited", "status": "declined" }
+      ],
+      "reviewEvents": [
+        { "key": "approved", "action": "approved", "actor": "focus_manager", "note": "Approved for producer visibility scenarios." }
+      ]
+    },
+    {
+      "key": "focus-midweek-experiment",
+      "theater": "focus_theater",
+      "createdBy": "focus_producer_1",
+      "status": "draft",
+      "eventType": "show",
+      "title": "Midweek Experiment",
+      "description": "Draft invite-only show with active and inactive invite states for producer workflow checks.",
+      "castingMode": "direct_invite",
+      "castMin": 4,
+      "castMax": 7,
+      "isCastFinalized": false,
+      "isPublicListed": false,
+      "producers": ["focus_producer_1"],
+      "occurrences": [
+        { "key": "week-1", "startsAt": "2026-04-12T00:30:00Z", "endsAt": "2026-04-12T01:45:00Z" }
+      ],
+      "cast": [
+        { "user": "performer_13", "source": "invited", "status": "accepted", "programOrder": 1 },
+        { "user": "performer_14", "source": "invited", "status": "pending", "programOrder": 2 },
+        { "user": "performer_15", "source": "invited", "status": "accepted", "programOrder": 3 },
+        { "user": "performer_16", "source": "invited", "status": "removed" },
+        { "user": "performer_17", "source": "invited", "status": "declined" }
+      ]
+    },
+    {
+      "key": "focus-community-clash",
+      "theater": "focus_theater",
+      "createdBy": "focus_producer_2",
+      "status": "approved",
+      "eventType": "show",
+      "title": "Community Clash",
+      "description": "Theater-casting show with accepted castmates, pending requests, and pending invites.",
+      "castingMode": "theater_casting",
+      "castMin": 6,
+      "castMax": 10,
+      "isCastFinalized": false,
+      "isPublicListed": true,
+      "ticketUrl": "https://example.com/community-clash",
+      "onSaleAt": "2026-04-06T16:00:00Z",
+      "producers": ["focus_producer_2"],
+      "occurrences": [
+        { "key": "week-1", "startsAt": "2026-04-13T01:30:00Z", "endsAt": "2026-04-13T03:00:00Z" }
+      ],
+      "cast": [
+        { "user": "performer_1", "source": "invited", "status": "accepted", "programOrder": 1 },
+        { "user": "performer_2", "source": "invited", "status": "accepted", "programOrder": 2 },
+        { "user": "performer_3", "source": "invited", "status": "pending", "programOrder": 3 },
+        { "user": "performer_4", "source": "requested", "status": "pending" },
+        { "user": "performer_5", "source": "requested", "status": "accepted", "programOrder": 4 },
+        { "user": "performer_6", "source": "requested", "status": "withdrawn" }
+      ],
+      "reviewEvents": [
+        { "key": "approved", "action": "approved", "actor": "focus_staff_2", "note": "Approved with mixed cast visibility states." }
+      ]
+    },
+    {
       "key": "spotlight-weeknight-mixer",
       "theater": "spotlight_theater",
       "createdBy": "spotlight_manager",

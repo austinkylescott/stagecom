@@ -503,9 +503,11 @@ function pushShowData(lines, shows, userByKey, theaterByKey) {
     "  read_at = excluded.read_at;",
   ]);
   pushInsert(lines, "-- Email outbox", "email_outbox", "(id, user_id, template, payload, dedupe_key, status, sent_at, last_error)", emailRows, [
-    "on conflict (user_id, dedupe_key) do update set",
+    "on conflict (id) do update set",
+    "  user_id = excluded.user_id,",
     "  template = excluded.template,",
     "  payload = excluded.payload,",
+    "  dedupe_key = excluded.dedupe_key,",
     "  status = excluded.status,",
     "  sent_at = excluded.sent_at,",
     "  last_error = excluded.last_error;",

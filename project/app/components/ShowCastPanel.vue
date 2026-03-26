@@ -6,6 +6,7 @@ import {
   usePatchCast,
   useRequestCast,
 } from "~/composables/useShowDetail";
+import { useShowCast } from "~/composables/useShowCast";
 import { usePerformers } from "~/composables/usePerformers";
 
 type CastMember = {
@@ -30,8 +31,11 @@ const props = defineProps<{
   theaterSlug: string;
   producers: Producer[];
   cast: CastMember[];
+  viewerCast: CastMember | null;
   isProducer: boolean;
   canRequestToJoin: boolean;
+  canSeePendingCast: boolean;
+  viewerCastResolved: boolean;
   refreshShow?: () => Promise<unknown> | unknown;
 }>();
 
@@ -48,64 +52,75 @@ const compareByName = (a: { displayName: string | null; userId: string }, b: {
 }) =>
   (a.displayName ?? a.userId).localeCompare(b.displayName ?? b.userId);
 
-const statusOrder: Record<CastMember["status"], number> = {
-  accepted: 0,
-  pending: 1,
-  declined: 2,
-  withdrawn: 3,
-  removed: 4,
-};
-
-const compareCastMembers = (a: CastMember, b: CastMember) => {
-  if (sortMode.value === "name") return compareByName(a, b);
-
-  const statusDiff = statusOrder[a.status] - statusOrder[b.status];
-  if (statusDiff !== 0) return statusDiff;
-
-  if (a.programOrder !== null || b.programOrder !== null) {
-    if (a.programOrder === null) return 1;
-    if (b.programOrder === null) return -1;
-    if (a.programOrder !== b.programOrder) return a.programOrder - b.programOrder;
-  }
-
-  if (a.source !== b.source) return a.source.localeCompare(b.source);
-  return compareByName(a, b);
-};
-
-const sortCastMembers = (members: CastMember[]) =>
-  members.slice().sort(compareCastMembers);
-
 const sortedProducers = computed(() =>
   props.producers.slice().sort(compareByName),
 );
-
-const accepted = computed(() =>
-  sortCastMembers(props.cast.filter((c) => c.status === "accepted")),
-);
-const pending = computed(() =>
-  sortCastMembers(props.cast.filter((c) => c.status === "pending")),
-);
-const pendingRequests = computed(() =>
-  sortCastMembers(pending.value.filter((c) => c.source === "requested")),
-);
-const pendingInvites = computed(() =>
-  sortCastMembers(pending.value.filter((c) => c.source === "invited")),
-);
-const inactive = computed(() =>
-  sortCastMembers(
-    props.cast.filter((c) => ["declined", "withdrawn", "removed"].includes(c.status)),
-  ),
-);
+const showCast = useShowCast({
+  cast: computed(() => props.cast),
+  viewerCast: computed(() => props.viewerCast),
+  canSeePendingCast: computed(() => props.canSeePendingCast),
+  sortMode,
+});
+const accepted = showCast.confirmedCast;
+const pendingRequests = showCast.pendingRequests;
+const pendingInvites = showCast.pendingInvites;
+const inactive = showCast.inactiveCast;
 
 const user = useSupabaseUser();
 const myUserId = computed(() => user.value?.id);
-const myCast = computed(() =>
-  props.cast.find((c) => c.userId === myUserId.value),
+const serverMyCast = computed(() =>
+  props.viewerCast ?? props.cast.find((c) => c.userId === myUserId.value),
 );
+const localRequestPending = ref(false);
+const myCast = computed(() => {
+  if (serverMyCast.value) {
+    return serverMyCast.value;
+  }
+
+  if (!localRequestPending.value || !myUserId.value) {
+    return undefined;
+  }
+
+  return {
+    userId: myUserId.value,
+    source: "requested" as const,
+    status: "pending" as const,
+    programOrder: null,
+    note: null,
+    displayName: null,
+    avatarUrl: null,
+  };
+});
 const canSubmitRequest = computed(() => {
   if (!myCast.value) return true;
   return ["declined", "withdrawn"].includes(myCast.value.status);
 });
+const hasPendingRequest = computed(
+  () =>
+    localRequestPending.value ||
+    (myCast.value?.status === "pending" && myCast.value.source === "requested"),
+);
+const canShowRequestPanel = computed(
+  () => !props.isProducer && props.canRequestToJoin,
+);
+const canShowRequestButton = computed(
+  () => props.viewerCastResolved && canSubmitRequest.value && !hasPendingRequest.value,
+);
+
+watch(
+  serverMyCast,
+  (member) => {
+    if (member?.status === "pending" && member.source === "requested") {
+      localRequestPending.value = false;
+      return;
+    }
+
+    if (member && !["declined", "withdrawn"].includes(member.status)) {
+      localRequestPending.value = false;
+    }
+  },
+  { immediate: true },
+);
 
 const searchInput = ref("");
 const search = ref("");
@@ -134,7 +149,7 @@ const { data: performerData, isLoading: searchLoading } = usePerformers({
 const alreadyCastIds = computed(
   () =>
     new Set(
-      props.cast
+      [...props.cast, ...(props.viewerCast ? [props.viewerCast] : [])]
         .filter((c) => c.status === "pending" || c.status === "accepted")
         .map((c) => c.userId),
     ),
@@ -162,8 +177,32 @@ const inviteUser = async (userId: string) => {
 };
 
 const submitRequest = async () => {
-  await requestCast();
-  await props.refreshShow?.();
+  localRequestPending.value = true;
+
+  try {
+    await requestCast();
+  } catch (error: any) {
+    const status =
+      error?.statusCode ?? error?.status ?? error?.response?.status;
+    const message =
+      error?.data?.statusMessage ||
+      error?.statusMessage ||
+      error?.message ||
+      "";
+
+    if (
+      status === 409 &&
+      typeof message === "string" &&
+      message.includes("active cast entry")
+    ) {
+      return;
+    }
+
+    localRequestPending.value = false;
+    throw error;
+  } finally {
+    await props.refreshShow?.();
+  }
 };
 
 const handlePatch = async (
@@ -266,12 +305,10 @@ const inactiveStatusLabel = (member: CastMember) => {
       </div>
     </div>
 
-    <div
-      v-if="isProducer && pendingRequests.length"
-      class="space-y-2"
-    >
+    <div v-if="pendingRequests.length" class="space-y-2">
       <p class="text-sm font-semibold text-slate-700">
-        Requests ({{ pendingRequests.length }})
+        {{ isProducer ? "Requests" : "Pending requests" }}
+        ({{ pendingRequests.length }})
       </p>
       <div
         v-for="member in pendingRequests"
@@ -283,7 +320,7 @@ const inactiveStatusLabel = (member: CastMember) => {
           <span class="text-sm">{{ member.displayName ?? member.userId }}</span>
           <UBadge size="xs" color="blue" variant="soft">requested</UBadge>
         </div>
-        <div class="flex gap-2">
+        <div v-if="isProducer" class="flex gap-2">
           <UButton
             size="xs"
             color="primary"
@@ -306,7 +343,7 @@ const inactiveStatusLabel = (member: CastMember) => {
       </div>
     </div>
 
-    <div v-if="isProducer && pendingInvites.length" class="space-y-2">
+    <div v-if="pendingInvites.length" class="space-y-2">
       <p class="text-sm font-semibold text-slate-700">
         Pending invites ({{ pendingInvites.length }})
       </p>
@@ -320,9 +357,8 @@ const inactiveStatusLabel = (member: CastMember) => {
           <span class="text-sm">{{ member.displayName ?? member.userId }}</span>
           <UBadge size="xs" color="orange" variant="soft">pending</UBadge>
         </div>
-        <div class="flex gap-2">
+        <div v-if="isProducer" class="flex gap-2">
           <UButton
-            v-if="isProducer"
             size="xs"
             color="red"
             variant="ghost"
@@ -364,33 +400,17 @@ const inactiveStatusLabel = (member: CastMember) => {
     </div>
 
     <div
-      v-if="myCast?.status === 'pending' && myCast.source === 'requested'"
-      class="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 space-y-2"
-    >
-      <p class="text-sm font-medium text-blue-800">
-        Your request to join this show is pending.
-      </p>
-      <div class="flex gap-2">
-        <UButton
-          size="xs"
-          color="gray"
-          variant="ghost"
-          :loading="patching"
-          @click="handlePatch('withdraw')"
-        >
-          Withdraw request
-        </UButton>
-      </div>
-    </div>
-
-    <div
-      v-if="!isProducer && canRequestToJoin && canSubmitRequest"
+      v-if="canShowRequestPanel"
       class="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 space-y-2"
     >
       <p class="text-sm font-medium text-blue-800">
         This show is open for cast requests.
       </p>
+      <p v-if="hasPendingRequest" class="text-sm text-blue-700">
+        Your request to join is pending review.
+      </p>
       <UButton
+        v-if="canShowRequestButton"
         size="sm"
         color="primary"
         :loading="requesting"

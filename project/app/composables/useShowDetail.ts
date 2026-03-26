@@ -1,7 +1,12 @@
 import { useQuery, useMutation, useQueryCache } from "@pinia/colada";
 import { computed } from "vue";
 import type { Ref } from "vue";
-import { showDetailQueryOptions, type ShowDetailResponse } from "~/queries/shows";
+import {
+  applyOptimisticShowCastRequest,
+  rollbackOptimisticShowDetail,
+  showDetailQueryOptions,
+  type ShowDetailResponse,
+} from "~/queries/shows";
 import { queryKeys } from "~/composables/queryKeys";
 
 export type { ShowDetailResponse } from "~/queries/shows";
@@ -74,13 +79,54 @@ export const usePatchCast = (showId: Ref<string>) => {
 
 export const useRequestCast = (showId: Ref<string>) => {
   const queryCache = useQueryCache();
+  const user = useSupabaseUser();
 
-  return useMutation<void, void>({
-    mutation: () =>
-      $fetch(`/api/shows/${showId.value}/cast/request`, {
-        method: "POST",
-        credentials: "include",
-      }),
+  return useMutation<
+    { status: "pending"; source: "requested"; duplicate?: boolean },
+    void,
+    unknown,
+    { previous?: ShowDetailResponse }
+  >({
+    mutation: async () => {
+      try {
+        return await $fetch<{ status: "pending"; source: "requested" }>(
+          `/api/shows/${showId.value}/cast/request`,
+          {
+            method: "POST",
+            credentials: "include",
+          },
+        );
+      } catch (error: any) {
+        const status =
+          error?.statusCode ?? error?.status ?? error?.response?.status;
+        const message =
+          error?.data?.statusMessage ||
+          error?.statusMessage ||
+          error?.message ||
+          "";
+
+        if (
+          status === 409 &&
+          typeof message === "string" &&
+          message.includes("active cast entry")
+        ) {
+          return {
+            status: "pending",
+            source: "requested",
+            duplicate: true,
+          };
+        }
+
+        throw error;
+      }
+    },
+    onMutate: () => ({
+      previous: applyOptimisticShowCastRequest(
+        queryCache,
+        showId.value,
+        user.value?.id,
+      ),
+    }),
     onSuccess: () => {
       queryCache.invalidateQueries({
         key: queryKeys.showDetail(showId.value),
@@ -90,6 +136,9 @@ export const useRequestCast = (showId: Ref<string>) => {
         key: queryKeys.notifications(),
         exact: true,
       });
+    },
+    onError: (_error, _vars, ctx) => {
+      rollbackOptimisticShowDetail(queryCache, showId.value, ctx?.previous);
     },
   });
 };

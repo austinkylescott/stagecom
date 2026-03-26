@@ -72,10 +72,28 @@ export type ShowDetailResponse = {
     displayName: string | null;
     avatarUrl: string | null;
   }[];
+  viewerCast: {
+    userId: string;
+    source: Enums<"show_cast_source">;
+    status: Enums<"show_cast_status">;
+    programOrder: number | null;
+    note: string | null;
+    displayName: string | null;
+    avatarUrl: string | null;
+  } | null;
   permissions: {
     isProducer: boolean;
     canRequestToJoin: boolean;
+    canSeePendingCast: boolean;
   };
+};
+
+type ShowDetailQueryCache = {
+  getQueryData: (key: readonly unknown[]) => unknown;
+  setQueryData: (
+    key: readonly unknown[],
+    value: unknown | ((previous: unknown) => unknown),
+  ) => unknown;
 };
 
 export const memberShowsQueryOptions = defineQueryOptions<
@@ -140,4 +158,58 @@ export const invalidateShowRelatedQueries = async (
       exact: false,
     }),
   ]);
+};
+
+export const applyOptimisticShowCastRequest = (
+  queryCache: ShowDetailQueryCache,
+  showId: string,
+  userId?: string | null,
+) => {
+  const key = queryKeys.showDetail(showId);
+  const previous = queryCache.getQueryData(key) as ShowDetailResponse | undefined;
+
+  if (!userId || !previous) {
+    return previous;
+  }
+
+  const existingCastIndex = previous.cast.findIndex((member) => member.userId === userId);
+  const nextCast =
+    existingCastIndex >= 0
+      ? previous.cast.map((member, index) =>
+          index === existingCastIndex
+            ? {
+                ...member,
+                source: "requested" as const,
+                status: "pending" as const,
+              }
+            : member,
+        )
+      : [
+          ...previous.cast,
+          {
+            userId,
+            source: "requested" as const,
+            status: "pending" as const,
+            programOrder: null,
+            note: null,
+            displayName: null,
+            avatarUrl: null,
+          },
+        ];
+
+  queryCache.setQueryData(key, {
+    ...previous,
+    cast: nextCast,
+  });
+
+  return previous;
+};
+
+export const rollbackOptimisticShowDetail = (
+  queryCache: Pick<ShowDetailQueryCache, "setQueryData">,
+  showId: string,
+  previous?: ShowDetailResponse,
+) => {
+  if (!previous) return;
+  queryCache.setQueryData(queryKeys.showDetail(showId), previous);
 };

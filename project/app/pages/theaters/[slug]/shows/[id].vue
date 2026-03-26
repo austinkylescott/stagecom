@@ -17,12 +17,47 @@ const { data: initialData } = await useAsyncData(
 );
 
 const { data, isLoading, error, refresh } = useShowDetail(id, initialData);
+const user = useSupabaseUser();
+const hasRefreshedAuthedDetail = ref(false);
+const authDetailResolved = ref(import.meta.server);
+
+watch(
+  () => user.value?.id,
+  async (userId) => {
+    if (!import.meta.client) {
+      return;
+    }
+
+    if (!userId) {
+      authDetailResolved.value = true;
+      return;
+    }
+
+    if (hasRefreshedAuthedDetail.value) {
+      return;
+    }
+
+    hasRefreshedAuthedDetail.value = true;
+    authDetailResolved.value = false;
+
+    try {
+      await refresh();
+    } finally {
+      authDetailResolved.value = true;
+    }
+  },
+  { immediate: true },
+);
 
 const show = computed(() => data.value?.show ?? null);
 const occurrences = computed(() => data.value?.occurrences ?? []);
 const producers = computed(() => data.value?.producers ?? []);
 const cast = computed(() => data.value?.cast ?? []);
+const viewerCast = computed(() => data.value?.viewerCast ?? null);
 const isProducer = computed(() => data.value?.permissions.isProducer ?? false);
+const canSeePendingCast = computed(
+  () => data.value?.permissions.canSeePendingCast ?? false,
+);
 
 const statusColors = {
   draft: "gray",
@@ -132,8 +167,11 @@ const statusColors = {
         :theater-slug="show.theaterSlug ?? ''"
         :producers="producers"
         :cast="cast"
+        :viewer-cast="viewerCast"
         :is-producer="isProducer"
         :can-request-to-join="data.permissions.canRequestToJoin"
+        :can-see-pending-cast="canSeePendingCast"
+        :viewer-cast-resolved="authDetailResolved"
         :refresh-show="refresh"
       />
     </UCard>

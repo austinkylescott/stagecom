@@ -1,11 +1,13 @@
 import { serverSupabaseClient } from "#supabase/server";
 import { z } from "zod";
+import { getServiceRoleClient } from "~~/server/utils/service-role";
 
 const paramsSchema = z.object({ id: z.string().trim().min(1) });
 
 export default defineEventHandler(async (event) => {
   const { id: showId } = parseParams(event, paramsSchema);
   const supabase = await serverSupabaseClient(event);
+  const serviceSupabase = getServiceRoleClient();
   const userId = await getOptionalUserId(event, supabase);
 
   const { data: show, error: showError } = await supabase
@@ -41,6 +43,7 @@ export default defineEventHandler(async (event) => {
 
   let isProducer = false;
   let canRequestToJoin = false;
+  let isTheaterStaff = false;
   if (userId) {
     const { data: roleRow } = await supabase
       .from("show_roles")
@@ -50,22 +53,51 @@ export default defineEventHandler(async (event) => {
       .maybeSingle();
     isProducer = roleRow?.role === "producer";
 
-    if (!isProducer && show.casting_mode !== "direct_invite") {
-      if (show.casting_mode === "public_casting") {
-        canRequestToJoin = true;
-      } else {
-        const { data: membershipRow } = await supabase
-          .from("theater_memberships")
-          .select("status")
-          .eq("theater_id", show.theater_id)
-          .eq("user_id", userId)
-          .eq("status", "active")
-          .maybeSingle();
+    const { data: membershipRow } = await supabase
+      .from("theater_memberships")
+      .select("status,roles")
+      .eq("theater_id", show.theater_id)
+      .eq("user_id", userId)
+      .maybeSingle();
 
-        canRequestToJoin = membershipRow?.status === "active";
-      }
+    const isActiveMember = membershipRow?.status === "active";
+    isTheaterStaff = isActiveMember && hasStaffRole(membershipRow?.roles);
+
+    if (!isProducer && show.casting_mode !== "direct_invite") {
+      canRequestToJoin =
+        show.casting_mode === "public_casting" ? true : isActiveMember;
     }
   }
+
+  let viewerCastRow: {
+    user_id: string;
+    source: "invited" | "requested";
+    status: "pending" | "accepted" | "declined" | "withdrawn" | "removed";
+    program_order: number | null;
+    note: string | null;
+  } | null = null;
+
+  if (userId && !isProducer) {
+    const { data, error } = await serviceSupabase
+      .from("show_cast")
+      .select("user_id,source,status,program_order,note")
+      .eq("show_id", showId)
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (error) {
+      throw createError({ statusCode: 500, statusMessage: error.message });
+    }
+
+    viewerCastRow = data;
+  }
+
+  const isViewerInvolved =
+    isProducer ||
+    isTheaterStaff ||
+    viewerCastRow?.status === "accepted" ||
+    (viewerCastRow?.status === "pending" && viewerCastRow?.source === "invited");
+  const canSeePendingCast = isViewerInvolved;
 
   let castQuery = supabase
     .from("show_cast")
@@ -75,17 +107,32 @@ export default defineEventHandler(async (event) => {
     .eq("show_id", showId)
     .order("program_order", { ascending: true, nullsFirst: false });
 
-  if (!isProducer) {
-    if (userId) {
-      castQuery = castQuery.or(`status.eq.accepted,user_id.eq.${userId}`);
-    } else {
-      castQuery = castQuery.eq("status", "accepted");
-    }
+  if (isProducer) {
+    // Producers need the full cast state, including inactive rows.
+  } else if (canSeePendingCast) {
+    castQuery = castQuery.in("status", ["accepted", "pending"]);
+  } else {
+    castQuery = castQuery.eq("status", "accepted");
   }
 
-  const { data: castRows } = await castQuery;
+  const { data: castRows, error: castError } = await castQuery;
 
-  const cast = (castRows ?? []).map((row) => {
+  if (castError) {
+    throw createError({ statusCode: 500, statusMessage: castError.message });
+  }
+
+  const castByUserId = new Map(
+    (castRows ?? []).map((row) => [row.user_id, row]),
+  );
+
+  if (viewerCastRow) {
+    castByUserId.set(viewerCastRow.user_id, {
+      ...viewerCastRow,
+      profiles: null,
+    });
+  }
+
+  const cast = Array.from(castByUserId.values()).map((row) => {
     const profile = Array.isArray(row.profiles)
       ? row.profiles[0]
       : row.profiles;
@@ -99,6 +146,18 @@ export default defineEventHandler(async (event) => {
       avatarUrl: profile?.avatar_url ?? null,
     };
   });
+
+  const viewerCast = viewerCastRow
+    ? {
+        userId: viewerCastRow.user_id,
+        source: viewerCastRow.source,
+        status: viewerCastRow.status,
+        programOrder: viewerCastRow.program_order,
+        note: viewerCastRow.note,
+        displayName: null,
+        avatarUrl: null,
+      }
+    : null;
 
   const producers = (producerRows ?? []).map((row) => {
     const profile = Array.isArray(row.profiles)
@@ -132,6 +191,7 @@ export default defineEventHandler(async (event) => {
     occurrences: occurrences ?? [],
     producers,
     cast,
-    permissions: { isProducer, canRequestToJoin },
+    viewerCast,
+    permissions: { isProducer, canRequestToJoin, canSeePendingCast },
   };
 });
