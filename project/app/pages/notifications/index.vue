@@ -91,7 +91,7 @@ const markAllRead = () => markRead({ all: true });
         @click="!n.read_at && markRead({ ids: [n.id] })"
       >
         <span
-          class="mt-1.5 h-2 w-2 rounded-full flex-shrink-0"
+          class="mt-1.5 h-2 w-2 rounded-full shrink-0"
           :class="n.read_at ? 'bg-transparent' : 'bg-blue-500'"
         />
         <div class="flex-1 min-w-0">
