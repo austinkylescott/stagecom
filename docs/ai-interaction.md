@@ -13,20 +13,25 @@
 This is the common workflow that we will use for every single feature/fix:
 
 1. **Document** - Document the feature in `context/current-feature.md`.
-2. **Branch** - Create new branch for feature, fix, etc
+2. **Branch** - Start from `main`, then create a new branch for the feature or fix
 3. **Implement** - Implement the feature/fix that I create in `context/current-feature.md`
 4. **Test** - Verify it works in the browser. Implement unit testing later. Run `npm run build` and fix any errors
 5. **Iterate** - Iterate and change things if needed
 6. **Commit** - Only after build passes and everything works
-7. **Merge** - Merge to main
-8. **Review** - Review AI-generated code periodically and on demand.
-9. Mark as completed in `context/current-feature.md` and add to history
+7. **Push Branch** - Push the feature branch to origin
+8. **Merge** - Merge into `main`
+9. **Review** - Review AI-generated code periodically and on demand.
+10. Mark as completed in `context/current-feature.md` and add to history
 
 Do NOT commit without permission and until the build passes. If build fails, fix the issues first.
 
 ## Branching
 
-We will create a new branch for every feature/fix. Name branch **feature/[feature]** or **fix[fix]**, etc.
+We will create a new branch for every feature/fix from `main`. Name branch **feature/[feature]** or **fix[fix]**, etc.
+
+Push the feature branch to `origin` before merging it into `main`.
+
+Keep feature branches after merge unless explicitly asked to delete them. This preserves an easy place to return for post-merge fixes or rollback-related work.
 
 ## Commits
 

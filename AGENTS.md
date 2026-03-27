@@ -73,6 +73,9 @@ Run commands from `project/` unless there is a clear reason not to.
 ## Branching And Commits
 
 - Use a new branch for each feature or fix, following the naming guidance in `docs/ai-interaction.md`.
+- Create feature branches from `main`.
+- Push the feature branch to `origin` before merging it into `main`.
+- Keep feature branches after merge unless explicitly asked to delete them.
 - Ask before committing.
 - Do not commit until the relevant verification passes, especially `npm run build` when the task changes shipped application behavior.
 - Use focused conventional commits such as `feat:`, `fix:`, or `chore:`.

@@ -1,12 +1,13 @@
 # Complete Action
 
 1. Stage all changes and commit with a descriptive message
-2. Switch to main and merge the feature branch (no push yet)
-3. Delete the local feature branch
-4. Reset `context/current-feature.md`:
+2. Push the feature branch to origin so the branch exists remotely before merge
+3. Switch to `main` and merge the feature branch (no push yet)
+4. Keep the local feature branch after merge so it remains available for follow-up fixes or rollback work
+5. Reset `context/current-feature.md`:
    - Change H1 back to `# Current Feature`
    - Clear Goals and Notes sections (keep placeholder comments)
    - Add feature summary to the END of History
-5. Commit the reset: `chore: reset context/current-feature.md after completing [feature]`
-6. Push main to origin ONCE (single push with all changes)
-7. If feature branch was previously pushed, delete it from origin
+6. Commit the reset: `chore: reset context/current-feature.md after completing [feature]`
+7. Push `main` to origin
+8. Do not delete the feature branch locally or on origin unless explicitly requested
