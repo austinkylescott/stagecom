@@ -12,16 +12,19 @@
 
 This is the common workflow that we will use for every single feature/fix:
 
-1. **Document** - Document the feature in `context/current-feature.md`.
-2. **Branch** - Start from `main`, then create a new branch for the feature or fix
-3. **Implement** - Implement the feature/fix that I create in `context/current-feature.md`
-4. **Test** - Verify it works in the browser. Implement unit testing later. Run `npm run build` and fix any errors
-5. **Iterate** - Iterate and change things if needed
-6. **Commit** - Only after build passes and everything works
-7. **Push Branch** - Push the feature branch to origin
-8. **Merge** - Merge into `main`
-9. **Review** - Review AI-generated code periodically and on demand.
-10. Mark as completed in `context/current-feature.md` and add to history
+1. **Draft Spec** - Write or update the feature spec in `docs/specs/` when the work is spec-driven.
+2. **Document** - Load that spec into `context/current-feature.md`.
+3. **Branch** - Start from `main`, then create a new branch for the feature or fix
+4. **Implement** - Implement the feature/fix that I create in `context/current-feature.md`
+5. **Test** - Verify it works in the browser. Implement unit testing later. Run `npm run build` and fix any errors
+6. **Iterate** - Iterate and change things if needed
+7. **Commit** - Only after build passes and everything works
+8. **Push Branch** - Push the feature branch to origin
+9. **Merge** - Merge into `main`
+10. **Review** - Review AI-generated code periodically and on demand.
+11. Mark as completed in `context/current-feature.md` and add to history
+
+Use the feature skill to load written specs from `docs/specs/` into `context/current-feature.md` before starting implementation.
 
 Do NOT commit without permission and until the build passes. If build fails, fix the issues first.
 
