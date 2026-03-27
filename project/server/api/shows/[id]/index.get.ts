@@ -1,6 +1,13 @@
 import { serverSupabaseClient } from "#supabase/server";
 import { z } from "zod";
 import { getServiceRoleClient } from "~~/server/utils/service-role";
+import {
+  canViewerAccessShow,
+  canViewerRequestToJoinShow,
+  canViewerSeeFullCastState,
+  canViewerSeePendingCast,
+  type ShowAccessContext,
+} from "~~/server/utils/show-access";
 
 const paramsSchema = z.object({ id: z.string().trim().min(1) });
 
@@ -10,7 +17,7 @@ export default defineEventHandler(async (event) => {
   const serviceSupabase = getServiceRoleClient();
   const userId = await getOptionalUserId(event, supabase);
 
-  const { data: show, error: showError } = await supabase
+  const { data: show, error: showError } = await serviceSupabase
     .from("shows")
     .select(
       "id,title,description,status,event_type,casting_mode,cast_min,cast_max,is_cast_finalized,is_public_listed,ticket_url,on_sale_at,theater_id,created_by_user_id",
@@ -23,52 +30,9 @@ export default defineEventHandler(async (event) => {
   if (!show)
     throw createError({ statusCode: 404, statusMessage: "Show not found" });
 
-  const { data: theater } = await supabase
-    .from("theaters")
-    .select("id,name,slug")
-    .eq("id", show.theater_id)
-    .maybeSingle();
-
-  const { data: occurrences } = await supabase
-    .from("show_occurrences")
-    .select("id,starts_at,ends_at,status")
-    .eq("show_id", showId)
-    .order("starts_at", { ascending: true });
-
-  const { data: producerRows } = await supabase
-    .from("show_roles")
-    .select("user_id,profiles(display_name,avatar_url)")
-    .eq("show_id", showId)
-    .eq("role", "producer");
-
   let isProducer = false;
-  let canRequestToJoin = false;
   let isTheaterStaff = false;
-  if (userId) {
-    const { data: roleRow } = await supabase
-      .from("show_roles")
-      .select("role")
-      .eq("show_id", showId)
-      .eq("user_id", userId)
-      .maybeSingle();
-    isProducer = roleRow?.role === "producer";
-
-    const { data: membershipRow } = await supabase
-      .from("theater_memberships")
-      .select("status,roles")
-      .eq("theater_id", show.theater_id)
-      .eq("user_id", userId)
-      .maybeSingle();
-
-    const isActiveMember = membershipRow?.status === "active";
-    isTheaterStaff = isActiveMember && hasStaffRole(membershipRow?.roles);
-
-    if (!isProducer && show.casting_mode !== "direct_invite") {
-      canRequestToJoin =
-        show.casting_mode === "public_casting" ? true : isActiveMember;
-    }
-  }
-
+  let isActiveTheaterMember = false;
   let viewerCastRow: {
     user_id: string;
     source: "invited" | "requested";
@@ -77,29 +41,114 @@ export default defineEventHandler(async (event) => {
     note: string | null;
   } | null = null;
 
-  if (userId && !isProducer) {
-    const { data, error } = await serviceSupabase
-      .from("show_cast")
-      .select("user_id,source,status,program_order,note")
-      .eq("show_id", showId)
-      .eq("user_id", userId)
-      .maybeSingle();
+  if (userId) {
+    const [
+      { data: roleRow, error: roleError },
+      { data: membershipRow, error: membershipError },
+      { data: castRow, error: castError },
+    ] = await Promise.all([
+      serviceSupabase
+        .from("show_roles")
+        .select("role")
+        .eq("show_id", showId)
+        .eq("user_id", userId)
+        .maybeSingle(),
+      serviceSupabase
+        .from("theater_memberships")
+        .select("status,roles")
+        .eq("theater_id", show.theater_id)
+        .eq("user_id", userId)
+        .maybeSingle(),
+      serviceSupabase
+        .from("show_cast")
+        .select("user_id,source,status,program_order,note")
+        .eq("show_id", showId)
+        .eq("user_id", userId)
+        .maybeSingle(),
+    ]);
 
-    if (error) {
-      throw createError({ statusCode: 500, statusMessage: error.message });
+    if (roleError) {
+      throw createError({ statusCode: 500, statusMessage: roleError.message });
+    }
+    if (membershipError) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: membershipError.message,
+      });
+    }
+    if (castError) {
+      throw createError({ statusCode: 500, statusMessage: castError.message });
     }
 
-    viewerCastRow = data;
+    isProducer = roleRow?.role === "producer";
+    isActiveTheaterMember = membershipRow?.status === "active";
+    isTheaterStaff =
+      isActiveTheaterMember && hasStaffRole(membershipRow.roles);
+    viewerCastRow = castRow;
   }
 
-  const isViewerInvolved =
-    isProducer ||
-    isTheaterStaff ||
-    viewerCastRow?.status === "accepted" ||
-    (viewerCastRow?.status === "pending" && viewerCastRow?.source === "invited");
-  const canSeePendingCast = isViewerInvolved;
+  const viewer: ShowAccessContext = {
+    userId,
+    isProducer,
+    isTheaterStaff,
+    isActiveTheaterMember,
+    viewerCast: viewerCastRow
+      ? {
+          source: viewerCastRow.source,
+          status: viewerCastRow.status,
+        }
+      : null,
+  };
 
-  let castQuery = supabase
+  if (
+    !canViewerAccessShow(
+      {
+        status: show.status,
+        isPublicListed: show.is_public_listed,
+        castingMode: show.casting_mode,
+      },
+      viewer,
+    )
+  ) {
+    throw createError({ statusCode: 404, statusMessage: "Show not found" });
+  }
+
+  const { data: theater, error: theaterError } = await serviceSupabase
+    .from("theaters")
+    .select("id,name,slug")
+    .eq("id", show.theater_id)
+    .maybeSingle();
+
+  if (theaterError) {
+    throw createError({ statusCode: 500, statusMessage: theaterError.message });
+  }
+
+  const { data: occurrences, error: occurrencesError } = await serviceSupabase
+    .from("show_occurrences")
+    .select("id,starts_at,ends_at,status")
+    .eq("show_id", showId)
+    .order("starts_at", { ascending: true });
+
+  if (occurrencesError) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: occurrencesError.message,
+    });
+  }
+
+  const { data: producerRows, error: producersError } = await serviceSupabase
+    .from("show_roles")
+    .select("user_id,profiles(display_name,avatar_url)")
+    .eq("show_id", showId)
+    .eq("role", "producer");
+
+  if (producersError) {
+    throw createError({ statusCode: 500, statusMessage: producersError.message });
+  }
+
+  const canSeePendingCast = canViewerSeePendingCast(viewer);
+
+  let castQuery = serviceSupabase
     .from("show_cast")
     .select(
       "user_id,source,status,program_order,note,profiles(id,display_name,avatar_url)",
@@ -107,8 +156,8 @@ export default defineEventHandler(async (event) => {
     .eq("show_id", showId)
     .order("program_order", { ascending: true, nullsFirst: false });
 
-  if (isProducer) {
-    // Producers need the full cast state, including inactive rows.
+  if (canViewerSeeFullCastState(viewer)) {
+    // Producers and theater staff may see the full cast state.
   } else if (canSeePendingCast) {
     castQuery = castQuery.in("status", ["accepted", "pending"]);
   } else {
@@ -192,6 +241,17 @@ export default defineEventHandler(async (event) => {
     producers,
     cast,
     viewerCast,
-    permissions: { isProducer, canRequestToJoin, canSeePendingCast },
+    permissions: {
+      isProducer,
+      canRequestToJoin: canViewerRequestToJoinShow(
+        {
+          status: show.status,
+          isPublicListed: show.is_public_listed,
+          castingMode: show.casting_mode,
+        },
+        viewer,
+      ),
+      canSeePendingCast,
+    },
   };
 });

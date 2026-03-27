@@ -1,6 +1,8 @@
 import { serverSupabaseClient } from "#supabase/server";
 import { z } from "zod";
 import type { Enums } from "~/types/database.types";
+import { filterVisiblePerformerMemberships } from "~~/server/utils/performer-memberships";
+import { getServiceRoleClient } from "~~/server/utils/service-role";
 
 type PerformerProfile = {
   id: string;
@@ -50,6 +52,7 @@ export default defineEventHandler(
       theaterId,
     } = parseQueryParams(event, querySchema);
     const supabase = await serverSupabaseClient(event);
+    const serviceSupabase = getServiceRoleClient();
     const userId = await getOptionalUserId(event, supabase);
     const search = rawSearch.trim();
     const from = (page - 1) * pageSize;
@@ -57,11 +60,18 @@ export default defineEventHandler(
 
     let allowedUserIds: string[] | null = null;
     if (theaterId) {
-      const { data: members } = await supabase
+      const { data: members, error: membersError } = await serviceSupabase
         .from("theater_memberships")
         .select("user_id")
         .eq("theater_id", theaterId)
         .eq("status", "active");
+
+      if (membersError) {
+        throw createError({
+          statusCode: 500,
+          statusMessage: membersError.message,
+        });
+      }
 
       allowedUserIds = (members ?? []).map((m) => m.user_id);
 
@@ -82,7 +92,7 @@ export default defineEventHandler(
 
     if (userId) {
       const { data: viewerMemberships, error: viewerMembershipsError } =
-        await supabase
+        await serviceSupabase
           .from("theater_memberships")
           .select("theater_id")
           .eq("user_id", userId)
@@ -99,7 +109,7 @@ export default defineEventHandler(
 
       if (viewerTheaterIds.length > 0) {
         const { data: sharedMemberships, error: sharedMembershipsError } =
-          await supabase
+          await serviceSupabase
             .from("theater_memberships")
             .select("user_id")
             .in("theater_id", viewerTheaterIds)
@@ -169,7 +179,7 @@ export default defineEventHandler(
 
     const profileIds = [...new Set([...(profiles ?? []).map((p) => p.id), userId])];
 
-    const { data: memberships, error: membershipsError } = await supabase
+    const { data: memberships, error: membershipsError } = await serviceSupabase
       .from("theater_memberships")
       .select("user_id,theater_id,status")
       .in("user_id", profileIds)
@@ -182,11 +192,16 @@ export default defineEventHandler(
       });
     }
 
-    const visibleMemberships = (memberships ?? []).map((m) => ({
-      user_id: m.user_id,
-      theater_id: m.theater_id,
-      status: "active" as const,
-    }));
+    const visibleMemberships = filterVisiblePerformerMemberships({
+      memberships: (memberships ?? []).map((m) => ({
+        user_id: m.user_id,
+        theater_id: m.theater_id,
+        status: "active" as const,
+      })),
+      viewerUserId: userId,
+      sharedTheaterIds: new Set(viewerTheaterIds),
+      requestedTheaterId: theaterId,
+    });
 
     return {
       profiles: sortProfiles(profiles ?? []),

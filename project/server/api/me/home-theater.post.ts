@@ -1,6 +1,5 @@
 import { serverSupabaseClient } from "#supabase/server";
 import { z } from "zod";
-import { getServiceRoleClient } from "~~/server/utils/service-role";
 
 const bodySchema = z.object({
   theaterId: z.string().trim().min(1).nullable().optional(),
@@ -9,13 +8,12 @@ const bodySchema = z.object({
 export default defineEventHandler(async (event) => {
   const { theaterId: parsedTheaterId } = await parseBody(event, bodySchema);
   const supabase = await serverSupabaseClient(event);
-  const serviceSupabase = getServiceRoleClient();
   const userId = await requireUserId(event, supabase);
   const theaterId = parsedTheaterId ?? null;
 
   // Clear home
   if (!theaterId) {
-    const { error: clearError } = await serviceSupabase
+    const { error: clearError } = await supabase
       .from("profiles")
       .update({ home_theater_id: null })
       .eq("id", userId);
@@ -41,12 +39,13 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: "Theater not found" });
   }
 
-  // Ensure user has active membership in theater. If missing, auto-follow as member.
+  // Home theater is a preference only; it must not create or upgrade membership.
   const { data: membership, error: membershipError } = await supabase
     .from("theater_memberships")
-    .select("theater_id,status,roles")
+    .select("theater_id,status")
     .eq("theater_id", theater.id)
     .eq("user_id", userId)
+    .eq("status", "active")
     .maybeSingle();
 
   if (membershipError) {
@@ -56,28 +55,15 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  if (!membership || membership.status !== "active") {
-    const upsertPayload = {
-      theater_id: theater.id,
-      user_id: userId,
-      roles: membership?.roles?.length ? membership.roles : ["member" as const],
-      status: "active" as const,
-    };
-
-    const { error: followError } = await serviceSupabase
-      .from("theater_memberships")
-      .upsert(upsertPayload, { onConflict: "theater_id,user_id" });
-
-    if (followError) {
-      throw createError({
-        statusCode: 500,
-        statusMessage: followError.message,
-      });
-    }
+  if (!membership) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: "Join the theater before setting it as home",
+    });
   }
 
   // Update profile
-  const { error: updateError } = await serviceSupabase
+  const { error: updateError } = await supabase
     .from("profiles")
     .update({ home_theater_id: theater.id })
     .eq("id", userId);

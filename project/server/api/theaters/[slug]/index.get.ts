@@ -81,29 +81,40 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const { count: totalShows, error: totalShowsError } = await supabase
-    .from("shows")
-    .select("id", { count: "exact", head: true })
-    .eq("theater_id", theater.id);
+  let totalShows = 0;
+  let pendingReviewCount = 0;
 
-  if (totalShowsError) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: totalShowsError.message,
-    });
-  }
+  if (isStaff) {
+    const [
+      { count: totalShowsCount, error: totalShowsError },
+      { count: pendingCount, error: pendingCountError },
+    ] = await Promise.all([
+      supabase
+        .from("shows")
+        .select("id", { count: "exact", head: true })
+        .eq("theater_id", theater.id),
+      supabase
+        .from("shows")
+        .select("id", { count: "exact", head: true })
+        .eq("theater_id", theater.id)
+        .eq("status", "pending_review"),
+    ]);
 
-  const { count: pendingReviewCount, error: pendingCountError } = await supabase
-    .from("shows")
-    .select("id", { count: "exact", head: true })
-    .eq("theater_id", theater.id)
-    .eq("status", "pending_review");
+    if (totalShowsError) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: totalShowsError.message,
+      });
+    }
+    if (pendingCountError) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: pendingCountError.message,
+      });
+    }
 
-  if (pendingCountError) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: pendingCountError.message,
-    });
+    totalShows = totalShowsCount ?? 0;
+    pendingReviewCount = pendingCount ?? 0;
   }
 
   // Public shows + earliest occurrences
@@ -167,8 +178,8 @@ export default defineEventHandler(async (event) => {
     permissions: { canReview: isStaff },
     stats: {
       memberCount: memberCount ?? 0,
-      totalShows: totalShows ?? 0,
-      pendingReviewCount: pendingReviewCount ?? 0,
+      totalShows: isStaff ? totalShows : publicShows.length,
+      pendingReviewCount,
       publicShowCount: publicShows.length,
     },
     shows: {
