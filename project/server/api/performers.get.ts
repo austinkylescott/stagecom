@@ -50,7 +50,7 @@ export default defineEventHandler(
       theaterId,
     } = parseQueryParams(event, querySchema);
     const supabase = await serverSupabaseClient(event);
-    const userId = await requireUserId(event, supabase);
+    const userId = await getOptionalUserId(event, supabase);
     const search = rawSearch.trim();
     const from = (page - 1) * pageSize;
     const to = from + pageSize - 1;
@@ -77,6 +77,47 @@ export default defineEventHandler(
       }
     }
 
+    let viewerTheaterIds: string[] = [];
+    let theaterOnlyVisibleUserIds: string[] = [];
+
+    if (userId) {
+      const { data: viewerMemberships, error: viewerMembershipsError } =
+        await supabase
+          .from("theater_memberships")
+          .select("theater_id")
+          .eq("user_id", userId)
+          .eq("status", "active");
+
+      if (viewerMembershipsError) {
+        throw createError({
+          statusCode: 500,
+          statusMessage: viewerMembershipsError.message,
+        });
+      }
+
+      viewerTheaterIds = (viewerMemberships ?? []).map((m) => m.theater_id);
+
+      if (viewerTheaterIds.length > 0) {
+        const { data: sharedMemberships, error: sharedMembershipsError } =
+          await supabase
+            .from("theater_memberships")
+            .select("user_id")
+            .in("theater_id", viewerTheaterIds)
+            .eq("status", "active");
+
+        if (sharedMembershipsError) {
+          throw createError({
+            statusCode: 500,
+            statusMessage: sharedMembershipsError.message,
+          });
+        }
+
+        theaterOnlyVisibleUserIds = [
+          ...new Set((sharedMemberships ?? []).map((m) => m.user_id)),
+        ];
+      }
+    }
+
     let profileQuery = supabase
       .from("profiles")
       .select("id,display_name,avatar_url,visibility", { count: "exact" })
@@ -87,6 +128,19 @@ export default defineEventHandler(
     }
     if (allowedUserIds) {
       profileQuery = profileQuery.in("id", allowedUserIds);
+    }
+    if (userId) {
+      const visibilityFilters = ["visibility.eq.public", `id.eq.${userId}`];
+
+      if (theaterOnlyVisibleUserIds.length > 0) {
+        visibilityFilters.push(
+          `and(visibility.eq.theater_only,id.in.(${theaterOnlyVisibleUserIds.join(",")}))`,
+        );
+      }
+
+      profileQuery = profileQuery.or(visibilityFilters.join(","));
+    } else {
+      profileQuery = profileQuery.eq("visibility", "public");
     }
 
     const {
@@ -102,9 +156,18 @@ export default defineEventHandler(
       });
     }
 
-    const profileIds = [
-      ...new Set([...(profiles ?? []).map((p) => p.id), userId]),
-    ];
+    if (!userId) {
+      return {
+        profiles: sortProfiles(profiles ?? []),
+        memberships: [],
+        page,
+        pageSize,
+        total: count ?? 0,
+        totalPages: Math.max(1, Math.ceil((count ?? 0) / pageSize)),
+      };
+    }
+
+    const profileIds = [...new Set([...(profiles ?? []).map((p) => p.id), userId])];
 
     const { data: memberships, error: membershipsError } = await supabase
       .from("theater_memberships")
