@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { watchDebounced } from "@vueuse/core";
+import type { PerformersResponse } from "~/queries/people";
+
+type Membership = PerformersResponse["memberships"][number];
 
 const user = useSupabaseUser();
 const searchInput = ref("");
@@ -21,12 +24,14 @@ const { data, isLoading, error, refresh } = usePerformers({
   pageSize: 24,
 });
 
+const performers = computed(() => data.value?.profiles ?? []);
+
 const sharedCounts = computed(() => {
   const myId = user.value?.id;
   const map = new Map<string, number>();
   const memberships = data.value?.memberships || [];
 
-  const byUser = memberships.reduce((acc: Map<string, Set<string>>, m: any) => {
+  const byUser = memberships.reduce((acc: Map<string, Set<string>>, m: Membership) => {
     const set = acc.get(m.user_id) || new Set<string>();
     set.add(m.theater_id);
     acc.set(m.user_id, set);
@@ -77,31 +82,16 @@ const showPagination = computed(() => totalPages.value > 1);
       Loading performers...
     </div>
 
-    <div v-else class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      <UCard v-for="performer in data?.profiles || []" :key="performer.id">
-        <div class="flex items-center gap-3">
-          <UAvatar
-            :src="performer.avatar_url"
-            :text="performer.display_name?.[0] || 'P'"
-          />
-          <div>
-            <p class="font-semibold">
-              {{ performer.display_name || "Unnamed performer" }}
-            </p>
-            <p class="text-xs text-slate-600">
-              Shared theaters: {{ sharedCounts.get(performer.id) || 0 }}
-            </p>
-          </div>
-        </div>
-        <template #footer>
-          <div class="flex gap-2">
-            <UButton size="xs" color="primary" variant="soft" :disabled="!user">
-              Invite to show
-            </UButton>
-            <UButton size="xs" variant="ghost">View profile</UButton>
-          </div>
-        </template>
-      </UCard>
+    <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <PerformerDirectoryRow
+        v-for="performer in performers"
+        :key="performer.id"
+        :performer="performer"
+        :shared-theater-count="sharedCounts.get(performer.id) || 0"
+      />
+      <p v-if="!performers.length" class="text-sm text-slate-500">
+        No performers match that search yet.
+      </p>
     </div>
 
     <div class="pt-2">
