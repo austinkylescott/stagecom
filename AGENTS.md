@@ -24,6 +24,7 @@ Read these before making behavior changes:
 - `docs/PRD.md`: locked product requirements and role philosophy.
 - `docs/data-model.md`: schema rules and entity relationships.
 - `docs/server-api-conventions.md`: required server auth, permission, and validation patterns.
+- `docs/visibility-policy.md`: maintained visibility matrix, scope vocabulary, and unauthorized response expectations.
 - `docs/coding-rules.md`: repo-specific guardrails.
 - `docs/ai-interaction.md`: workflow, branch, commit, and collaboration rules for AI-assisted work.
 - `docs/events-and-notifications.md` and feature specs when touching those areas.
@@ -46,6 +47,7 @@ Read these before making behavior changes:
 - Producers are never assumed to be cast.
 - Cast membership requires an explicit `show_cast` entry.
 - Significant behavior changes require corresponding doc updates in `docs/`.
+- Visibility-sensitive features must align with `docs/visibility-policy.md` and update it when policy changes.
 - Ask before large refactors or architectural changes.
 - Do not add features that are not in the project spec.
 - Never delete files without clarification.
