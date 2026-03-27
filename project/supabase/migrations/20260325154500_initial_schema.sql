@@ -151,13 +151,16 @@ create table email_outbox (
     unique (user_id, dedupe_key)
 );
 
-create or replace function set_timestamp()
-returns trigger as $$
+create or replace function public.set_timestamp()
+returns trigger
+language plpgsql
+set search_path to 'public'
+as $$
 begin
   new.updated_at = now();
   return new;
 end;
-$$ language plpgsql;
+$$;
 
 create trigger trg_profiles_updated
   before update on profiles
@@ -194,7 +197,7 @@ begin
 
   return new;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer set search_path to 'public';
 
 create or replace function public.is_active_member_of_theater(p_theater_id uuid)
 returns boolean

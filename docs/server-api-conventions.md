@@ -14,6 +14,9 @@ This project standardizes server route behavior to keep auth, permissions, and v
 - Use `hasStaffRole(roles)` for staff checks.
 - Use `staffRoles` from `server/utils/permissions.ts` for shared role definitions.
 - Do not redefine staff role arrays or role-check helpers inside routes.
+- Sensitive read routes must make an explicit authorization decision before returning non-public data.
+- Do not rely solely on client query shape or database defaults to hide private fields.
+- If a route uses a service-role client for a read, compute authorization first and keep the service-role query scoped to the approved result.
 
 ## Validation
 
@@ -30,5 +33,8 @@ This project standardizes server route behavior to keep auth, permissions, and v
   - direct route usage of `serverSupabaseUser` / `supabase.auth.getUser()`
   - duplicated inline staff role array definitions
   - redefined `hasStaffRole` in route files
+
+Note:
+- This guardrail script checks helper usage conventions only. It does not prove that a route's permission model is correct.
 
 In CI, add `npm run check:server-conventions` as a required check.

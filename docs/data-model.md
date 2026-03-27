@@ -25,6 +25,10 @@ Postgres-first, Supabase-friendly schema blueprint.
 - roles (array of theater_role; admin, manager, staff, instructor, member)
 - status (active, inactive)
 
+Rules:
+- Membership changes must happen through explicit membership flows or authorized theater staff actions
+- `home_theater_id` is a profile preference and must never create or reactivate membership
+
 ---
 
 ### shows
@@ -45,6 +49,10 @@ Public listing / ticketing readiness:
 - is_public_listed (boolean; only true when approved)
 - ticket_url (nullable)
 - on_sale_at (nullable)
+
+Visibility rules:
+- Approved + publicly listed shows may be visible outside the owning theater
+- Draft, pending, rejected, and other non-public shows require an authorized relationship such as producer, theater staff, or explicit cast involvement
 
 ---
 
@@ -81,6 +89,11 @@ Performer membership is explicit:
 Rule:
 - producers do not appear here unless explicitly added
 
+Visibility rules:
+- Producers and authorized theater staff may inspect the full cast state
+- Performers may inspect their own cast record
+- Accepted cast is the public/program-facing state
+
 ---
 
 ### show_review_events
@@ -99,6 +112,10 @@ Rule:
 - payload (jsonb)
 - dedupe_key (unique per user)
 - read_at (nullable)
+
+Security rules:
+- Notifications belong to exactly one recipient user
+- Read and update access is restricted to that recipient except for service-role workflows
 
 ---
 
