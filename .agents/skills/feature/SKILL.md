@@ -10,11 +10,11 @@ Manages the full lifecycle of a feature from spec to merge.
 
 ## Working File
 
-@context/current-feature.md
+`context/current-feature.md`
 
 ### File Structure
 
-current-feature.md has these sections:
+`context/current-feature.md` has these sections:
 
 - `# Current Feature` - H1 heading with feature name when active
 - `## Status` - Not Started | In Progress | Complete

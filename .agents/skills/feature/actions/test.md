@@ -1,6 +1,6 @@
 # Test Action
 
-1. Read current-feature.md to understand what was implemented
+1. Read `context/current-feature.md` to understand what was implemented
 2. Identify server actions and utility functions added/modified for this feature
 3. Check if tests already exist for these functions
 4. For functions without tests that have testable logic, write unit tests:
