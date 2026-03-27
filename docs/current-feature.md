@@ -1,6 +1,6 @@
 # Current Feature
 
-Mock Data Workflow
+Show Cast Panel Cleanup
 
 ## Status
 
@@ -8,24 +8,18 @@ In Progress
 
 ## Goals
 
-- Add a deterministic mock-data framework for local/dev databases.
-- Support generating mock SQL from a config of real Supabase auth user IDs.
-- Support seeding mock data, wiping the dev schema, and rebuilding from scratch with one command path.
-- Keep the workflow aligned with the current SQL-first schema and Stagecom role invariants.
-- Audit the live Supabase schema before baking in a local/dev workflow.
-- Start moving from docs-only SQL toward a Supabase CLI-backed project structure.
-- Support creating or syncing mock auth users through the Supabase Admin API so app-data seeding no longer depends on manual user UUID lookup.
+- Reduce the size and responsibility count of `project/app/components/ShowCastPanel.vue`.
+- Extract cast-display logic into smaller presentational components without changing cast behavior.
+- Extract performer search and invite state into a composable or focused child component.
+- Preserve the current producer, request, invite, and inactive-cast flows exactly as they work today.
+- Keep this as a refactor-only change with no API, schema, or notification behavior changes.
 
 ## Notes
 
-- This change maps to the MVP need for producers, performers, theater staff, review states, casting modes, and notifications to be testable in realistic combinations.
-- The generator never treats producers as cast automatically; mock cast membership still requires explicit `show_cast` entries.
-- The config requires real auth user IDs because app tables still reference `auth.users`.
-- The current example scenario includes approved, pending-review, and draft events plus notification/email rows.
-- Live schema audit now confirms the deployed public tables/enums/functions match the repo baseline after accounting for `public.is_active_member_of_theater`.
-- The repo now supports split DB env vars and a Node-based SQL runner so dev scripts do not depend on URL-encoded passwords or a local `psql` install.
-- Mock auth seeding now writes a resolved config with real auth user IDs before seeding app tables.
-- Home theater assignment currently fails when auto-following a theater through the authenticated request client because `theater_memberships` writes are subject to RLS.
+- This came out of the latest code scan as the clearest low-risk quick win.
+- The target is maintainability only: fewer coupled refs/computed values in one file and easier follow-up changes to cast UI.
+- Do not change request permissions, invitation rules, or server interactions as part of this feature.
+- If extracted pieces need shared state, prefer a composable over passing many reactive props through multiple layers.
 
 ## History
 

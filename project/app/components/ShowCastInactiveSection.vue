@@ -1,0 +1,56 @@
+<script setup lang="ts">
+import type { ShowCastMember } from "~/composables/useShowCast";
+
+defineProps<{
+  inviting: boolean;
+  members: ShowCastMember[];
+  inactiveStatusLabel: (member: ShowCastMember) => string;
+}>();
+
+const emit = defineEmits<{
+  invite: [userId: string];
+}>();
+</script>
+
+<template>
+  <UCollapsible v-if="members.length">
+    <UButton size="xs" variant="ghost" color="gray">
+      Show declined / withdrawn / removed ({{ members.length }})
+    </UButton>
+    <template #content>
+      <div class="mt-2 space-y-1">
+        <div
+          v-for="member in members"
+          :key="member.userId"
+          class="flex items-center justify-between rounded-lg border border-slate-100 px-3 py-2"
+        >
+          <div class="flex min-w-0 items-center gap-2">
+            <UAvatar :text="member.displayName?.[0] ?? '?'" size="xs" />
+            <div class="min-w-0">
+              <p class="text-sm text-slate-700">
+                {{ member.displayName ?? member.userId }}
+              </p>
+              <p class="text-xs text-slate-500">
+                {{ inactiveStatusLabel(member) }}
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <UBadge size="xs" color="gray" variant="soft">
+              {{ member.status }}
+            </UBadge>
+            <UButton
+              size="xs"
+              color="primary"
+              variant="soft"
+              :loading="inviting"
+              @click="emit('invite', member.userId)"
+            >
+              Invite again
+            </UButton>
+          </div>
+        </div>
+      </div>
+    </template>
+  </UCollapsible>
+</template>

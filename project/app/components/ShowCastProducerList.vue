@@ -1,0 +1,32 @@
+<script setup lang="ts">
+type Producer = {
+  userId: string;
+  displayName: string | null;
+  avatarUrl: string | null;
+};
+
+defineProps<{
+  producers: Producer[];
+}>();
+</script>
+
+<template>
+  <div v-if="producers.length" class="space-y-2">
+    <p class="text-sm font-semibold text-slate-700">
+      Producer{{ producers.length > 1 ? "s" : "" }}
+    </p>
+    <div class="flex flex-wrap gap-2">
+      <div
+        v-for="producer in producers"
+        :key="producer.userId"
+        class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5"
+      >
+        <UAvatar :text="producer.displayName?.[0] ?? '?'" size="xs" />
+        <span class="text-sm font-medium text-slate-700">
+          {{ producer.displayName ?? producer.userId }}
+        </span>
+        <UBadge size="xs" color="gray" variant="soft">producer</UBadge>
+      </div>
+    </div>
+  </div>
+</template>
