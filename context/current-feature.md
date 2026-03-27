@@ -1,23 +1,12 @@
-# Current Feature: Performers Page UI Pass
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Replace the current full-card performer presentation with a more compact card layout informed by the producer pill visual language.
-- Keep this as a visual-only pass with no behavior, grouping, or data-model changes.
-- Preserve clear performer scanning with avatar, display name, and shared-theaters context.
-- Preserve the existing performer actions in a more compact always-visible treatment.
-- Reduce page scroll and improve information density on desktop and mobile.
-
 ## Notes
-
-- Preferred direction is a compact card rather than a pure pill so the performer actions fit more naturally.
-- The visual language should borrow from the producer pill treatment without copying it too literally.
-- Theater grouping and future troupe or team grouping are explicitly out of scope for this pass.
-- The current actions remain present but intentionally disabled with clear "Feature coming soon" messaging until their flows are implemented.
 
 ## History
 
@@ -30,3 +19,4 @@ In Progress
 - Added split DB env support, live schema audit tooling, and a baseline Supabase CLI schema scaffold
 - Added Supabase Admin API-based mock auth seeding and full seed/rebuild wrappers
 - Refactored the show cast panel into focused components and an invite-search composable
+- Refreshed the Performers page with compact cards, producer-pill-inspired styling, and explicit coming-soon action states
