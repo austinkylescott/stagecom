@@ -1,9 +1,18 @@
 import { serverSupabaseClient } from "#supabase/server";
 import type { Enums, Tables } from "~/types/database.types";
+import { hasStaffRole } from "~~/server/utils/permissions";
+import { canViewShow } from "~~/server/utils/visibility-policy";
 
 type ShowRow = Pick<
   Tables<"shows">,
-  "id" | "title" | "description" | "status" | "theater_id" | "event_type"
+  | "id"
+  | "title"
+  | "description"
+  | "status"
+  | "theater_id"
+  | "event_type"
+  | "casting_mode"
+  | "is_public_listed"
 >;
 
 type OccRow = Pick<
@@ -34,7 +43,7 @@ export default defineEventHandler(async (event) => {
   // Theaters where user is active member
   const { data: memberships, error: membershipError } = await supabase
     .from("theater_memberships")
-    .select("theater_id")
+    .select("theater_id,roles,status")
     .eq("user_id", userId)
     .eq("status", "active");
 
@@ -63,7 +72,7 @@ export default defineEventHandler(async (event) => {
   // Shows for those theaters
   const { data: shows, error: showsError } = await supabase
     .from("shows")
-    .select("id,title,description,status,theater_id,event_type")
+    .select("id,title,description,status,theater_id,event_type,casting_mode,is_public_listed")
     .in("theater_id", theaterIds);
 
   if (showsError) {
@@ -73,11 +82,75 @@ export default defineEventHandler(async (event) => {
   const showIds = (shows ?? []).map((s) => s.id);
   if (showIds.length === 0) return { shows: [] };
 
+  const [
+    { data: roleRows, error: roleError },
+    { data: castRows, error: castError },
+  ] = await Promise.all([
+    supabase
+      .from("show_roles")
+      .select("show_id,role")
+      .in("show_id", showIds)
+      .eq("user_id", userId),
+    supabase
+      .from("show_cast")
+      .select("show_id,source,status")
+      .in("show_id", showIds)
+      .eq("user_id", userId),
+  ]);
+
+  if (roleError) {
+    throw createError({ statusCode: 500, statusMessage: roleError.message });
+  }
+
+  if (castError) {
+    throw createError({ statusCode: 500, statusMessage: castError.message });
+  }
+
+  const activeMembershipByTheaterId = new Map(
+    (memberships ?? []).map((membership) => [membership.theater_id, membership]),
+  );
+  const producerShowIds = new Set(
+    (roleRows ?? [])
+      .filter((row) => row.role === "producer")
+      .map((row) => row.show_id),
+  );
+  const castByShowId = new Map((castRows ?? []).map((row) => [row.show_id, row]));
+
+  const visibleShows = (shows ?? []).filter((show) => {
+    const membership = activeMembershipByTheaterId.get(show.theater_id);
+    const viewerCast = castByShowId.get(show.id);
+
+    return canViewShow(
+      {
+        status: show.status,
+        isPublicListed: show.is_public_listed,
+        castingMode: show.casting_mode,
+      },
+      {
+        userId,
+        isProducer: producerShowIds.has(show.id),
+        isTheaterStaff: Boolean(membership && hasStaffRole(membership.roles)),
+        isActiveTheaterMember: membership?.status === "active",
+        viewerCast: viewerCast
+          ? {
+              source: viewerCast.source,
+              status: viewerCast.status,
+            }
+          : null,
+      },
+    );
+  });
+
+  if (visibleShows.length === 0) return { shows: [] };
+
   // Upcoming occurrences
   const { data: occs, error: occError } = await supabase
     .from("show_occurrences")
     .select("show_id,starts_at,status")
-    .in("show_id", showIds)
+    .in(
+      "show_id",
+      visibleShows.map((show) => show.id),
+    )
     .eq("status", "scheduled")
     .gte("starts_at", new Date().toISOString());
 
@@ -97,7 +170,7 @@ export default defineEventHandler(async (event) => {
     (theaters ?? []).map((t) => [t.id, { name: t.name, slug: t.slug }]),
   );
 
-  const result: ShowItem[] = (shows ?? []).map((s) => {
+  const result: ShowItem[] = visibleShows.map((s) => {
     const theater = theaterById.get(s.theater_id);
     return {
       id: s.id,

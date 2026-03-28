@@ -1,5 +1,6 @@
 import { serverSupabaseClient } from "#supabase/server";
 import type { Enums } from "~/types/database.types";
+import { canViewTheaterReview } from "~~/server/utils/visibility-policy";
 
 type InboxShow = {
   id: string;
@@ -39,7 +40,13 @@ export default defineEventHandler(async (event) => {
   }
 
   const reviewTheaterIds = (memberships || [])
-    .filter((membership) => hasStaffRole(membership.roles))
+    .filter((membership) =>
+      canViewTheaterReview({
+        userId,
+        theaterMembershipStatus: membership.status,
+        theaterRoles: membership.roles,
+      }),
+    )
     .map((membership) => membership.theater_id);
 
   const trackedStatuses: Enums<"show_status">[] = [

@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { Enums } from "~/types/database.types";
 import { filterVisiblePerformerMemberships } from "~~/server/utils/performer-memberships";
 import { getServiceRoleClient } from "~~/server/utils/service-role";
+import { canViewPerformerProfile } from "~~/server/utils/visibility-policy";
 
 type PerformerProfile = {
   id: string;
@@ -128,6 +129,8 @@ export default defineEventHandler(
       }
     }
 
+    const sharedTheaterIds = new Set(viewerTheaterIds);
+
     let profileQuery = supabase
       .from("profiles")
       .select("id,display_name,avatar_url,visibility", { count: "exact" })
@@ -166,9 +169,18 @@ export default defineEventHandler(
       });
     }
 
+    const visibleProfiles = (profiles ?? []).filter((profile) =>
+      canViewPerformerProfile({
+        viewerUserId: userId,
+        performerUserId: profile.id,
+        visibility: profile.visibility,
+        sharedTheaterIds,
+      }),
+    );
+
     if (!userId) {
       return {
-        profiles: sortProfiles(profiles ?? []),
+        profiles: sortProfiles(visibleProfiles),
         memberships: [],
         page,
         pageSize,
@@ -177,7 +189,7 @@ export default defineEventHandler(
       };
     }
 
-    const profileIds = [...new Set([...(profiles ?? []).map((p) => p.id), userId])];
+    const profileIds = [...new Set([...visibleProfiles.map((p) => p.id), userId])];
 
     const { data: memberships, error: membershipsError } = await serviceSupabase
       .from("theater_memberships")
@@ -199,12 +211,12 @@ export default defineEventHandler(
         status: "active" as const,
       })),
       viewerUserId: userId,
-      sharedTheaterIds: new Set(viewerTheaterIds),
+      sharedTheaterIds,
       requestedTheaterId: theaterId,
     });
 
     return {
-      profiles: sortProfiles(profiles ?? []),
+      profiles: sortProfiles(visibleProfiles),
       memberships: visibleMemberships,
       page,
       pageSize,

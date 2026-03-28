@@ -12,6 +12,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "~": rootDir,
+      "~~": rootDir,
       "@": rootDir,
       "@@": rootDir,
     },

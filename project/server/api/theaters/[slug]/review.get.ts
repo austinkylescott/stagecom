@@ -1,6 +1,7 @@
 import { serverSupabaseClient } from "#supabase/server";
 import { z } from "zod";
 import type { Tables } from "~/types/database.types";
+import { canViewTheaterReview } from "~~/server/utils/visibility-policy";
 
 type ReviewShowRow = Pick<
   Tables<"shows">,
@@ -43,9 +44,15 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const isStaff = (membershipRows ?? []).some((m) => hasStaffRole(m.roles));
+  const canReview = (membershipRows ?? []).some((m) =>
+    canViewTheaterReview({
+      userId,
+      theaterMembershipStatus: m.status,
+      theaterRoles: m.roles,
+    }),
+  );
 
-  if (!isStaff) {
+  if (!canReview) {
     throw createError({ statusCode: 403, statusMessage: "Not allowed" });
   }
 
