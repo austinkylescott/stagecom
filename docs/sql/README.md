@@ -1,6 +1,6 @@
 # Stagecom SQL
 
-- `001-init.sql` — drops and recreates core tables/enums/triggers per `docs/data-model.md`.
+- `001-init.sql` — drops and recreates core tables/enums/triggers per `docs/data/data-model.md`.
 - `002-seed.sql` — legacy one-off demo seed data; useful as a reference, but the config-driven workflow below is the preferred mock-data path now.
 - `003-event-type-migration.sql` — converts legacy `shows.is_practice` to `shows.event_type` and removes `is_practice`.
 - `project/scripts/mock-data.mjs` — generates deterministic mock SQL from a JSON config with real auth user IDs.
@@ -47,7 +47,7 @@ npm run db:rebuild:mock -- ./mock-data.config.json
 
 `db:reset` and `db:trash` both wipe and recreate the schema from `docs/sql/001-init.sql`.
 
-See `docs/mock-data-workflow.md` for the config shape and workflow details.
+See `docs/data/mock-data-workflow.md` for the config shape and workflow details.
 
 The project scripts now prefer split DB env vars (`DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_SSL`) and only fall back to `DATABASE_URL`.
 

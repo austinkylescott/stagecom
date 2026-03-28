@@ -21,12 +21,12 @@ Repository guide for coding agents working in Stagecom.
 
 Read these before making behavior changes:
 
-- `docs/PRD.md`: locked product requirements and role philosophy.
-- `docs/data-model.md`: schema rules and entity relationships.
-- `docs/server-api-conventions.md`: required server auth, permission, and validation patterns.
-- `docs/coding-rules.md`: repo-specific guardrails.
-- `docs/ai-interaction.md`: workflow, branch, commit, and collaboration rules for AI-assisted work.
-- `docs/events-and-notifications.md` and feature specs when touching those areas.
+- `docs/product/PRD.md`: locked product requirements and role philosophy.
+- `docs/data/data-model.md`: schema rules and entity relationships.
+- `docs/development/server-api-conventions.md`: required server auth, permission, and validation patterns.
+- `docs/development/coding-rules.md`: repo-specific guardrails.
+- `docs/development/ai-interaction.md`: workflow, branch, commit, and collaboration rules for AI-assisted work.
+- `docs/product/events-and-notifications.md` and feature specs when touching those areas.
 
 ## Documentation Sources
 
@@ -38,9 +38,9 @@ Read these before making behavior changes:
 
 ## Non-Negotiable Rules
 
-- Every feature change must map back to `docs/PRD.md`.
-- Follow `docs/ai-interaction.md` for communication, workflow, branching, and commit behavior.
-- Do not add tables or schema-level entities without updating `docs/data-model.md`.
+- Every feature change must map back to `docs/product/PRD.md`.
+- Follow `docs/development/ai-interaction.md` for communication, workflow, branching, and commit behavior.
+- Do not add tables or schema-level entities without updating `docs/data/data-model.md`.
 - Any change to database schema, enums, relationships, seeded assumptions, or DB-backed product expectations must update the mock-data workflow and configs so seeded data still reflects the current model.
 - All notifications must go through the notification service via `emitEvent()`.
 - Producers are never assumed to be cast.
@@ -65,7 +65,7 @@ For files in `project/server/api/`:
 
 Run commands from `project/` unless there is a clear reason not to.
 
-- Follow the feature workflow in `docs/ai-interaction.md`.
+- Follow the feature workflow in `docs/development/ai-interaction.md`.
 - Install: `npm install`
 - Dev server: `npm run dev`
 - Tests: `npm test`
@@ -74,7 +74,7 @@ Run commands from `project/` unless there is a clear reason not to.
 
 ## Branching And Commits
 
-- Use a new branch for each feature or fix, following the naming guidance in `docs/ai-interaction.md`.
+- Use a new branch for each feature or fix, following the naming guidance in `docs/development/ai-interaction.md`.
 - Create feature branches from `main`.
 - Push the feature branch to `origin` before merging it into `main`.
 - Keep feature branches after merge unless explicitly asked to delete them.
@@ -92,6 +92,6 @@ Run commands from `project/` unless there is a clear reason not to.
 - When database or data-model behavior changes, update the relevant mock-data assets in the same change:
   - `project/mock-data.config.example.json`
   - `project/mock-data.config.json` if it exists locally for the active workflow
-  - `docs/mock-data-workflow.md`
+  - `docs/data/mock-data-workflow.md`
   - related seed/auth scripts under `project/scripts/` when expectations change
 - If a feature touches notifications, permissions, roles, or show/cast behavior, verify the change against the PRD and data model docs before finishing.

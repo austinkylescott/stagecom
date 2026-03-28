@@ -28,10 +28,10 @@ This feature closes the audit findings around self-granted theater membership, o
 ---
 
 ## Source Of Truth
-- `docs/PRD.md`
-- `docs/data-model.md`
-- `docs/server-api-conventions.md`
-- `docs/events-and-notifications.md`
+- `docs/product/PRD.md`
+- `docs/data/data-model.md`
+- `docs/development/server-api-conventions.md`
+- `docs/product/events-and-notifications.md`
 - `project/supabase/migrations/*`
 
 ---
@@ -144,10 +144,10 @@ Policy intent:
 
 ### 6. Document The Security Model
 - Update relevant docs to reflect the final rules:
-  - `docs/data-model.md` for policy-sensitive relationship expectations if needed
-  - `docs/server-api-conventions.md` if new auth or permission helpers are introduced
-  - `docs/ai-interaction.md` only if workflow expectations change
-- If notification recipients or event triggers change as a consequence of tightened auth, update `docs/events-and-notifications.md`.
+  - `docs/data/data-model.md` for policy-sensitive relationship expectations if needed
+  - `docs/development/server-api-conventions.md` if new auth or permission helpers are introduced
+  - `docs/development/ai-interaction.md` only if workflow expectations change
+- If notification recipients or event triggers change as a consequence of tightened auth, update `docs/product/events-and-notifications.md`.
 
 ### 7. Add Verification Coverage
 - Add tests for the highest-risk regressions, prioritizing server-route behavior and authorization helpers.

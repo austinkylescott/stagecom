@@ -2,7 +2,7 @@
 
 This document is a research snapshot of the current implementation as of March 27, 2026.
 
-The maintained policy source of truth now lives in `docs/visibility-policy.md`.
+The maintained policy source of truth now lives in `docs/product/visibility-policy.md`.
 
 ## Scope
 
@@ -335,8 +335,8 @@ If the team wants a simpler long-term model while keeping the current intent, th
 
 This document was derived from the current implementation and supporting docs, primarily:
 
-- `docs/PRD.md`
-- `docs/data-model.md`
+- `docs/product/PRD.md`
+- `docs/data/data-model.md`
 - `docs/specs/feature-spec-show-lifecycle-v1.md`
 - `docs/specs/feature-spec-auth-security-hardening-v1.md`
 - `project/server/api/theaters/[slug]/index.get.ts`

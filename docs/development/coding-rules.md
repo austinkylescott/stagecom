@@ -4,15 +4,15 @@ These rules exist to keep Stagecom aligned with the current product docs, data m
 
 ## 1. Source of truth
 
-- Every feature must map back to `docs/PRD.md`.
-- Follow `docs/ai-interaction.md` for AI workflow, branching, commit, and collaboration expectations.
-- Do not introduce schema-level entities or change table meaning without updating `docs/data-model.md`.
+- Every feature must map back to `docs/product/PRD.md`.
+- Follow `docs/development/ai-interaction.md` for AI workflow, branching, commit, and collaboration expectations.
+- Do not introduce schema-level entities or change table meaning without updating `docs/data/data-model.md`.
 - Do not change schema, DB-backed assumptions, or seed expectations without updating the mock-data workflow and example config in the same change.
 - Significant behavior changes must update the relevant docs in the same change:
-  - `docs/PRD.md` for product or role changes
-  - `docs/data-model.md` for schema or relationship changes
-  - `docs/events-and-notifications.md` for event or recipient changes
-  - `docs/mock-data-workflow.md` and the mock-data configs/scripts when database-backed test expectations change
+  - `docs/product/PRD.md` for product or role changes
+  - `docs/data/data-model.md` for schema or relationship changes
+  - `docs/product/events-and-notifications.md` for event or recipient changes
+  - `docs/data/mock-data-workflow.md` and the mock-data configs/scripts when database-backed test expectations change
   - feature specs in `docs/specs/` when behavior is spec-driven
 
 ## 2. Stack requirements
@@ -54,7 +54,7 @@ These rules exist to keep Stagecom aligned with the current product docs, data m
 
 ## 6. Data fetching and state rules
 
-- Follow `docs/data-layer.md`.
+- Follow `docs/development/data-layer.md`.
 - Reads are Pinia Colada queries.
 - Writes are Pinia Colada mutations.
 - Query keys must come from `project/app/composables/queryKeys.ts`.
@@ -65,7 +65,7 @@ These rules exist to keep Stagecom aligned with the current product docs, data m
 
 ## 7. Server API rules
 
-- Follow `docs/server-api-conventions.md`.
+- Follow `docs/development/server-api-conventions.md`.
 - Route files belong in `project/server/api/`.
 - Use shared auth helpers:
   - `requireUser()`
@@ -82,20 +82,20 @@ These rules exist to keep Stagecom aligned with the current product docs, data m
 - Producers are contextual show-level roles, not assumed performers.
 - Producers are never assumed to be cast.
 - Cast membership requires an explicit `show_cast` entry.
-- Theater and show permissions must follow the contextual role model in `docs/PRD.md`.
+- Theater and show permissions must follow the contextual role model in `docs/product/PRD.md`.
 - Do not infer notification recipients from UI state when domain data already defines the relationship.
 
 ## 9. Notifications and events
 
-- Follow `docs/events-and-notifications.md`.
+- Follow `docs/product/events-and-notifications.md`.
 - All notifications must go through the notification service via `emitEvent()`.
 - No route, component, or direct DB write should create notifications outside that service.
 - Notification changes must preserve recipient rules, dedupe behavior, and the principle that producers receive operational notifications even when not cast.
-- New notification types or event flows require doc updates in `docs/events-and-notifications.md`.
+- New notification types or event flows require doc updates in `docs/product/events-and-notifications.md`.
 
 ## 10. Database and persistence rules
 
-- Keep the project Postgres-first and Supabase-friendly, as described in `docs/data-model.md`.
+- Keep the project Postgres-first and Supabase-friendly, as described in `docs/data/data-model.md`.
 - Prefer Supabase client access plus generated database types over introducing a parallel ORM abstraction.
 - Respect existing naming and enum values in the schema docs and SQL files under `docs/sql/`.
 - Keep `project/mock-data.config.example.json` aligned with the current schema and product expectations so seeded data remains a trustworthy dev/test fixture.
