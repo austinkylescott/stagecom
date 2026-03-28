@@ -1,5 +1,6 @@
 import { serverSupabaseClient } from "#supabase/server";
 import { z } from "zod";
+import { canViewNotifications } from "~~/server/utils/visibility-policy";
 
 const MY_SHOWS_TYPES = [
   "show.approved",
@@ -29,6 +30,10 @@ export default defineEventHandler(async (event) => {
   const { filter, page, pageSize } = parseQueryParams(event, querySchema);
   const supabase = await serverSupabaseClient(event);
   const userId = await requireUserId(event, supabase);
+
+  if (!canViewNotifications(userId, userId)) {
+    throw createError({ statusCode: 403, statusMessage: "Not allowed" });
+  }
 
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;

@@ -1,3 +1,5 @@
+import { canViewPerformerAffiliation } from "./visibility-policy";
+
 type ActiveMembership = {
   user_id: string;
   theater_id: string;
@@ -18,13 +20,20 @@ export const filterVisiblePerformerMemberships = ({
   requestedTheaterId,
 }: FilterMembershipsInput): ActiveMembership[] =>
   memberships.filter((membership) => {
-    if (membership.user_id === viewerUserId) {
-      return true;
+    if (
+      !canViewPerformerAffiliation({
+        viewerUserId,
+        performerUserId: membership.user_id,
+        affiliationTheaterId: membership.theater_id,
+        sharedTheaterIds,
+      })
+    ) {
+      return false;
     }
 
     if (requestedTheaterId) {
       return membership.theater_id === requestedTheaterId;
     }
 
-    return sharedTheaterIds.has(membership.theater_id);
+    return true;
   });

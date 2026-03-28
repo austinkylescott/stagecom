@@ -1,6 +1,7 @@
 import { serverSupabaseClient } from "#supabase/server";
 import { z } from "zod";
 import type { Enums, Tables } from "~/types/database.types";
+import { canViewTheaterOperations } from "~~/server/utils/visibility-policy";
 
 type PublicShowRow = Pick<
   Tables<"shows">,
@@ -65,7 +66,11 @@ export default defineEventHandler(async (event) => {
     isHome = profile?.home_theater_id === theater.id;
   }
 
-  const isStaff = hasStaffRole(membership?.roles);
+  const canViewOperations = canViewTheaterOperations({
+    userId,
+    theaterMembershipStatus: membership?.status ?? null,
+    theaterRoles: membership?.roles ?? [],
+  });
 
   // Stats
   const { count: memberCount, error: memberCountError } = await supabase
@@ -84,7 +89,7 @@ export default defineEventHandler(async (event) => {
   let totalShows = 0;
   let pendingReviewCount = 0;
 
-  if (isStaff) {
+  if (canViewOperations) {
     const [
       { count: totalShowsCount, error: totalShowsError },
       { count: pendingCount, error: pendingCountError },
@@ -175,10 +180,10 @@ export default defineEventHandler(async (event) => {
     membership: membership
       ? { ...membership, isHome }
       : { isHome, roles: [], status: null },
-    permissions: { canReview: isStaff },
+    permissions: { canReview: canViewOperations },
     stats: {
       memberCount: memberCount ?? 0,
-      totalShows: isStaff ? totalShows : publicShows.length,
+      totalShows: canViewOperations ? totalShows : publicShows.length,
       pendingReviewCount,
       publicShowCount: publicShows.length,
     },

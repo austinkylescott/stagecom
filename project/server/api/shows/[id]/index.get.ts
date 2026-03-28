@@ -1,13 +1,16 @@
 import { serverSupabaseClient } from "#supabase/server";
 import { z } from "zod";
+import { hasStaffRole } from "~~/server/utils/permissions";
 import { getServiceRoleClient } from "~~/server/utils/service-role";
 import {
-  canViewerAccessShow,
-  canViewerRequestToJoinShow,
-  canViewerSeeFullCastState,
-  canViewerSeePendingCast,
-  type ShowAccessContext,
-} from "~~/server/utils/show-access";
+  canRequestToJoinShow,
+  canViewAcceptedCast,
+  canViewFullCastState,
+  canViewPendingCast,
+  canViewShow,
+  shouldHideResourceExistence,
+  type ShowVisibilityViewer,
+} from "~~/server/utils/visibility-policy";
 
 const paramsSchema = z.object({ id: z.string().trim().min(1) });
 
@@ -87,7 +90,7 @@ export default defineEventHandler(async (event) => {
     viewerCastRow = castRow;
   }
 
-  const viewer: ShowAccessContext = {
+  const viewer: ShowVisibilityViewer = {
     userId,
     isProducer,
     isTheaterStaff,
@@ -101,7 +104,7 @@ export default defineEventHandler(async (event) => {
   };
 
   if (
-    !canViewerAccessShow(
+    !canViewShow(
       {
         status: show.status,
         isPublicListed: show.is_public_listed,
@@ -110,7 +113,11 @@ export default defineEventHandler(async (event) => {
       viewer,
     )
   ) {
-    throw createError({ statusCode: 404, statusMessage: "Show not found" });
+    const hideExistence = shouldHideResourceExistence("show");
+    throw createError({
+      statusCode: hideExistence ? 404 : 403,
+      statusMessage: hideExistence ? "Show not found" : "Not allowed",
+    });
   }
 
   const { data: theater, error: theaterError } = await serviceSupabase
@@ -146,7 +153,15 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 500, statusMessage: producersError.message });
   }
 
-  const canSeePendingCast = canViewerSeePendingCast(viewer);
+  const canSeePendingCast = canViewPendingCast(viewer);
+  const canSeeAcceptedCast = canViewAcceptedCast(
+    {
+      status: show.status,
+      isPublicListed: show.is_public_listed,
+      castingMode: show.casting_mode,
+    },
+    viewer,
+  );
 
   let castQuery = serviceSupabase
     .from("show_cast")
@@ -156,11 +171,11 @@ export default defineEventHandler(async (event) => {
     .eq("show_id", showId)
     .order("program_order", { ascending: true, nullsFirst: false });
 
-  if (canViewerSeeFullCastState(viewer)) {
+  if (canViewFullCastState(viewer)) {
     // Producers and theater staff may see the full cast state.
   } else if (canSeePendingCast) {
     castQuery = castQuery.in("status", ["accepted", "pending"]);
-  } else {
+  } else if (canSeeAcceptedCast) {
     castQuery = castQuery.eq("status", "accepted");
   }
 
@@ -243,7 +258,7 @@ export default defineEventHandler(async (event) => {
     viewerCast,
     permissions: {
       isProducer,
-      canRequestToJoin: canViewerRequestToJoinShow(
+      canRequestToJoin: canRequestToJoinShow(
         {
           status: show.status,
           isPublicListed: show.is_public_listed,

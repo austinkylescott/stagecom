@@ -1,5 +1,6 @@
 import { serverSupabaseClient } from "#supabase/server";
 import { z } from "zod";
+import { canViewNotifications } from "~~/server/utils/visibility-policy";
 
 const bodySchema = z.object({
   ids: z.array(z.string()).optional(),
@@ -10,6 +11,10 @@ export default defineEventHandler(async (event) => {
   const { ids, all } = await parseBody(event, bodySchema);
   const supabase = await serverSupabaseClient(event);
   const userId = await requireUserId(event, supabase);
+
+  if (!canViewNotifications(userId, userId)) {
+    throw createError({ statusCode: 403, statusMessage: "Not allowed" });
+  }
 
   if (!ids?.length && !all) {
     throw createError({

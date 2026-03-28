@@ -4,8 +4,8 @@ import {
   canViewerRequestToJoinShow,
   canViewerSeePendingCast,
   type ShowAccessContext,
-  type ShowVisibility,
 } from "./show-access";
+import type { ShowVisibility } from "./visibility-policy";
 
 const publicShow: ShowVisibility = {
   status: "approved",

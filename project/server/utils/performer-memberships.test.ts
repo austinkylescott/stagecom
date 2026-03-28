@@ -34,8 +34,20 @@ describe("performer-memberships", () => {
       }),
     ).toEqual([
       { user_id: "viewer", theater_id: "a", status: "active" },
-      { user_id: "viewer", theater_id: "b", status: "active" },
       { user_id: "other-1", theater_id: "a", status: "active" },
+    ]);
+  });
+
+  it("does not reveal requested-theater affiliations when the viewer shares no theater", () => {
+    expect(
+      filterVisiblePerformerMemberships({
+        memberships,
+        viewerUserId: "viewer",
+        sharedTheaterIds: new Set(),
+        requestedTheaterId: "a",
+      }),
+    ).toEqual([
+      { user_id: "viewer", theater_id: "a", status: "active" },
     ]);
   });
 });
