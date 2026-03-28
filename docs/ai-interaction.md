@@ -15,7 +15,7 @@ This is the common workflow that we will use for every single feature/fix:
 1. **Draft Spec** - Write or update the feature spec in `docs/specs/` when the work is spec-driven.
 2. **Document** - Load that spec into `context/current-feature.md`.
 3. **Branch** - Start from `main`, then create a new branch for the feature or fix
-4. **Implement** - Implement the feature/fix that I create in `context/current-feature.md`
+4. **Implement** - Switch to that new branch and do all implementation work there, not on `main`
 5. **Test** - Verify it works in the browser. Implement unit testing later. Run `npm run build` and fix any errors
 6. **Iterate** - Iterate and change things if needed
 7. **Commit** - Only after build passes and everything works
@@ -31,6 +31,10 @@ Do NOT commit without permission and until the build passes. If build fails, fix
 ## Branching
 
 We will create a new branch for every feature/fix from `main`. Name branch **feature/[feature]** or **fix[fix]**, etc.
+
+After creating the branch, switch to it immediately and keep all feature work on that branch until it is merged.
+
+Do not implement features on `main` and later move that work to a branch unless recovery is absolutely necessary.
 
 Push the feature branch to `origin` before merging it into `main`.
 

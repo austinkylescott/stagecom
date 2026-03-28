@@ -8,6 +8,13 @@ argument-hint: load|start|review|explain|complete
 
 Manages the full lifecycle of a feature from spec to merge.
 
+Branch discipline is part of the workflow:
+
+- Create and switch to the feature branch before implementation begins.
+- Do all code changes, tests, and commits on that feature branch.
+- Keep `main` clean during implementation.
+- Merge back into `main` only after the feature branch is ready.
+
 ## Working File
 
 `context/current-feature.md`
