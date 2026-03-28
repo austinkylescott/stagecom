@@ -13,6 +13,7 @@ const MY_SHOWS_TYPES = [
 ];
 
 const OTHER_TYPES = [
+  "show.submitted_for_review",
   "cast.invited",
   "cast.request_approved",
   "occurrence.time_changed",

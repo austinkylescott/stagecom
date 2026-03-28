@@ -30,6 +30,7 @@ const showId = computed(() => props.showId);
 const { mutateAsync: invite, isLoading: inviting } = useInviteCast(showId);
 const { mutateAsync: requestCast, isLoading: requesting } = useRequestCast(showId);
 const { mutateAsync: patchCast, isLoading: patching } = usePatchCast(showId);
+const programOrderDrafts = reactive<Record<string, number | null>>({});
 
 const sortMode = ref<"status" | "name">("status");
 
@@ -144,11 +145,46 @@ const submitRequest = async () => {
 };
 
 const handlePatch = async (
-  action: "accept" | "approve" | "decline" | "withdraw" | "remove",
+  action:
+    | "accept"
+    | "approve"
+    | "decline"
+    | "withdraw"
+    | "remove"
+    | "set_program_order",
   targetUserId?: string,
+  programOrder?: number | null,
 ) => {
-  await patchCast({ action, targetUserId });
+  await patchCast({ action, targetUserId, programOrder });
   await props.refreshShow?.();
+};
+
+const getProgramOrderDraft = (member: ShowCastMember) => {
+  if (!(member.userId in programOrderDrafts)) {
+    programOrderDrafts[member.userId] = member.programOrder;
+  }
+
+  return programOrderDrafts[member.userId];
+};
+
+const setProgramOrderDraft = (member: ShowCastMember, value: string | number) => {
+  const normalized = typeof value === "string" ? value.trim() : String(value);
+
+  if (normalized === "") {
+    programOrderDrafts[member.userId] = null;
+    return;
+  }
+
+  const parsed = Number(normalized);
+  programOrderDrafts[member.userId] = Number.isFinite(parsed) ? parsed : null;
+};
+
+const saveProgramOrder = async (member: ShowCastMember) => {
+  await handlePatch(
+    "set_program_order",
+    member.userId,
+    getProgramOrderDraft(member),
+  );
 };
 
 const inactiveStatusLabel = (member: ShowCastMember) => {
@@ -188,6 +224,25 @@ const inactiveStatusLabel = (member: ShowCastMember) => {
 
     <ShowCastMemberSection title="Confirmed" :members="accepted">
       <template #actions="{ member }">
+        <div v-if="isProducer" class="flex items-center gap-2">
+          <UInput
+            size="xs"
+            type="number"
+            min="1"
+            class="w-20"
+            :model-value="getProgramOrderDraft(member) ?? ''"
+            @update:model-value="setProgramOrderDraft(member, $event)"
+          />
+          <UButton
+            size="xs"
+            color="gray"
+            variant="soft"
+            :loading="patching"
+            @click="saveProgramOrder(member)"
+          >
+            Save slot
+          </UButton>
+        </div>
         <UButton
           v-if="member.userId === myUserId"
           size="xs"

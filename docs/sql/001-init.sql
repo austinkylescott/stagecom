@@ -473,6 +473,10 @@ as $function$
     );
 $function$;
 
+-- Direct authenticated inserts into show_review_events stay staff-scoped.
+-- Producer review submissions are expected to be recorded by an authorized
+-- server-side workflow after producer permissions are checked.
+
 alter table public.profiles enable row level security;
 alter table public.theaters enable row level security;
 alter table public.theater_memberships enable row level security;

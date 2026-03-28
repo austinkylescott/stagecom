@@ -88,6 +88,14 @@ export type ShowDetailResponse = {
   };
 };
 
+export type UpdateShowStatusAction =
+  | "submit_for_review"
+  | "approve"
+  | "reject"
+  | "changes_requested"
+  | "cancel"
+  | "reopen_draft";
+
 type ShowDetailQueryCache = {
   getQueryData: (key: readonly unknown[]) => unknown;
   setQueryData: (

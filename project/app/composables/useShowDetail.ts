@@ -6,6 +6,7 @@ import {
   rollbackOptimisticShowDetail,
   showDetailQueryOptions,
   type ShowDetailResponse,
+  type UpdateShowStatusAction,
 } from "~/queries/shows";
 import { queryKeys } from "~/composables/queryKeys";
 
@@ -54,8 +55,15 @@ export const usePatchCast = (showId: Ref<string>) => {
   return useMutation<
     void,
     {
-      action: "accept" | "approve" | "decline" | "withdraw" | "remove";
+      action:
+        | "accept"
+        | "approve"
+        | "decline"
+        | "withdraw"
+        | "remove"
+        | "set_program_order";
       targetUserId?: string;
+      programOrder?: number | null;
     }
   >({
     mutation: (body) =>
@@ -71,6 +79,77 @@ export const usePatchCast = (showId: Ref<string>) => {
       });
       queryCache.invalidateQueries({
         key: queryKeys.notifications(),
+        exact: true,
+      });
+    },
+  });
+};
+
+export const useUpdateShowStatus = (
+  showId: Ref<string>,
+  theaterSlug?: Ref<string | null | undefined>,
+) => {
+  const queryCache = useQueryCache();
+
+  return useMutation<
+    void,
+    {
+      action: UpdateShowStatusAction;
+      reason?: string;
+      note?: string;
+    }
+  >({
+    mutation: ({ action, reason, note }) =>
+      $fetch(`/api/shows/${showId.value}/status`, {
+        method: "POST",
+        credentials: "include",
+        body: { action, reason, note },
+      }),
+    onSuccess: () => {
+      queryCache.invalidateQueries({
+        key: queryKeys.showDetail(showId.value),
+        exact: true,
+      });
+      queryCache.invalidateQueries({
+        key: queryKeys.memberShows(),
+        exact: true,
+      });
+      queryCache.invalidateQueries({
+        key: queryKeys.reviewInbox(),
+        exact: true,
+      });
+      queryCache.invalidateQueries({
+        key: queryKeys.notifications(),
+        exact: true,
+      });
+
+      if (theaterSlug?.value) {
+        queryCache.invalidateQueries({
+          key: queryKeys.theater(theaterSlug.value),
+          exact: false,
+        });
+        queryCache.invalidateQueries({
+          key: queryKeys.theaterReview(theaterSlug.value),
+          exact: false,
+        });
+      }
+    },
+  });
+};
+
+export const useUpdateShowSettings = (showId: Ref<string>) => {
+  const queryCache = useQueryCache();
+
+  return useMutation<void, { isCastFinalized: boolean }>({
+    mutation: ({ isCastFinalized }) =>
+      $fetch(`/api/shows/${showId.value}/settings`, {
+        method: "PATCH",
+        credentials: "include",
+        body: { isCastFinalized },
+      }),
+    onSuccess: () => {
+      queryCache.invalidateQueries({
+        key: queryKeys.showDetail(showId.value),
         exact: true,
       });
     },

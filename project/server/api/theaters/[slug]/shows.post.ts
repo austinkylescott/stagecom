@@ -1,6 +1,9 @@
 import { serverSupabaseClient } from "#supabase/server";
 import { z } from "zod";
 import type { Enums, TablesInsert } from "~/types/database.types";
+import { buildShowEvent, emitEvent } from "~~/server/utils/notify";
+import { hasStaffRole } from "~~/server/utils/permissions";
+import { getServiceRoleClient } from "~~/server/utils/service-role";
 
 /**
  * POST /api/theaters/:slug/shows
@@ -87,6 +90,7 @@ export default defineEventHandler(async (event) => {
     submitForReview,
   } = await parseBody(event, bodySchema);
   const supabase = await serverSupabaseClient(event);
+  const serviceSupabase = getServiceRoleClient();
   const userId = await requireUserId(event, supabase);
 
   // Lookup theater
@@ -204,6 +208,61 @@ export default defineEventHandler(async (event) => {
 
     if (occError) {
       throw createError({ statusCode: 500, statusMessage: occError.message });
+    }
+  }
+
+  if (submitForReview) {
+    const { error: reviewError } = await serviceSupabase.from("show_review_events").insert({
+      show_id: show.id,
+      action: "submitted",
+      actor_user_id: userId,
+      note: null,
+    });
+
+    if (reviewError) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: reviewError.message,
+      });
+    }
+
+    const { data: theaterInfo, error: theaterInfoError } = await supabase
+      .from("theaters")
+      .select("slug")
+      .eq("id", theater.id)
+      .maybeSingle();
+
+    if (theaterInfoError) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: theaterInfoError.message,
+      });
+    }
+
+    const { data: staffMemberships, error: staffError } = await supabase
+      .from("theater_memberships")
+      .select("user_id,roles,status")
+      .eq("theater_id", theater.id)
+      .eq("status", "active");
+
+    if (staffError) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: staffError.message,
+      });
+    }
+
+    for (const membershipRow of staffMemberships ?? []) {
+      if (!hasStaffRole(membershipRow.roles)) continue;
+
+      await emitEvent(
+        buildShowEvent("show.submitted_for_review", {
+          showId: show.id,
+          showTitle: title,
+          theaterSlug: theaterInfo?.slug ?? slug,
+          recipientId: membershipRow.user_id,
+        }),
+      );
     }
   }
 

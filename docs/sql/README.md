@@ -5,6 +5,10 @@
 - `003-event-type-migration.sql` — converts legacy `shows.is_practice` to `shows.event_type` and removes `is_practice`.
 - `project/scripts/mock-data.mjs` — generates deterministic mock SQL from a JSON config with real auth user IDs.
 
+Behavior notes:
+- `show_cast.program_order` is treated as an application-managed lineup position for accepted performers. Producers insert a performer into a slot, and the application reindexes later slotted performers to keep the order collision-free.
+- Producer review submissions may write `show_review_events(action = 'submitted')` through a server-side privileged workflow after producer authorization is checked.
+
 ## Usage
 
 ### Local psql

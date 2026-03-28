@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { useRequestHeaders } from "#app";
-import { useShowDetail, type ShowDetailResponse } from "~/composables/useShowDetail";
+import {
+  useShowDetail,
+  useUpdateShowSettings,
+  useUpdateShowStatus,
+  type ShowDetailResponse,
+} from "~/composables/useShowDetail";
 import ShowCastPanel from "~/components/ShowCastPanel.vue";
 
 const route = useRoute();
@@ -58,6 +63,111 @@ const isProducer = computed(() => data.value?.permissions.isProducer ?? false);
 const canSeePendingCast = computed(
   () => data.value?.permissions.canSeePendingCast ?? false,
 );
+const acceptedCast = computed(() =>
+  cast.value.filter((member) => member.status === "accepted"),
+);
+const confirmedCount = computed(() => acceptedCast.value.length);
+const castRangeLabel = computed(() => {
+  if (!show.value) return null;
+
+  if (show.value.castMin !== null && show.value.castMax !== null) {
+    if (show.value.castMin === show.value.castMax) {
+      return `${show.value.castMax}`;
+    }
+
+    return `${show.value.castMin}-${show.value.castMax}`;
+  }
+
+  if (show.value.castMax !== null) {
+    return `up to ${show.value.castMax}`;
+  }
+
+  if (show.value.castMin !== null) {
+    return `${show.value.castMin}+`;
+  }
+
+  return null;
+});
+const castCountSummary = computed(() => {
+  if (!castRangeLabel.value) {
+    return `${confirmedCount.value} confirmed`;
+  }
+
+  return `${confirmedCount.value} confirmed / ${castRangeLabel.value}`;
+});
+const hasCastOverflow = computed(
+  () =>
+    show.value?.castMax !== null &&
+    show.value?.castMax !== undefined &&
+    confirmedCount.value > show.value.castMax,
+);
+const programLink = computed(() =>
+  show.value ? `/theaters/${slug.value}/shows/${show.value.id}/program` : null,
+);
+
+const updateShowStatus = useUpdateShowStatus(id, slug);
+const updateShowSettings = useUpdateShowSettings(id);
+const isUpdatingStatus = computed(() => updateShowStatus.isLoading.value);
+const isUpdatingSettings = computed(() => updateShowSettings.isLoading.value);
+const statusNotice = ref("");
+const statusError = ref("");
+
+const runStatusAction = async (
+  action:
+    | "submit_for_review"
+    | "cancel"
+    | "reopen_draft",
+) => {
+  statusNotice.value = "";
+  statusError.value = "";
+
+  try {
+    await updateShowStatus.mutateAsync({ action });
+
+    if (action === "submit_for_review") statusNotice.value = "Submitted for review";
+    else if (action === "cancel") statusNotice.value = "Show cancelled";
+    else statusNotice.value = "Moved back to draft";
+
+    await refresh();
+  } catch (err: any) {
+    statusError.value =
+      err?.data?.statusMessage || err?.data?.message || err?.message || "Action failed";
+  }
+};
+
+const toggleCastFinalized = async () => {
+  if (!show.value) return;
+
+  statusNotice.value = "";
+  statusError.value = "";
+
+  try {
+    await updateShowSettings.mutateAsync({
+      isCastFinalized: !show.value.isCastFinalized,
+    });
+    statusNotice.value = show.value.isCastFinalized
+      ? "Cast reopened"
+      : "Cast finalized";
+    await refresh();
+  } catch (err: any) {
+    statusError.value =
+      err?.data?.statusMessage || err?.data?.message || err?.message || "Action failed";
+  }
+};
+
+const canSubmitForReview = computed(
+  () => isProducer.value && ["draft", "rejected"].includes(show.value?.status ?? ""),
+);
+const canCancelShow = computed(
+  () =>
+    isProducer.value &&
+    ["draft", "pending_review", "approved", "rejected"].includes(show.value?.status ?? ""),
+);
+const canReopenDraft = computed(
+  () =>
+    isProducer.value &&
+    ["cancelled", "rejected"].includes(show.value?.status ?? ""),
+);
 
 const statusColors = {
   draft: "gray",
@@ -82,6 +192,14 @@ const statusColors = {
       {{ error?.data?.message || error?.message }}
     </div>
 
+    <div v-if="statusError" class="text-sm text-red-600">
+      {{ statusError }}
+    </div>
+
+    <div v-if="statusNotice" class="text-sm text-emerald-600">
+      {{ statusNotice }}
+    </div>
+
     <div v-if="isLoading && !show" class="text-sm text-slate-500">
       Loading...
     </div>
@@ -95,9 +213,18 @@ const statusColors = {
               {{ show.eventType }}
             </p>
           </div>
-          <UBadge :color="statusColors[show.status]" variant="soft">
-            {{ show.status }}
-          </UBadge>
+          <div class="flex items-center gap-2 flex-wrap justify-end">
+            <UBadge :color="statusColors[show.status]" variant="soft">
+              {{ show.status }}
+            </UBadge>
+            <UBadge
+              v-if="show.isCastFinalized"
+              color="primary"
+              variant="soft"
+            >
+              Cast finalized
+            </UBadge>
+          </div>
         </div>
       </template>
 
@@ -106,9 +233,9 @@ const statusColors = {
           {{ show.description }}
         </p>
         <div class="grid gap-2 sm:grid-cols-2 text-sm">
-          <div v-if="show.castMin || show.castMax">
+          <div v-if="castRangeLabel">
             <span class="text-slate-500">Cast size: </span>
-            <span>{{ show.castMin ?? "?" }}–{{ show.castMax ?? "?" }}</span>
+            <span>{{ castCountSummary }}</span>
           </div>
           <div v-if="show.ticketUrl">
             <span class="text-slate-500">Tickets: </span>
@@ -121,6 +248,64 @@ const statusColors = {
               Link
             </a>
           </div>
+        </div>
+
+        <p
+          v-if="hasCastOverflow"
+          class="text-sm text-orange-700"
+        >
+          Confirmed cast exceeds the current max. v1 allows this, but it should be reviewed.
+        </p>
+
+        <div class="flex items-center gap-2 flex-wrap">
+          <UButton
+            v-if="programLink"
+            size="sm"
+            variant="soft"
+            :to="programLink"
+            icon="i-heroicons-queue-list"
+          >
+            Program view
+          </UButton>
+          <UButton
+            v-if="canSubmitForReview"
+            size="sm"
+            color="primary"
+            :loading="isUpdatingStatus"
+            @click="runStatusAction('submit_for_review')"
+          >
+            Submit for review
+          </UButton>
+          <UButton
+            v-if="isProducer"
+            size="sm"
+            :color="show.isCastFinalized ? 'gray' : 'primary'"
+            variant="soft"
+            :loading="isUpdatingSettings"
+            @click="toggleCastFinalized"
+          >
+            {{ show.isCastFinalized ? "Reopen cast" : "Finalize cast" }}
+          </UButton>
+          <UButton
+            v-if="canReopenDraft"
+            size="sm"
+            color="gray"
+            variant="ghost"
+            :loading="isUpdatingStatus"
+            @click="runStatusAction('reopen_draft')"
+          >
+            Move to draft
+          </UButton>
+          <UButton
+            v-if="canCancelShow"
+            size="sm"
+            color="red"
+            variant="ghost"
+            :loading="isUpdatingStatus"
+            @click="runStatusAction('cancel')"
+          >
+            Cancel show
+          </UButton>
         </div>
       </div>
     </UCard>

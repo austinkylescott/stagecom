@@ -1,6 +1,7 @@
 import { serverSupabaseClient } from "#supabase/server";
 import type { Enums, Tables } from "~/types/database.types";
 import { hasStaffRole } from "~~/server/utils/permissions";
+import { getServiceRoleClient } from "~~/server/utils/service-role";
 import { canViewShow } from "~~/server/utils/visibility-policy";
 
 type ShowRow = Pick<
@@ -34,6 +35,7 @@ type ShowItem = {
 
 export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient(event);
+  const serviceSupabase = getServiceRoleClient();
   const userId = await getOptionalUserId(event, supabase);
 
   if (!userId) {
@@ -70,7 +72,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Shows for those theaters
-  const { data: shows, error: showsError } = await supabase
+  const { data: shows, error: showsError } = await serviceSupabase
     .from("shows")
     .select("id,title,description,status,theater_id,event_type,casting_mode,is_public_listed")
     .in("theater_id", theaterIds);
@@ -86,12 +88,12 @@ export default defineEventHandler(async (event) => {
     { data: roleRows, error: roleError },
     { data: castRows, error: castError },
   ] = await Promise.all([
-    supabase
+    serviceSupabase
       .from("show_roles")
       .select("show_id,role")
       .in("show_id", showIds)
       .eq("user_id", userId),
-    supabase
+    serviceSupabase
       .from("show_cast")
       .select("show_id,source,status")
       .in("show_id", showIds)
@@ -144,7 +146,7 @@ export default defineEventHandler(async (event) => {
   if (visibleShows.length === 0) return { shows: [] };
 
   // Upcoming occurrences
-  const { data: occs, error: occError } = await supabase
+  const { data: occs, error: occError } = await serviceSupabase
     .from("show_occurrences")
     .select("show_id,starts_at,status")
     .in(

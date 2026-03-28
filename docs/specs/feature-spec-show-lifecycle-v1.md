@@ -11,7 +11,7 @@ This is the first complete vertical slice.
 ---
 
 ## Show Creation Rules
-- Any authenticated user may create a show
+- Any authenticated user with active membership in the theater may create a show
 - Creator is automatically assigned as Producer
 - Producer is **not automatically cast**
 - Shows begin in Draft state
@@ -78,6 +78,7 @@ Behavior:
 - Read-only
 - Accepted performers only
 - Ordered lineup (program_order)
+- `program_order` must be collision-free within a show; moving one performer into a slot shifts later slotted performers down
 - Optimized for mobile
 
 ---
@@ -87,4 +88,5 @@ Behavior:
 - Cast membership requires an explicit show_cast entry
 - Only accepted performers appear in program
 - Unapproved shows are not publicly visible
-- Assignment and schedule changes trigger notifications
+- Assignment changes trigger notifications
+- Occurrence management and schedule-change notifications are deferred until occurrence editing is implemented

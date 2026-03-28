@@ -48,6 +48,7 @@ Roles are **contextual**, not global.
 - Responsible for scheduling, casting, and communication
 - Automatically assigned when creating a show
 - **Is not automatically part of the cast** (must be added explicitly if performing)
+- Must belong to the relevant theater in order to create a show or event there
 
 #### Theater Manager
 - Oversees a theater
@@ -104,6 +105,7 @@ A user may hold different roles per theater and per show.
 - Authentication & profiles
 - Theater creation and membership
 - Show and practice creation
+- Theater members create shows and events within theaters they belong to
 - Approval workflow (review queue)
 - Lineup management with cast size ranges
 - Casting visibility modes (invite-only, theater casting, public casting)

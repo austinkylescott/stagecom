@@ -10,7 +10,10 @@ export type CastEventType =
   | "cast.withdrawn"
   | "cast.removed_by_producer";
 
-export type ShowEventType = "show.approved" | "show.rejected";
+export type ShowEventType =
+  | "show.submitted_for_review"
+  | "show.approved"
+  | "show.rejected";
 
 type CastEventBase = {
   showId: string;
@@ -37,6 +40,11 @@ export type NotifyEvent =
 export const buildCastEvent = (
   type: CastEventType,
   base: CastEventBase,
+): NotifyEvent => ({ type, ...base });
+
+export const buildShowEvent = (
+  type: ShowEventType,
+  base: ShowEventBase,
 ): NotifyEvent => ({ type, ...base });
 
 const EMAIL_TYPES = new Set<string>([

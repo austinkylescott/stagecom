@@ -28,6 +28,8 @@ export const formatNotification = (
 
   const text = (() => {
     switch (type) {
+      case "show.submitted_for_review":
+        return `${show} was submitted for review`;
       case "cast.invited":
         return `${actor} invited you to perform in ${show}`;
       case "cast.requested":

@@ -86,6 +86,8 @@ No notification is created outside this service.
 
 ## Implementation Notes
 - Prefer application-level triggers (service called after DB writes) for v1
+- Producer `show.submitted_for_review` flows may log the review event through a server-side privileged write after producer authorization is confirmed
+- Schedule-change notification types are part of the model, but live occurrence editing and emission of those events are deferred until occurrence management is implemented
 - Use deterministic dedupe keys to prevent spam on retries
 - `cast.requested` dedupes per request cycle per requester per show per recipient so repeat requests still notify producers
 - Never infer cast membership from producer role

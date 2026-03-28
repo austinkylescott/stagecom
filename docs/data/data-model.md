@@ -88,6 +88,9 @@ Performer membership is explicit:
 
 Rule:
 - producers do not appear here unless explicitly added
+- `program_order` is an application-managed lineup position for accepted performers
+- `program_order` must remain collision-free within a show; when a producer moves one performer into a slot, later slotted performers shift down
+- accepted performers may still have `program_order = null` until the producer places them in the lineup
 
 Visibility rules:
 - Producers and authorized theater staff may inspect the full cast state
@@ -101,6 +104,11 @@ Visibility rules:
 - action (submitted, approved, rejected, changes_requested)
 - actor_user_id
 - note (nullable)
+
+Rules:
+- Producer submissions into the review queue must create a `submitted` review event
+- Staff approvals and rejections must create the corresponding review event
+- Producer-originated review submissions may be written through an authorized server-side workflow even if direct user SQL policies stay staff-only
 
 ---
 

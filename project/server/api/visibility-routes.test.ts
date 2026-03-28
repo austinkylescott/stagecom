@@ -197,6 +197,8 @@ describe("visibility route wiring", () => {
           data: [{ id: "theater-a", name: "Theater A", slug: "theater-a" }],
         },
       ],
+    });
+    const serviceSupabase = createMockClient({
       shows: [
         {
           data: [
@@ -265,6 +267,9 @@ describe("visibility route wiring", () => {
 
     vi.doMock("#supabase/server", () => ({
       serverSupabaseClient: vi.fn(async () => supabase),
+    }));
+    vi.doMock("~~/server/utils/service-role", () => ({
+      getServiceRoleClient: vi.fn(() => serviceSupabase),
     }));
 
     const { default: handler } = await importFresh<typeof import("./shows/index.get")>(
