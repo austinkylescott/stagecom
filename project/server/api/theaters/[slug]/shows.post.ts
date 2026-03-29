@@ -7,7 +7,7 @@ import { getServiceRoleClient } from "~~/server/utils/service-role";
 
 /**
  * POST /api/theaters/:slug/shows
- * Create a show under a theater. Any authenticated user may create; creator is implied producer (handled later).
+ * Create a show under a theater for an active theater member; creator is implied producer (handled later).
  */
 const paramsSchema = z.object({ slug: z.string().trim().min(1) });
 const emptyToUndefined = (value: unknown) => {

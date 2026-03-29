@@ -207,6 +207,14 @@ as $function$
     );
 $function$;
 
+-- Direct authenticated inserts into show_review_events stay staff-scoped.
+-- Producer review submissions are expected to be recorded by an authorized
+-- server-side workflow after producer permissions are checked.
+--
+-- program_order is application-managed for accepted performers. Producers
+-- reorder the lineup through server logic that reindexes later slotted
+-- performers so the order remains collision-free within a show.
+
 alter table public.profiles enable row level security;
 alter table public.theater_memberships enable row level security;
 alter table public.shows enable row level security;
