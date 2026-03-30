@@ -68,6 +68,15 @@ const visibleShows = computed(() => {
   if (activeFilter.value === "created") return createdShows.value;
   return sortedShows.value;
 });
+const pendingApprovalCount = computed(
+  () => sortedShows.value.filter((show) => show.status === "pending_review").length,
+);
+const createdPendingCount = computed(
+  () =>
+    sortedShows.value.filter(
+      (show) => show.createdByMe && show.status === "pending_review",
+    ).length,
+);
 
 const statusTone = (status: string) => {
   if (status === "pending_review") return "bg-[var(--stage-event)]";
@@ -195,11 +204,9 @@ const updateStatus = async (
         <div class="space-y-5">
           <span class="stage-kicker">Review board</span>
           <div>
-            <h1 class="stage-section-title">Approvals, fixes, and tonight's queue.</h1>
+            <h1 class="stage-section-title">Approvals that explain what is blocked.</h1>
             <p class="mt-3 max-w-3xl text-lg leading-8 stage-muted">
-              This is the operational inbox for the shows you created and the
-              shows your theaters need reviewed. It should feel like the same
-              product shown on the homepage, not a detached admin screen.
+              Use this board to see what needs theater approval, what you are still shepherding, and what can move forward right now.
             </p>
           </div>
 
@@ -317,6 +324,25 @@ const updateStatus = async (
           </p>
         </div>
 
+        <div class="grid gap-3 sm:grid-cols-3">
+          <div class="stage-stat">
+            <span class="stage-overline">Awaiting approval</span>
+            <span class="stage-stat-value">{{ pendingApprovalCount }}</span>
+            <p class="mt-2 text-sm stage-muted">Across all visible theaters.</p>
+          </div>
+          <div class="stage-stat">
+            <span class="stage-overline">Your pending shows</span>
+            <span class="stage-stat-value">{{ createdPendingCount }}</span>
+            <p class="mt-2 text-sm stage-muted">Still blocked on review.</p>
+          </div>
+          <div class="stage-stat">
+            <span class="stage-overline">Checklist</span>
+            <p class="mt-3 text-sm leading-6 stage-muted">
+              Verify title, description, schedule, and whether the listing is ready for the theater to stand behind publicly.
+            </p>
+          </div>
+        </div>
+
         <div
           v-if="isLoading"
           class="stage-panel px-5 py-6 text-sm stage-muted"
@@ -350,6 +376,28 @@ const updateStatus = async (
             </div>
 
             <div class="space-y-3 p-4 text-[var(--stage-ink)]">
+              <div class="flex flex-wrap items-center gap-2">
+                <UBadge
+                  :color="statusColors[show.status] || 'neutral'"
+                  variant="soft"
+                >
+                  {{ show.status.replaceAll('_', ' ') }}
+                </UBadge>
+                <UBadge
+                  v-if="show.canReview && show.status === 'pending_review'"
+                  color="warning"
+                  variant="soft"
+                >
+                  Needs theater decision
+                </UBadge>
+                <UBadge
+                  v-else-if="show.createdByMe"
+                  color="neutral"
+                  variant="soft"
+                >
+                  Tracked by you
+                </UBadge>
+              </div>
               <div class="flex items-center justify-between gap-3 border-2 border-[rgba(43,41,38,0.1)] p-3">
                 <div>
                   <div class="text-sm font-medium">{{ show.title }}</div>
@@ -380,6 +428,15 @@ const updateStatus = async (
               <div class="flex items-center justify-between border-2 border-[rgba(43,41,38,0.1)] p-3">
                 <span class="text-sm stage-muted">Next occurrence</span>
                 <span class="text-sm font-bold">{{ formatDateTime(show.nextStartsAt) }}</span>
+              </div>
+              <div class="border-2 border-[rgba(43,41,38,0.1)] p-3 text-sm stage-muted">
+                {{
+                  show.canReview && show.status === 'pending_review'
+                    ? 'Decision needed: confirm the listing is clear enough for public theater backing.'
+                    : show.createdByMe
+                      ? 'Tracked here because you created this show and may need to respond to review outcomes.'
+                      : 'Tracked here because it belongs to a theater you help oversee.'
+                }}
               </div>
               <div v-if="show.canReview && show.status === 'pending_review'" class="grid gap-3 md:grid-cols-[0.9fr_1.1fr]">
                 <USelect
@@ -413,9 +470,9 @@ const updateStatus = async (
             What matters here
           </h2>
           <div class="mt-4 space-y-3 text-sm leading-7 stage-muted">
-            <p>Approvals should be fast, explicit, and visible to the people running the show.</p>
-            <p>Request changes when scheduling, casting, or policy details are still unclear.</p>
-            <p>The goal is fewer backchannel follow-ups and a queue everyone can trust.</p>
+            <p>Approve when the title, description, and schedule are clean enough for a public theater board.</p>
+            <p>Request changes when the producer needs to clarify logistics, lineup readiness, or policy concerns.</p>
+            <p>Reject only when the proposal should not proceed in its current form.</p>
           </div>
         </section>
 

@@ -131,9 +131,7 @@ const save = async () => {
         <span class="stage-kicker">Profile</span>
         <h1 class="mt-4 stage-section-title">How you appear across the scene.</h1>
         <p class="mt-3 max-w-3xl text-lg leading-8 stage-muted">
-          Your profile should read like the rest of the product: clear identity,
-          useful context for theaters, and explicit control over what stays
-          visible.
+          Keep your identity readable for producers and theaters while staying explicit about what is public, theater-only, or private.
         </p>
       </div>
     </StageSection>
@@ -212,7 +210,7 @@ const save = async () => {
         <aside class="stage-panel-dark stage-grid-board p-5 sm:p-6">
           <span class="stage-overline text-[var(--stage-cream)]">What this controls</span>
           <h2 class="mt-3 text-2xl font-black tracking-[-0.03em] text-[var(--stage-cream)]">
-            Keep your basics current.
+            Make it easy to recognize you.
           </h2>
           <div class="mt-4 space-y-4 text-sm leading-6 text-[rgba(251,247,239,0.82)]">
             <p>

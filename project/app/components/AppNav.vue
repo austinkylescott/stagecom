@@ -14,9 +14,8 @@ const navItems = computed(() => {
 
   if (isAuthed.value) {
     items.push(
-      { label: "Shows", to: "/shows" },
-      { label: "Review", to: "/review" },
-      { label: "Profile", to: "/profile" },
+      { label: "My Schedule", to: "/shows" },
+      { label: "Approvals", to: "/review" },
     );
   }
 
@@ -44,7 +43,7 @@ const navToneClasses = (to: string, active: boolean) => {
     ];
   }
 
-  if (to.startsWith("/performers") || to.startsWith("/profile")) {
+  if (to.startsWith("/performers")) {
     return [
       active
         ? "bg-[var(--stage-performer)] hover:bg-[var(--stage-performer-soft)] active:bg-[var(--stage-performer-soft)]"

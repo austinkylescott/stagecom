@@ -1,9 +1,14 @@
 <script setup lang="ts">
+import type { DropdownMenuItem } from "@nuxt/ui";
 import {
   useNotificationsBell,
   useMarkRead,
 } from "~/composables/useNotifications";
 import { formatNotification } from "~/utils/notifications";
+
+type NotificationDropdownItem = DropdownMenuItem & {
+  unread?: boolean;
+};
 
 const { data, unreadCount } = useNotificationsBell();
 const { mutateAsync: markRead } = useMarkRead();
@@ -11,10 +16,44 @@ const { mutateAsync: markRead } = useMarkRead();
 const notifications = computed(() => data.value?.notifications ?? []);
 
 const markAllRead = () => markRead({ all: true });
+
+const latestNotificationToneClass = computed(() => {
+  const latestType = notifications.value[0]?.type;
+
+  if (!latestType) return "bg-[var(--stage-paper-strong)]";
+  if (latestType.startsWith("cast.")) return "bg-[var(--stage-performer-soft)]";
+  if (["show.submitted_for_review", "show.approved"].includes(latestType)) {
+    return "bg-[var(--stage-theater-soft)]";
+  }
+
+  return "bg-[var(--stage-paper-strong)]";
+});
+
+const notificationItems = computed<NotificationDropdownItem[][]>(() => [
+  notifications.value.map((notification) => {
+    const formatted = formatNotification(notification.type, notification.payload);
+
+    return {
+      label: formatted.text,
+      description: new Date(notification.created_at).toLocaleDateString(),
+      to: formatted.href ?? "/notifications",
+      icon: "i-heroicons-bell",
+      unread: !notification.read_at,
+      onSelect: () => {
+        if (!notification.read_at) {
+          return markRead({ ids: [notification.id] });
+        }
+      },
+    } satisfies DropdownMenuItem;
+  }),
+]);
 </script>
 
 <template>
-  <UPopover :content="{ side: 'bottom', align: 'end', sideOffset: 8 }">
+  <AppHeaderDropdown
+    :items="notificationItems"
+    :header-tone-class="latestNotificationToneClass"
+  >
     <UButton color="neutral" variant="ghost" class="relative">
       <UIcon name="i-heroicons-bell" class="size-5" />
       <span
@@ -25,63 +64,52 @@ const markAllRead = () => markRead({ all: true });
       </span>
     </UButton>
 
-    <template #content>
-      <div class="w-80 border-3 border-[var(--stage-ink)] bg-[var(--stage-cream)] shadow-[8px_8px_0_0_var(--stage-ink)]">
-        <div
-          class="flex items-center justify-between border-b-3 border-[var(--stage-ink)] bg-[var(--stage-theater)] px-3 py-2"
-        >
-          <p class="text-sm font-medium text-[var(--stage-ink)]">Notifications</p>
-          <div class="flex gap-3">
-            <button
-              v-if="unreadCount > 0"
-              class="text-xs font-semibold text-[var(--stage-ink)] underline underline-offset-2"
-              @click="markAllRead"
-            >
-              Mark all read
-            </button>
-            <NuxtLink
-              to="/notifications"
-              class="text-xs font-semibold text-[var(--stage-ink)] underline underline-offset-2"
-            >
-              See all
-            </NuxtLink>
-          </div>
-        </div>
+    <template #header>
+      <p class="text-sm font-medium text-[var(--stage-ink)]">Notifications</p>
+    </template>
 
-        <div
-          v-if="!notifications.length"
-          class="px-3 py-6 text-center text-sm stage-muted"
+    <template #header-actions>
+      <div class="flex gap-3">
+        <button
+          v-if="unreadCount > 0"
+          class="text-xs font-semibold text-[var(--stage-ink)] underline underline-offset-2"
+          @click="markAllRead"
         >
-          No notifications yet.
-        </div>
-
-        <div v-else>
-          <NuxtLink
-            v-for="n in notifications"
-            :key="n.id"
-            :to="formatNotification(n.type, n.payload).href ?? '/notifications'"
-            class="flex items-start gap-2 border-b border-[rgba(43,41,38,0.12)] px-3 py-2 transition-colors hover:bg-[var(--stage-paper-strong)]"
-            :class="{ 'bg-[rgba(94,144,217,0.14)]': !n.read_at }"
-            @click="!n.read_at && markRead({ ids: [n.id] })"
-          >
-            <span
-              class="mt-1.5 size-2 shrink-0 border border-[var(--stage-ink)]"
-              :class="n.read_at ? 'bg-transparent' : 'bg-[var(--stage-performer)]'"
-            />
-            <div class="flex-1 min-w-0">
-              <p
-                class="text-sm leading-snug"
-                :class="n.read_at ? 'stage-muted' : 'text-[var(--stage-ink)] font-medium'"
-              >
-                {{ formatNotification(n.type, n.payload).text }}
-              </p>
-              <p class="mt-0.5 text-xs stage-muted">
-                {{ new Date(n.created_at).toLocaleDateString() }}
-              </p>
-            </div>
-          </NuxtLink>
-        </div>
+          Mark all read
+        </button>
+        <NuxtLink
+          to="/notifications"
+          class="text-xs font-semibold text-[var(--stage-ink)] underline underline-offset-2"
+        >
+          See all
+        </NuxtLink>
       </div>
     </template>
-  </UPopover>
+
+    <template #content-bottom>
+      <div
+        v-if="!notifications.length"
+        class="px-3 py-6 text-center text-sm stage-muted"
+      >
+        No notifications yet.
+      </div>
+    </template>
+
+    <template #item-leading="{ item }">
+      <span
+        class="mt-1.5 size-2 shrink-0 border border-[var(--stage-ink)]"
+        :class="item.unread ? 'bg-[var(--stage-performer)]' : 'bg-transparent'"
+      />
+    </template>
+
+    <template #item-label="{ item }">
+      <span :class="item.unread ? 'font-medium text-[var(--stage-ink)]' : 'stage-muted'">
+        {{ item.label }}
+      </span>
+    </template>
+
+    <template #item-description="{ item }">
+      {{ item.description }}
+    </template>
+  </AppHeaderDropdown>
 </template>

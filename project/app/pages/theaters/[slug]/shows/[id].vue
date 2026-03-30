@@ -57,6 +57,7 @@ watch(
 
 const show = computed(() => data.value?.show ?? null);
 const occurrences = computed(() => data.value?.occurrences ?? []);
+const nextOccurrence = computed(() => occurrences.value[0] ?? null);
 const producers = computed(() => data.value?.producers ?? []);
 const cast = computed(() => data.value?.cast ?? []);
 const viewerCast = computed(() => data.value?.viewerCast ?? null);
@@ -193,6 +194,63 @@ const canReopenDraft = computed(
     isProducer.value &&
     ["cancelled", "rejected"].includes(show.value?.status ?? ""),
 );
+const viewerRoleLabel = computed(() => {
+  if (isProducer.value) return "Producer";
+  if (viewerCast.value?.status === "accepted") return "Confirmed performer";
+  if (viewerCast.value?.status === "pending") {
+    return viewerCast.value.source === "requested"
+      ? "Pending request"
+      : "Pending invite";
+  }
+  if (viewerCast.value?.status === "declined") return "Declined";
+  if (viewerCast.value?.status === "withdrawn") return "Withdrawn";
+  return "Viewer";
+});
+const showStateLabel = computed(() => {
+  if (!show.value) return "";
+
+  if (show.value.status === "pending_review") {
+    return "Waiting on theater approval before public listing.";
+  }
+  if (show.value.status === "approved") {
+    return show.value.isPublicListed
+      ? "Approved and visible on the theater board."
+      : "Approved, but not yet public.";
+  }
+  if (show.value.status === "draft") {
+    return "Still in setup. Only authorized people should rely on this version.";
+  }
+  if (show.value.status === "rejected") {
+    return "Needs producer changes before it should move forward.";
+  }
+  if (show.value.status === "cancelled") {
+    return "Cancelled. Keep this page as a record, not an active plan.";
+  }
+  return "";
+});
+const viewerActionLabel = computed(() => {
+  if (isProducer.value) {
+    if (canSubmitForReview.value) return "Complete setup and submit this show for theater review.";
+    if (!show.value?.isCastFinalized) return "Track responses, place performers, and finalize the cast when ready.";
+    return "Use this page to monitor lineup, schedule, and show-day readiness.";
+  }
+
+  if (viewerCast.value?.status === "accepted") {
+    return "You are in the lineup. Double-check the next occurrence and watch for show-day updates.";
+  }
+
+  if (viewerCast.value?.status === "pending") {
+    return viewerCast.value.source === "requested"
+      ? "Your request is pending producer review."
+      : "Your invite is still awaiting a response.";
+  }
+
+  if (show.value?.status === "approved" && show.value?.castingMode !== "direct_invite") {
+    return "If you want in, use the cast panel below to request a spot.";
+  }
+
+  return "Review the details here before taking action on casting or attendance.";
+});
 
 const statusColors = {
   draft: "neutral",
@@ -248,6 +306,9 @@ const statusColors = {
               </p>
             </div>
             <div class="flex items-center gap-2 flex-wrap justify-end">
+              <UBadge color="error" variant="soft">
+                {{ viewerRoleLabel }}
+              </UBadge>
               <UBadge :color="statusColors[show.status]" variant="soft">
                 {{ show.status }}
               </UBadge>
@@ -267,6 +328,31 @@ const statusColors = {
           >
             {{ show.description }}
           </p>
+
+          <div class="grid gap-3 lg:grid-cols-[1.1fr_0.9fr]">
+            <div class="stage-dark-inset p-4">
+              <p class="stage-overline text-[var(--stage-paper-muted)]">
+                What matters now
+              </p>
+              <p class="mt-3 text-base leading-7 text-[var(--stage-cream)]">
+                {{ viewerActionLabel }}
+              </p>
+              <p class="mt-3 text-sm text-[var(--stage-paper-muted)]">
+                {{ showStateLabel }}
+              </p>
+            </div>
+            <div class="stage-dark-inset p-4">
+              <p class="stage-overline text-[var(--stage-paper-muted)]">
+                Next occurrence
+              </p>
+              <p class="mt-2 font-display text-3xl uppercase tracking-[0.08em]">
+                {{ nextOccurrence ? formatDateTime(nextOccurrence.starts_at) : "TBD" }}
+              </p>
+              <p class="mt-2 text-sm text-[var(--stage-paper-muted)]">
+                {{ nextOccurrence ? nextOccurrence.status.replaceAll("_", " ") : "No scheduled occurrence yet." }}
+              </p>
+            </div>
+          </div>
 
           <div class="grid gap-3 sm:grid-cols-3">
             <div class="stage-dark-inset p-4">
@@ -314,7 +400,7 @@ const statusColors = {
 
         <div class="stage-dark-inset p-5">
           <p class="stage-overline text-[var(--stage-paper-muted)]">
-            Producer actions
+            Show controls
           </p>
 
           <div class="mt-4 flex items-center gap-2 flex-wrap">
@@ -374,6 +460,10 @@ const statusColors = {
               <span class="font-semibold text-[var(--stage-cream)]">Cast size:</span>
               {{ castCountSummary }}
             </div>
+            <div class="stage-dark-inset p-4 text-sm text-[var(--stage-paper-muted)]">
+              <span class="font-semibold text-[var(--stage-cream)]">Casting mode:</span>
+              {{ show.castingMode.replaceAll("_", " ") }}
+            </div>
             <div
               v-if="show.ticketUrl"
               class="stage-dark-inset p-4 text-sm text-[var(--stage-paper-muted)]"
@@ -402,7 +492,7 @@ const statusColors = {
           </h2>
         </div>
         <p class="max-w-2xl text-sm stage-muted">
-          Quick-read summaries for setup, invites, and lineup order. These are reference panels, not direct action surfaces.
+          Use these as quick summaries of setup, cast movement, and program order before you scroll into the detailed cast controls.
         </p>
       </div>
 

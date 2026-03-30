@@ -76,8 +76,7 @@ const submit = async (submitForReview: boolean) => {
           <span class="stage-kicker">Show setup</span>
           <h1 class="mt-4 stage-section-title">Create an event with clear ownership.</h1>
           <p class="mt-3 max-w-3xl text-lg leading-8 stage-muted">
-            This screen should read like the setup card from the homepage:
-            title, schedule, casting mode, range, then a clear path to draft or review.
+            Start with the public-facing basics, then set casting rules and save it as a draft or send it to theater review.
           </p>
         </div>
         <UButton variant="ghost" :to="`/theaters/${slug}/review`">

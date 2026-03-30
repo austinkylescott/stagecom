@@ -167,6 +167,40 @@ const agendaItems = computed(() => {
   });
 });
 
+const upcomingItems = computed(() =>
+  allItems.value
+    .filter((item) => new Date(item.startsAt).getTime() >= Date.now())
+    .sort((left, right) => new Date(left.startsAt).getTime() - new Date(right.startsAt).getTime()),
+);
+
+const nextUpItem = computed(() => upcomingItems.value[0] ?? null);
+const upcomingCount = computed(() => upcomingItems.value.length);
+const todayCount = computed(
+  () => itemsByDate.value.get(todayDate)?.length ?? 0,
+);
+const theatersInViewCount = computed(
+  () => new Set(allItems.value.map((item) => item.show.theaterId)).size,
+);
+const pendingReviewCount = computed(
+  () =>
+    new Set(
+      allItems.value
+        .filter((item) => item.show.status === "pending_review")
+        .map((item) => item.show.id),
+    ).size,
+);
+const scheduleLead = computed(() => {
+  if (timelineFilter.value === "upcoming") {
+    return "See what you are producing, performing in, or monitoring next.";
+  }
+
+  if (timelineFilter.value === "past") {
+    return "Use the board as a record of what already happened and what changed.";
+  }
+
+  return "Use this as the operational board for what is happening across your Stagecom work.";
+});
+
 const theaterOptions = computed(() => [
   { label: "All theaters", value: ALL_FILTER_VALUE },
   ...(data.value?.filters.theaters ?? []),
@@ -319,22 +353,82 @@ watch(
 <template>
   <div class="space-y-0">
     <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[var(--stage-cream)] stage-texture overflow-hidden" inner-class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
-      <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-        <div class="space-y-3">
+      <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
+        <div class="space-y-5">
           <span class="stage-kicker">Programming Board</span>
           <div>
-            <h1 class="stage-section-title">Shows as a working schedule.</h1>
+            <h1 class="stage-section-title">Your schedule, queue, and next move.</h1>
             <p class="mt-3 max-w-3xl text-lg leading-8 stage-muted">
-              Scan the month, inspect a single day, and keep the full programming queue in view without leaving the dashboard.
+              {{ scheduleLead }}
             </p>
+          </div>
+
+          <div class="grid gap-3 sm:grid-cols-3">
+            <div class="stage-stat">
+              <span class="stage-overline">Upcoming</span>
+              <span class="stage-stat-value">{{ upcomingCount }}</span>
+              <p class="mt-2 text-sm stage-muted">Occurrences still ahead of you.</p>
+            </div>
+            <div class="stage-stat">
+              <span class="stage-overline">Today</span>
+              <span class="stage-stat-value">{{ todayCount }}</span>
+              <p class="mt-2 text-sm stage-muted">Items landing on today's board.</p>
+            </div>
+            <div class="stage-stat">
+              <span class="stage-overline">Pending review</span>
+              <span class="stage-stat-value">{{ pendingReviewCount }}</span>
+              <p class="mt-2 text-sm stage-muted">Shows still waiting on theater approval.</p>
+            </div>
           </div>
         </div>
 
-        <div class="flex flex-wrap items-center gap-3 lg:justify-self-end lg:self-start">
-          <UButton color="warning" icon="i-heroicons-plus" :to="newShowLink">
-            New show
-          </UButton>
-        </div>
+        <UCard class="stage-dot-board">
+          <template #header>
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="stage-overline">Next up</p>
+                <h2 class="mt-2 font-display text-4xl uppercase tracking-[0.08em]">
+                  {{ nextUpItem ? nextUpItem.show.title : "Quiet board" }}
+                </h2>
+              </div>
+              <UButton color="warning" icon="i-heroicons-plus" :to="newShowLink">
+                New show
+              </UButton>
+            </div>
+          </template>
+
+          <div v-if="nextUpItem" class="space-y-3 text-sm text-[var(--stage-ink)]">
+            <div class="flex flex-wrap items-center gap-2">
+              <UBadge color="warning" variant="soft">
+                {{ nextUpItem.show.eventType || "show" }}
+              </UBadge>
+              <UBadge :color="statusTone(nextUpItem.show.status)" variant="soft">
+                {{ nextUpItem.show.status.replaceAll("_", " ") }}
+              </UBadge>
+            </div>
+            <p class="font-semibold">
+              {{ formatDateLabel(nextUpItem.startsAt.slice(0, 10)) }} at {{ formatTimeLabel(nextUpItem.startsAt) }}
+            </p>
+            <p class="stage-muted">
+              {{ nextUpItem.show.theaterName }} · {{ nextUpItem.occurrenceStatus.replaceAll("_", " ") }}
+            </p>
+            <div class="grid gap-3 sm:grid-cols-2">
+              <div class="border-2 border-[rgba(43,41,38,0.12)] bg-[rgba(251,247,239,0.72)] px-3 py-2">
+                <p class="stage-overline stage-muted">Theaters in view</p>
+                <p class="mt-1 font-semibold">{{ theatersInViewCount }}</p>
+              </div>
+              <div class="border-2 border-[rgba(43,41,38,0.12)] bg-[rgba(251,247,239,0.72)] px-3 py-2">
+                <p class="stage-overline stage-muted">Selected day</p>
+                <p class="mt-1 font-semibold">{{ selectedDayItems.length }} item{{ selectedDayItems.length === 1 ? "" : "s" }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div v-else class="space-y-3 text-sm stage-muted">
+            <p>No upcoming occurrences match the current filters.</p>
+            <p>Try broadening the timeline or create a new show from a theater you belong to.</p>
+          </div>
+        </UCard>
       </div>
     </StageSection>
 

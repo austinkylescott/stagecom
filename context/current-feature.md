@@ -2,15 +2,19 @@
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-- None currently loaded.
+- Make the authenticated product easier to understand at a glance.
+- Reframe primary screens around role, state, and next action instead of design-system narration.
+- Improve UI hierarchy on schedule, show detail, review, and notifications surfaces without backend changes.
 
 ## Notes
 
-- No active feature notes.
+- Focus on PRD-aligned usability cleanup.
+- Preserve the established brutalist theme, but use quieter layouts where state clarity matters more than spectacle.
+- Keep changes targeted to existing surfaces and data.
 
 ## History
 

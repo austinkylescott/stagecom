@@ -60,8 +60,7 @@ const showPagination = computed(() => totalPages.value > 1);
           <span class="stage-kicker">Performer discovery</span>
           <h1 class="mt-4 stage-section-title">Find people across your scene.</h1>
           <p class="mt-3 max-w-3xl text-lg leading-8 stage-muted">
-            This page does not have a direct homepage feature card, so it should
-            still live inside the same board-heavy system and feel native to the product.
+            Search by name, scan shared-theater context, and quickly understand who is already part of your working community.
           </p>
         </div>
         <UButton icon="i-heroicons-arrow-path" variant="ghost" @click="refresh">
@@ -111,8 +110,7 @@ const showPagination = computed(() => totalPages.value > 1);
       </div>
 
       <div class="pt-6 text-xs stage-muted">
-        Social clustering v1 uses shared theater membership as a proxy for “play
-        together”. We can extend this to co-cast counts when cast data lands.
+        Shared theater membership is the current proxy for community overlap, so use it as context rather than a hard ranking of collaboration history.
       </div>
     </StageSection>
   </div>
