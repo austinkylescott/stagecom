@@ -170,17 +170,17 @@ const canReopenDraft = computed(
 );
 
 const statusColors = {
-  draft: "gray",
-  pending_review: "orange",
-  approved: "emerald",
-  rejected: "red",
-  cancelled: "gray",
+  draft: "neutral",
+  pending_review: "warning",
+  approved: "success",
+  rejected: "error",
+  cancelled: "neutral",
 } as const;
 </script>
 
 <template>
-  <div class="space-y-6 max-w-3xl">
-    <div class="flex items-center gap-2 text-sm text-slate-500">
+  <div class="space-y-6">
+    <div class="flex items-center gap-2 text-sm stage-muted">
       <NuxtLink :to="`/theaters/${slug}`" class="hover:underline">
         {{ show?.theaterName ?? slug }}
       </NuxtLink>
@@ -188,150 +188,220 @@ const statusColors = {
       <span>{{ show?.title ?? "Show" }}</span>
     </div>
 
-    <div v-if="error" class="text-sm text-red-600">
+    <div v-if="error" class="stage-panel px-5 py-4 text-sm text-red-700">
       {{ error?.data?.message || error?.message }}
     </div>
 
-    <div v-if="statusError" class="text-sm text-red-600">
+    <div v-if="statusError" class="stage-panel px-5 py-4 text-sm text-red-700">
       {{ statusError }}
     </div>
 
-    <div v-if="statusNotice" class="text-sm text-emerald-600">
+    <div
+      v-if="statusNotice"
+      class="stage-panel px-5 py-4 text-sm text-emerald-700"
+    >
       {{ statusNotice }}
     </div>
 
-    <div v-if="isLoading && !show" class="text-sm text-slate-500">
+    <div v-if="isLoading && !show" class="text-sm stage-muted">
       Loading...
     </div>
 
-    <UCard v-if="show">
-      <template #header>
-        <div class="flex items-start justify-between gap-3 flex-wrap">
-          <div class="space-y-1">
-            <h1 class="text-2xl font-semibold">{{ show.title }}</h1>
-            <p class="text-xs uppercase tracking-wide text-slate-500">
+    <section v-if="show" class="stage-panel-dark stage-grid-board p-6 sm:p-8">
+      <div class="grid gap-6 xl:grid-cols-[1.12fr_0.88fr]">
+        <div class="space-y-5">
+          <div class="flex items-start justify-between gap-3 flex-wrap">
+            <div class="space-y-2">
+              <p class="stage-overline text-[var(--stage-paper-muted)]">
+                Show detail
+              </p>
+              <h1 class="font-display text-6xl uppercase tracking-[0.1em]">
+                {{ show.title }}
+              </h1>
+              <p class="text-xs uppercase tracking-[0.18em] text-[var(--stage-paper-muted)]">
               {{ show.eventType }}
-            </p>
+              </p>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap justify-end">
+              <UBadge :color="statusColors[show.status]" variant="soft">
+                {{ show.status }}
+              </UBadge>
+              <UBadge
+                v-if="show.isCastFinalized"
+                color="primary"
+                variant="soft"
+              >
+                Cast finalized
+              </UBadge>
+            </div>
           </div>
-          <div class="flex items-center gap-2 flex-wrap justify-end">
-            <UBadge :color="statusColors[show.status]" variant="soft">
-              {{ show.status }}
-            </UBadge>
-            <UBadge
-              v-if="show.isCastFinalized"
-              color="primary"
+
+          <p
+            v-if="show.description"
+            class="max-w-3xl text-lg leading-8 text-[var(--stage-paper-muted)]"
+          >
+            {{ show.description }}
+          </p>
+
+          <div class="grid gap-3 sm:grid-cols-3">
+            <div
+              class="rounded-[1.15rem] border-[3px] border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.08)] p-4"
+            >
+              <p class="stage-overline text-[var(--stage-paper-muted)]">
+                Cast count
+              </p>
+              <p class="mt-2 font-display text-3xl uppercase tracking-[0.08em]">
+                {{ confirmedCount }}
+              </p>
+              <p class="mt-2 text-sm text-[var(--stage-paper-muted)]">
+                {{ castRangeLabel ? `${castRangeLabel} target` : "No range set" }}
+              </p>
+            </div>
+            <div
+              class="rounded-[1.15rem] border-[3px] border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.08)] p-4"
+            >
+              <p class="stage-overline text-[var(--stage-paper-muted)]">
+                Producers
+              </p>
+              <p class="mt-2 font-display text-3xl uppercase tracking-[0.08em]">
+                {{ producers.length }}
+              </p>
+              <p class="mt-2 text-sm text-[var(--stage-paper-muted)]">
+                Operational owners on this show.
+              </p>
+            </div>
+            <div
+              class="rounded-[1.15rem] border-[3px] border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.08)] p-4"
+            >
+              <p class="stage-overline text-[var(--stage-paper-muted)]">
+                Schedule
+              </p>
+              <p class="mt-2 font-display text-3xl uppercase tracking-[0.08em]">
+                {{ occurrences.length }}
+              </p>
+              <p class="mt-2 text-sm text-[var(--stage-paper-muted)]">
+                Scheduled occurrence{{ occurrences.length === 1 ? "" : "s" }}.
+              </p>
+            </div>
+          </div>
+
+          <p
+            v-if="hasCastOverflow"
+            class="rounded-[1rem] border-[3px] border-[var(--stage-gold)] bg-[rgba(234,165,66,0.14)] px-4 py-3 text-sm text-[var(--stage-cream)]"
+          >
+            Confirmed cast exceeds the current max. v1 allows this, but it should be reviewed.
+          </p>
+        </div>
+
+        <div class="rounded-[1.4rem] border-[3px] border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.08)] p-5">
+          <p class="stage-overline text-[var(--stage-paper-muted)]">
+            Producer actions
+          </p>
+
+          <div class="mt-4 flex items-center gap-2 flex-wrap">
+            <UButton
+              v-if="programLink"
+              size="sm"
               variant="soft"
+              :to="programLink"
+              icon="i-heroicons-queue-list"
             >
-              Cast finalized
-            </UBadge>
-          </div>
-        </div>
-      </template>
-
-      <div class="space-y-4">
-        <p v-if="show.description" class="text-slate-700">
-          {{ show.description }}
-        </p>
-        <div class="grid gap-2 sm:grid-cols-2 text-sm">
-          <div v-if="castRangeLabel">
-            <span class="text-slate-500">Cast size: </span>
-            <span>{{ castCountSummary }}</span>
-          </div>
-          <div v-if="show.ticketUrl">
-            <span class="text-slate-500">Tickets: </span>
-            <a
-              :href="show.ticketUrl"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-blue-600 hover:underline"
+              Program view
+            </UButton>
+            <UButton
+              v-if="canSubmitForReview"
+              size="sm"
+              color="primary"
+              :loading="isUpdatingStatus"
+              @click="runStatusAction('submit_for_review')"
             >
-              Link
-            </a>
+              Submit for review
+            </UButton>
+            <UButton
+              v-if="isProducer"
+              size="sm"
+              :color="show.isCastFinalized ? 'neutral' : 'primary'"
+              variant="soft"
+              :loading="isUpdatingSettings"
+              @click="toggleCastFinalized"
+            >
+              {{ show.isCastFinalized ? "Reopen cast" : "Finalize cast" }}
+            </UButton>
+            <UButton
+              v-if="canReopenDraft"
+              size="sm"
+              color="neutral"
+              variant="ghost"
+              :loading="isUpdatingStatus"
+              @click="runStatusAction('reopen_draft')"
+            >
+              Move to draft
+            </UButton>
+            <UButton
+              v-if="canCancelShow"
+              size="sm"
+              color="error"
+              variant="ghost"
+              :loading="isUpdatingStatus"
+              @click="runStatusAction('cancel')"
+            >
+              Cancel show
+            </UButton>
           </div>
-        </div>
 
-        <p
-          v-if="hasCastOverflow"
-          class="text-sm text-orange-700"
-        >
-          Confirmed cast exceeds the current max. v1 allows this, but it should be reviewed.
-        </p>
-
-        <div class="flex items-center gap-2 flex-wrap">
-          <UButton
-            v-if="programLink"
-            size="sm"
-            variant="soft"
-            :to="programLink"
-            icon="i-heroicons-queue-list"
-          >
-            Program view
-          </UButton>
-          <UButton
-            v-if="canSubmitForReview"
-            size="sm"
-            color="primary"
-            :loading="isUpdatingStatus"
-            @click="runStatusAction('submit_for_review')"
-          >
-            Submit for review
-          </UButton>
-          <UButton
-            v-if="isProducer"
-            size="sm"
-            :color="show.isCastFinalized ? 'gray' : 'primary'"
-            variant="soft"
-            :loading="isUpdatingSettings"
-            @click="toggleCastFinalized"
-          >
-            {{ show.isCastFinalized ? "Reopen cast" : "Finalize cast" }}
-          </UButton>
-          <UButton
-            v-if="canReopenDraft"
-            size="sm"
-            color="gray"
-            variant="ghost"
-            :loading="isUpdatingStatus"
-            @click="runStatusAction('reopen_draft')"
-          >
-            Move to draft
-          </UButton>
-          <UButton
-            v-if="canCancelShow"
-            size="sm"
-            color="red"
-            variant="ghost"
-            :loading="isUpdatingStatus"
-            @click="runStatusAction('cancel')"
-          >
-            Cancel show
-          </UButton>
+          <div class="mt-4 grid gap-3 md:grid-cols-2">
+            <div
+              class="rounded-[1rem] border-[2px] border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.08)] p-4 text-sm text-[var(--stage-paper-muted)]"
+            >
+              <span class="font-semibold text-[var(--stage-cream)]">Cast size:</span>
+              {{ castCountSummary }}
+            </div>
+            <div
+              v-if="show.ticketUrl"
+              class="rounded-[1rem] border-[2px] border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.08)] p-4 text-sm text-[var(--stage-paper-muted)]"
+            >
+              <span class="font-semibold text-[var(--stage-cream)]">Tickets:</span>
+              <a
+                :href="show.ticketUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="stage-link ml-2 text-[var(--stage-cream)]"
+              >
+                External link
+              </a>
+            </div>
+          </div>
         </div>
       </div>
-    </UCard>
+    </section>
 
     <UCard v-if="show">
       <template #header>
-        <p class="font-semibold">Schedule</p>
+        <div>
+          <p class="stage-overline">Schedule</p>
+          <h2 class="mt-2 font-display text-4xl uppercase tracking-[0.08em]">
+            Occurrences
+          </h2>
+        </div>
       </template>
-      <div v-if="!occurrences.length" class="text-sm text-slate-500">
+      <div v-if="!occurrences.length" class="text-sm stage-muted">
         No occurrences scheduled yet.
       </div>
       <div v-else class="space-y-2">
         <div
           v-for="occ in occurrences"
           :key="occ.id"
-          class="flex items-center justify-between rounded-lg border border-slate-100 px-3 py-2 text-sm"
+          class="stage-list-card flex items-center justify-between gap-3 px-4 py-4 text-sm"
         >
           <span>{{ new Date(occ.starts_at).toLocaleString() }}</span>
           <div class="flex items-center gap-2">
-            <span v-if="occ.ends_at" class="text-slate-500">
+            <span v-if="occ.ends_at" class="stage-muted">
               → {{ new Date(occ.ends_at).toLocaleString() }}
             </span>
             <UBadge
               v-if="occ.status !== 'scheduled'"
               size="xs"
-              color="orange"
+              color="warning"
               variant="soft"
             >
               {{ occ.status }}
@@ -343,7 +413,12 @@ const statusColors = {
 
     <UCard v-if="show">
       <template #header>
-        <p class="font-semibold">Cast</p>
+        <div>
+          <p class="stage-overline">Cast</p>
+          <h2 class="mt-2 font-display text-4xl uppercase tracking-[0.08em]">
+            Lineup management
+          </h2>
+        </div>
       </template>
       <ShowCastPanel
         v-if="data"

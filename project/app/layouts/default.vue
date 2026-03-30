@@ -1,10 +1,10 @@
 <template>
   <UApp>
-    <div class="min-h-screen">
+    <div class="stage-shell">
       <AppNav />
-      <UContainer class="py-8">
+      <main class="stage-main">
         <slot />
-      </UContainer>
+      </main>
     </div>
   </UApp>
 </template>

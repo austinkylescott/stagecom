@@ -37,18 +37,34 @@ const { formatLocation } = useLocationFormatter();
 
 <template>
   <div
-    class="flex items-center justify-between rounded-lg border border-slate-200 px-4 py-3"
+    class="stage-list-card flex flex-col gap-4 px-4 py-4 lg:flex-row lg:items-start lg:justify-between"
   >
-    <div>
-      <p class="font-semibold">{{ theater.name }}</p>
-      <p class="text-xs text-slate-600">
+    <div class="space-y-2">
+      <div class="flex flex-wrap items-center gap-2">
+        <span
+          v-if="isHome"
+          class="stage-chip bg-[var(--stage-mint)] text-[var(--stage-ink)]"
+        >
+          Home theater
+        </span>
+        <span
+          v-else-if="isMember"
+          class="stage-chip bg-[var(--stage-paper-strong)] text-[var(--stage-ink)]"
+        >
+          Following
+        </span>
+      </div>
+      <p class="font-display text-3xl uppercase tracking-[0.08em]">
+        {{ theater.name }}
+      </p>
+      <p class="text-xs stage-overline stage-muted">
         {{ formatLocation(theater) }}
       </p>
-      <p v-if="theater.tagline" class="text-xs text-slate-700 mt-1">
+      <p v-if="theater.tagline" class="max-w-xl text-sm leading-6 stage-muted">
         {{ theater.tagline }}
       </p>
     </div>
-    <div class="flex gap-2 flex-wrap items-center">
+    <div class="flex flex-wrap gap-2 items-center">
       <UButton size="xs" :to="primaryTo || `/theaters/${theater.slug}`">
         {{ primaryLabel || "View" }}
       </UButton>

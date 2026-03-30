@@ -199,17 +199,26 @@ const cancelLeaveHome = () => {
 
 <template>
   <div class="space-y-8">
-    <div class="flex items-center justify-between flex-wrap gap-3">
-      <div>
-        <h1 class="text-2xl font-semibold">Theaters</h1>
-        <p class="text-slate-600">
-          Browse all theaters and the ones you're part of.
-        </p>
+    <section
+      class="stage-panel px-6 py-7 sm:px-8 sm:py-8 lg:grid lg:grid-cols-[1.1fr_auto] lg:items-end"
+    >
+      <div class="space-y-4">
+        <span class="stage-kicker">Theater Discovery</span>
+        <div>
+          <h1 class="stage-section-title">Find your local scene.</h1>
+          <p class="mt-3 max-w-3xl text-lg leading-8 stage-muted">
+            Follow theaters, set a home base, and move from public programming
+            into the community spaces where casting and operations actually
+            happen.
+          </p>
+        </div>
       </div>
-      <UButton color="primary" icon="i-heroicons-plus" to="/theaters/new"
-        >Create theater</UButton
-      >
-    </div>
+      <div class="mt-5 lg:mt-0 lg:justify-self-end">
+        <UButton color="primary" icon="i-heroicons-plus" to="/theaters/new">
+          Create theater
+        </UButton>
+      </div>
+    </section>
 
     <HomeTheaterHero
       :theater="homeTheater"
@@ -218,7 +227,7 @@ const cancelLeaveHome = () => {
       :on-set-home="saveHome"
     />
 
-    <div v-if="error" class="text-sm text-red-600">
+    <div v-if="error" class="stage-panel px-5 py-4 text-sm text-red-700">
       {{ error?.data?.message || error?.message }}
     </div>
 
@@ -250,7 +259,14 @@ const cancelLeaveHome = () => {
         <template #header>
           <div class="flex flex-col gap-3 w-full">
             <div class="flex items-center justify-between gap-3 flex-wrap">
-              <p class="font-semibold">All theaters</p>
+              <div>
+                <p class="stage-overline">All theaters</p>
+                <h2
+                  class="mt-2 font-display text-3xl uppercase tracking-[0.08em]"
+                >
+                  Browse the board
+                </h2>
+              </div>
               <div class="flex gap-2 flex-wrap">
                 <UInput
                   v-model="search"
