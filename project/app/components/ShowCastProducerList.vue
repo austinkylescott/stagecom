@@ -25,7 +25,7 @@ defineProps<{
         <span class="text-sm font-medium text-[var(--stage-ink)]">
           {{ producer.displayName ?? producer.userId }}
         </span>
-        <UBadge size="xs" color="neutral" variant="soft">producer</UBadge>
+        <UBadge size="xs" color="error" variant="soft">producer</UBadge>
       </div>
     </div>
   </div>

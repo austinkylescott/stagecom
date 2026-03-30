@@ -50,7 +50,7 @@ const guestItems: DropdownMenuItem[] = [
     :content="{ align: 'end', sideOffset: 8 }"
   >
     <UButton
-      color="gray"
+      color="neutral"
       variant="ghost"
       class="flex items-center gap-2 border-2 border-[var(--stage-ink)] bg-[var(--stage-paper)]"
       :loading="loggingOut"

@@ -58,6 +58,10 @@ export const useMembershipToggle = (
           exact: true,
         }),
         queryCache.invalidateQueries({
+          key: queryKeys.memberShowsSchedulePrefix(),
+          exact: false,
+        }),
+        queryCache.invalidateQueries({
           key: queryKeys.theaterPrefix(),
           exact: false,
         }),
@@ -77,6 +81,10 @@ export const useMembershipToggle = (
       queryCache.invalidateQueries({
         key: queryKeys.memberShows(),
         exact: true,
+      });
+      queryCache.invalidateQueries({
+        key: queryKeys.memberShowsSchedulePrefix(),
+        exact: false,
       });
       toast?.add({
         title: "Action failed",

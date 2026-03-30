@@ -26,18 +26,24 @@
   --stage-paper: #f5efe2;
   --stage-paper-strong: #efe3cd;
   --stage-paper-muted: #d8ccb5;
-  --stage-gold: #eaa542;
-  --stage-mint: #82bfb6;
-  --stage-coral: #c76056;
+  --stage-theater: #82bfb6;
+  --stage-theater-soft: #cfe7e3;
+  --stage-event: #eaa542;
+  --stage-event-soft: #f4d7aa;
+  --stage-performer: #c76056;
+  --stage-performer-soft: #e8b3ac;
+  --stage-gold: var(--stage-event);
+  --stage-mint: var(--stage-theater);
+  --stage-coral: var(--stage-performer);
   --stage-cream: #fbf7ef;
   --stage-shadow: 8px 8px 0 0 var(--stage-ink);
   --stage-shadow-sm: 5px 5px 0 0 var(--stage-ink);
-  --ui-primary: var(--stage-gold);
-  --ui-secondary: var(--stage-mint);
+  --ui-primary: var(--stage-theater);
+  --ui-secondary: var(--stage-event);
   --ui-success: #4f8e61;
-  --ui-info: var(--stage-mint);
-  --ui-warning: var(--stage-gold);
-  --ui-error: var(--stage-coral);
+  --ui-info: var(--stage-theater);
+  --ui-warning: var(--stage-event);
+  --ui-error: var(--stage-performer);
   --ui-neutral: var(--stage-ink);
 }
 
@@ -51,15 +57,16 @@
     min-height: 100vh;
     color: var(--stage-ink);
     background:
-      radial-gradient(circle at top left, rgba(234, 165, 66, 0.18), transparent 34%),
-      radial-gradient(circle at top right, rgba(130, 191, 182, 0.16), transparent 28%),
+      radial-gradient(circle at top left, rgba(231, 180, 55, 0.18), transparent 34%),
+      radial-gradient(circle at top right, rgba(94, 144, 217, 0.16), transparent 28%),
+      radial-gradient(circle at 50% 100%, rgba(191, 77, 70, 0.1), transparent 36%),
       linear-gradient(180deg, #fbf7ef 0%, #f3e7d4 38%, #efe0c4 100%);
     font-family: var(--font-sans);
   }
 
   ::selection {
     color: var(--stage-ink);
-    background: color-mix(in srgb, var(--stage-gold) 58%, white);
+    background: color-mix(in srgb, var(--stage-theater) 40%, white);
   }
 
   a,
@@ -97,14 +104,21 @@
     border: 3px solid var(--stage-ink);
     color: var(--stage-cream);
     background:
-      linear-gradient(145deg, rgba(43, 41, 38, 0.96), rgba(67, 62, 55, 0.98));
+      linear-gradient(145deg, rgba(43, 41, 38, 0.985), rgba(67, 62, 55, 1));
     box-shadow: var(--stage-shadow);
+  }
+
+  .stage-dark-inset {
+    border: 3px solid var(--stage-ink);
+    background:
+      linear-gradient(180deg, rgba(251, 247, 239, 0.18), rgba(216, 204, 181, 0.14));
+    box-shadow: var(--stage-shadow-sm);
   }
 
   .stage-panel-accent {
     border: 3px solid var(--stage-ink);
     background:
-      linear-gradient(180deg, rgba(234, 165, 66, 0.88), rgba(251, 247, 239, 0.96));
+      linear-gradient(180deg, rgba(231, 180, 55, 0.88), rgba(251, 247, 239, 0.96));
     box-shadow: var(--stage-shadow);
   }
 
@@ -122,7 +136,7 @@
     border: 2px solid var(--stage-ink);
     padding: 0.35rem 0.8rem;
     color: var(--stage-ink);
-    background: color-mix(in srgb, var(--stage-gold) 48%, white);
+    background: color-mix(in srgb, var(--stage-theater) 28%, white);
     font-size: 0.72rem;
     font-weight: 800;
     letter-spacing: 0.12em;
@@ -132,7 +146,7 @@
   .stage-kicker::before {
     width: 0.65rem;
     height: 0.65rem;
-    background: var(--stage-coral);
+    background: var(--stage-event);
     box-shadow: 0 0 0 2px var(--stage-ink);
     content: "";
   }
@@ -197,6 +211,19 @@
     box-shadow: var(--stage-shadow-sm);
   }
 
+  .stage-article-card {
+    border: 4px solid var(--stage-ink);
+    background: var(--stage-cream);
+    box-shadow: var(--stage-shadow-sm);
+  }
+
+  .stage-article-card-dark {
+    border: 4px solid var(--stage-ink);
+    background:
+      linear-gradient(180deg, rgba(251, 247, 239, 0.14), rgba(216, 204, 181, 0.09));
+    box-shadow: var(--stage-shadow-sm);
+  }
+
   .stage-chip {
     display: inline-flex;
     align-items: center;
@@ -235,8 +262,8 @@
     inset: 0;
     background:
       linear-gradient(0deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.18)),
-      radial-gradient(circle at 20% 20%, rgba(130, 191, 182, 0.18), transparent 24%),
-      radial-gradient(circle at 80% 0%, rgba(199, 96, 86, 0.18), transparent 28%);
+      radial-gradient(circle at 20% 20%, rgba(94, 144, 217, 0.18), transparent 24%),
+      radial-gradient(circle at 80% 0%, rgba(191, 77, 70, 0.18), transparent 28%);
     mix-blend-mode: multiply;
     opacity: 0.8;
     pointer-events: none;

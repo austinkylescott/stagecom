@@ -188,7 +188,7 @@ const formatDateTime = (value: string | null) =>
             <template #left-callout>
               <div class="absolute -left-5 top-1/4 border-2 border-[var(--stage-ink)] bg-[var(--stage-cream)] px-3 py-2">
                 <div class="flex items-center gap-2">
-                  <div class="size-3 bg-[var(--stage-gold)]" />
+                  <div class="size-3 bg-[var(--stage-event)]" />
                   <span class="text-xs font-bold text-[var(--stage-ink)]">
                     {{ data?.stats.publicShowCount ?? 0 }} public listings
                   </span>
@@ -244,7 +244,7 @@ const formatDateTime = (value: string | null) =>
               <div class="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <div class="flex flex-wrap items-center gap-2">
-                    <span class="stage-chip bg-[var(--stage-gold)]">
+                    <span class="stage-chip bg-[var(--stage-event)]">
                       Public
                     </span>
                     <span class="stage-chip bg-[var(--stage-paper-strong)]">

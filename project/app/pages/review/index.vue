@@ -70,10 +70,10 @@ const visibleShows = computed(() => {
 });
 
 const statusTone = (status: string) => {
-  if (status === "pending_review") return "bg-[var(--stage-coral)]";
-  if (status === "approved") return "bg-[var(--stage-mint)]";
+  if (status === "pending_review") return "bg-[var(--stage-event)]";
+  if (status === "approved") return "bg-[var(--stage-theater)]";
   if (status === "rejected") return "bg-[var(--stage-paper-muted)]";
-  return "bg-[var(--stage-gold)]";
+  return "bg-[var(--stage-event)]";
 };
 
 const formatDateTime = (value: string | null) =>
@@ -137,6 +137,10 @@ const updateStatusMutation = useMutation<
       queryCache.invalidateQueries({
         key: queryKeys.memberShows(),
         exact: true,
+      }),
+      queryCache.invalidateQueries({
+        key: queryKeys.memberShowsSchedulePrefix(),
+        exact: false,
       }),
       queryCache.invalidateQueries({
         key: queryKeys.theaterPrefix(),
@@ -220,14 +224,14 @@ const updateStatus = async (
           <div class="flex flex-wrap gap-2">
             <UButton
               :variant="activeFilter === 'needs_action' ? 'soft' : 'ghost'"
-              :class="activeFilter === 'needs_action' ? 'bg-[var(--stage-mint)]' : ''"
+              :class="activeFilter === 'needs_action' ? 'bg-[var(--stage-theater)]' : ''"
               @click="activeFilter = 'needs_action'"
             >
               Needs action
             </UButton>
             <UButton
               :variant="activeFilter === 'created' ? 'soft' : 'ghost'"
-              :class="activeFilter === 'created' ? 'bg-[var(--stage-gold)]' : ''"
+              :class="activeFilter === 'created' ? 'bg-[var(--stage-event)]' : ''"
               @click="activeFilter = 'created'"
             >
               Created by you
@@ -250,7 +254,7 @@ const updateStatus = async (
                 Live board
               </h2>
             </div>
-            <span class="stage-chip bg-[var(--stage-mint)] text-[var(--stage-ink)]">
+            <span class="stage-chip bg-[var(--stage-theater)] text-[var(--stage-ink)]">
               {{ upcomingShows.length }} upcoming
             </span>
           </div>
@@ -333,7 +337,7 @@ const updateStatus = async (
             :key="show.id"
             class="border-4 border-[rgba(43,41,38,0.16)] bg-[var(--stage-cream)]"
           >
-            <div class="border-b-4 border-[var(--stage-ink)] bg-[var(--stage-mint)] px-4 py-3">
+            <div class="border-b-4 border-[var(--stage-ink)] bg-[var(--stage-theater)] px-4 py-3">
               <div class="flex items-center justify-between gap-3">
                 <div>
                   <h3 class="font-bold text-[var(--stage-ink)]">{{ show.title }}</h3>
@@ -355,7 +359,7 @@ const updateStatus = async (
                   <UButton
                     v-if="show.canReview && show.status === 'pending_review'"
                     size="xs"
-                    color="emerald"
+                    color="primary"
                     :loading="statusMutating"
                     @click="updateStatus(show.id, 'approve')"
                   >
@@ -474,7 +478,7 @@ const updateStatus = async (
             <div class="flex gap-2 flex-wrap">
               <UButton
                 size="xs"
-                color="emerald"
+                color="primary"
                 :loading="statusMutating"
                 @click="updateStatus(row.original.id, 'approve')"
               >
@@ -482,7 +486,7 @@ const updateStatus = async (
               </UButton>
               <UButton
                 size="xs"
-                color="red"
+                color="error"
                 variant="soft"
                 :loading="statusMutating"
                 @click="updateStatus(row.original.id, 'reject')"
@@ -491,7 +495,7 @@ const updateStatus = async (
               </UButton>
               <UButton
                 size="xs"
-                color="orange"
+                color="warning"
                 variant="soft"
                 :loading="statusMutating"
                 @click="updateStatus(row.original.id, 'changes_requested')"

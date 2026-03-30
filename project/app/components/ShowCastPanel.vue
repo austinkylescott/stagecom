@@ -235,7 +235,7 @@ const inactiveStatusLabel = (member: ShowCastMember) => {
           />
           <UButton
             size="xs"
-            color="gray"
+            color="neutral"
             variant="soft"
             :loading="patching"
             @click="saveProgramOrder(member)"
@@ -246,7 +246,7 @@ const inactiveStatusLabel = (member: ShowCastMember) => {
         <UButton
           v-if="member.userId === myUserId"
           size="xs"
-          color="gray"
+          color="neutral"
           variant="ghost"
           :loading="patching"
           @click="handlePatch('withdraw')"
@@ -256,7 +256,7 @@ const inactiveStatusLabel = (member: ShowCastMember) => {
         <UButton
           v-if="isProducer"
           size="xs"
-          color="red"
+          color="error"
           variant="ghost"
           :loading="patching"
           @click="handlePatch('remove', member.userId)"
@@ -270,13 +270,13 @@ const inactiveStatusLabel = (member: ShowCastMember) => {
       :title="isProducer ? 'Requests' : 'Pending requests'"
       :members="pendingRequests"
       badge-label="requested"
-      badge-color="blue"
+      badge-color="error"
     >
       <template #actions="{ member }">
         <template v-if="isProducer">
           <UButton
             size="xs"
-            color="primary"
+            color="error"
             variant="soft"
             :loading="patching"
             @click="handlePatch('approve', member.userId)"
@@ -285,7 +285,7 @@ const inactiveStatusLabel = (member: ShowCastMember) => {
           </UButton>
           <UButton
             size="xs"
-            color="red"
+            color="error"
             variant="ghost"
             :loading="patching"
             @click="handlePatch('remove', member.userId)"
@@ -300,13 +300,13 @@ const inactiveStatusLabel = (member: ShowCastMember) => {
       title="Pending invites"
       :members="pendingInvites"
       badge-label="pending"
-      badge-color="orange"
+      badge-color="warning"
     >
       <template #actions="{ member }">
         <template v-if="isProducer">
           <UButton
             size="xs"
-            color="red"
+            color="error"
             variant="ghost"
             :loading="patching"
             @click="handlePatch('remove', member.userId)"
@@ -319,7 +319,7 @@ const inactiveStatusLabel = (member: ShowCastMember) => {
 
     <div
       v-if="myCast?.status === 'pending' && myCast.source === 'invited'"
-      class="space-y-2 border-2 border-[var(--stage-ink)] bg-[rgba(234,165,66,0.18)] px-4 py-3"
+      class="space-y-2 border-2 border-[var(--stage-ink)] bg-[rgba(231,180,55,0.18)] px-4 py-3"
     >
       <p class="text-sm font-medium text-[var(--stage-ink)]">
         You have a pending invite for this show.
@@ -327,7 +327,7 @@ const inactiveStatusLabel = (member: ShowCastMember) => {
       <div class="flex gap-2">
         <UButton
           size="xs"
-          color="primary"
+          color="warning"
           :loading="patching"
           @click="handlePatch('accept')"
         >
@@ -335,7 +335,7 @@ const inactiveStatusLabel = (member: ShowCastMember) => {
         </UButton>
         <UButton
           size="xs"
-          color="gray"
+          color="neutral"
           variant="ghost"
           :loading="patching"
           @click="handlePatch('decline')"
@@ -347,7 +347,7 @@ const inactiveStatusLabel = (member: ShowCastMember) => {
 
     <div
       v-if="canShowRequestPanel"
-      class="space-y-2 border-2 border-[var(--stage-ink)] bg-[rgba(130,191,182,0.18)] px-4 py-3"
+      class="space-y-2 border-2 border-[var(--stage-ink)] bg-[rgba(191,77,70,0.14)] px-4 py-3"
     >
       <p class="text-sm font-medium text-[var(--stage-ink)]">
         This show is open for cast requests.
@@ -358,7 +358,7 @@ const inactiveStatusLabel = (member: ShowCastMember) => {
       <UButton
         v-if="canShowRequestButton"
         size="sm"
-        color="primary"
+        color="error"
         :loading="requesting"
         @click="submitRequest"
       >

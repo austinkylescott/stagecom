@@ -109,7 +109,7 @@ const handleHome = async () => {
     <UButton
       :size="size"
       variant="ghost"
-      :color="computedIsHome ? 'primary' : 'gray'"
+      :color="computedIsHome ? 'primary' : 'neutral'"
       icon="i-heroicons-home"
       :loading="loading"
       @click="handleHome"

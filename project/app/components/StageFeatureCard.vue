@@ -8,7 +8,10 @@ defineProps<{
 </script>
 
 <template>
-  <component :is="as || 'article'" class="border-4 border-[rgba(43,41,38,0.16)] bg-[var(--stage-cream)]">
+  <component
+    :is="as || 'article'"
+    class="stage-article-card"
+  >
     <div class="border-b-4 border-[var(--stage-ink)] px-4 py-3" :class="tone">
       <div class="flex items-center justify-between gap-3">
         <div>

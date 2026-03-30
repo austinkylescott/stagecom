@@ -115,6 +115,10 @@ export const useUpdateShowStatus = (
         exact: true,
       });
       queryCache.invalidateQueries({
+        key: queryKeys.memberShowsSchedulePrefix(),
+        exact: false,
+      });
+      queryCache.invalidateQueries({
         key: queryKeys.reviewInbox(),
         exact: true,
       });

@@ -15,11 +15,11 @@ const markAllRead = () => markRead({ all: true });
 
 <template>
   <UPopover :content="{ side: 'bottom', align: 'end', sideOffset: 8 }">
-    <UButton color="gray" variant="ghost" class="relative">
+    <UButton color="neutral" variant="ghost" class="relative">
       <UIcon name="i-heroicons-bell" class="size-5" />
       <span
         v-if="unreadCount > 0"
-        class="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center border border-[var(--stage-ink)] bg-[var(--stage-coral)] px-0.5 text-[10px] font-medium text-[var(--stage-cream)]"
+        class="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center border border-[var(--stage-ink)] bg-[var(--stage-performer)] px-0.5 text-[10px] font-medium text-[var(--stage-cream)]"
       >
         {{ unreadCount > 9 ? "9+" : unreadCount }}
       </span>
@@ -28,7 +28,7 @@ const markAllRead = () => markRead({ all: true });
     <template #content>
       <div class="w-80 border-3 border-[var(--stage-ink)] bg-[var(--stage-cream)] shadow-[8px_8px_0_0_var(--stage-ink)]">
         <div
-          class="flex items-center justify-between border-b-3 border-[var(--stage-ink)] bg-[var(--stage-gold)] px-3 py-2"
+          class="flex items-center justify-between border-b-3 border-[var(--stage-ink)] bg-[var(--stage-theater)] px-3 py-2"
         >
           <p class="text-sm font-medium text-[var(--stage-ink)]">Notifications</p>
           <div class="flex gap-3">
@@ -61,12 +61,12 @@ const markAllRead = () => markRead({ all: true });
             :key="n.id"
             :to="formatNotification(n.type, n.payload).href ?? '/notifications'"
             class="flex items-start gap-2 border-b border-[rgba(43,41,38,0.12)] px-3 py-2 transition-colors hover:bg-[var(--stage-paper-strong)]"
-            :class="{ 'bg-[rgba(130,191,182,0.14)]': !n.read_at }"
+            :class="{ 'bg-[rgba(94,144,217,0.14)]': !n.read_at }"
             @click="!n.read_at && markRead({ ids: [n.id] })"
           >
             <span
               class="mt-1.5 size-2 shrink-0 border border-[var(--stage-ink)]"
-              :class="n.read_at ? 'bg-transparent' : 'bg-[var(--stage-coral)]'"
+              :class="n.read_at ? 'bg-transparent' : 'bg-[var(--stage-performer)]'"
             />
             <div class="flex-1 min-w-0">
               <p

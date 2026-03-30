@@ -17,6 +17,39 @@ export type ShowItem = {
 
 export type MemberShowsResponse = { shows: ShowItem[] };
 
+export type ShowScheduleParams = {
+  month: string;
+  theater: string;
+  type: string;
+  status: string;
+  timeline: "all" | "upcoming" | "past";
+};
+
+export type ShowScheduleItem = {
+  occurrenceId: string;
+  startsAt: string;
+  endsAt: string | null;
+  occurrenceStatus: Enums<"show_occurrence_status">;
+  show: {
+    id: string;
+    title: string;
+    status: Enums<"show_status">;
+    eventType: Enums<"event_type"> | null;
+    theaterId: string;
+    theaterName: string;
+    theaterSlug: string;
+  };
+};
+
+export type ShowScheduleResponse = {
+  items: ShowScheduleItem[];
+  filters: {
+    theaters: { label: string; value: string }[];
+    eventTypes: { label: string; value: Enums<"event_type"> }[];
+    statuses: { label: string; value: Enums<"show_status"> }[];
+  };
+};
+
 export type CreateShowPayload = {
   title: string;
   description: string;
@@ -143,6 +176,38 @@ export const showDetailQueryOptions = defineQueryOptions<
   } as const;
 });
 
+export const memberShowsScheduleQueryOptions = defineQueryOptions<
+  ShowScheduleParams,
+  ShowScheduleResponse
+>((params) => {
+  const headers = import.meta.server
+    ? useRequestHeaders(["cookie"])
+    : undefined;
+
+  return {
+    key: queryKeys.memberShowsSchedule({
+      month: params?.month ?? "",
+      theater: params?.theater ?? "",
+      type: params?.type ?? "",
+      status: params?.status ?? "",
+      timeline: params?.timeline ?? "all",
+    }),
+    query: () =>
+      $fetch<ShowScheduleResponse>("/api/shows/schedule", {
+        credentials: "include",
+        headers,
+        params: {
+          month: params?.month ?? undefined,
+          theater: params?.theater || undefined,
+          type: params?.type || undefined,
+          status: params?.status || undefined,
+          timeline: params?.timeline ?? "all",
+        },
+      }),
+    staleTime: 20_000,
+  } as const;
+});
+
 export const invalidateShowRelatedQueries = async (
   queryCache: {
     invalidateQueries: (filters: {
@@ -156,6 +221,10 @@ export const invalidateShowRelatedQueries = async (
     queryCache.invalidateQueries({
       key: queryKeys.memberShows(),
       exact: true,
+    }),
+    queryCache.invalidateQueries({
+      key: queryKeys.memberShowsSchedulePrefix(),
+      exact: false,
     }),
     queryCache.invalidateQueries({
       key: queryKeys.theaterReview(slug ?? ""),

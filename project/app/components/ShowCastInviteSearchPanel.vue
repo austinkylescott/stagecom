@@ -34,7 +34,7 @@ const { filteredResults, scopeAll, search, searchInput, searchLoading } =
       />
       <UButton
         size="sm"
-        :color="!scopeAll ? 'primary' : 'gray'"
+        :color="!scopeAll ? 'primary' : 'neutral'"
         :variant="!scopeAll ? 'soft' : 'ghost'"
         @click="scopeAll = false"
       >
@@ -42,7 +42,7 @@ const { filteredResults, scopeAll, search, searchInput, searchLoading } =
       </UButton>
       <UButton
         size="sm"
-        :color="scopeAll ? 'primary' : 'gray'"
+        :color="scopeAll ? 'error' : 'neutral'"
         :variant="scopeAll ? 'soft' : 'ghost'"
         @click="scopeAll = true"
       >
@@ -65,7 +65,7 @@ const { filteredResults, scopeAll, search, searchInput, searchLoading } =
           <UBadge
             v-if="!profile.isMember"
             size="xs"
-            color="gray"
+            color="neutral"
             variant="soft"
           >
             not a member
@@ -73,7 +73,7 @@ const { filteredResults, scopeAll, search, searchInput, searchLoading } =
         </div>
         <UButton
           size="xs"
-          color="primary"
+          color="error"
           :disabled="profile.alreadyCast || inviting"
           :loading="inviting"
           @click="emit('invite', profile.id)"

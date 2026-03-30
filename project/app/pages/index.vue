@@ -14,8 +14,8 @@ const workflowSources = [
 ];
 
 const heroPreviewShows = [
-  { cast: 4, title: "Friday Night Showcase", time: "8:00 PM", status: "Confirmed", tone: "bg-[var(--stage-mint)]" },
-  { cast: 6, title: "Late Night Jam", time: "10:30 PM", status: "Casting", tone: "bg-[var(--stage-gold)]" },
+  { cast: 4, title: "Friday Night Showcase", time: "8:00 PM", status: "Confirmed", tone: "bg-[var(--stage-event)]" },
+  { cast: 6, title: "Late Night Jam", time: "10:30 PM", status: "Casting", tone: "bg-[var(--stage-performer)]" },
   { cast: 12, title: "Weekend Workshop", time: "2:00 PM Sat", status: "Pending", tone: "bg-[var(--stage-paper-strong)]" },
 ];
 
@@ -32,13 +32,13 @@ const features = [
   { title: "Theater Membership", description: "Organize your community with clear roles and relationships", tone: "bg-[var(--stage-mint)]", span: "sm:col-span-2 lg:col-span-2" },
   { title: "Show & Event Creation", description: "Schedule shows, practices, workshops, meetings, and auditions", tone: "bg-[var(--stage-gold)]", span: "sm:col-span-2 lg:col-span-2" },
   { title: "Explicit Cast Management", description: "People are only in a lineup when they are actually added", tone: "bg-[var(--stage-coral)]", span: "lg:col-span-1" },
-  { title: "Invitations & Responses", description: "Clear accept/decline flows with automatic tracking", tone: "bg-[var(--stage-mint)]", span: "lg:col-span-1" },
-  { title: "Lineup & Rundown", description: "Program order that everyone can see and trust", tone: "bg-[var(--stage-gold)]", span: "lg:col-span-1" },
-  { title: "Review & Approval", description: "Theater oversight without micromanagement", tone: "bg-[var(--stage-coral)]", span: "lg:col-span-1" },
+  { title: "Invitations & Responses", description: "Clear accept/decline flows with automatic tracking", tone: "bg-[var(--stage-coral)]", span: "lg:col-span-1" },
+  { title: "Lineup & Rundown", description: "Program order that everyone can see and trust", tone: "bg-[var(--stage-coral)]", span: "lg:col-span-1" },
+  { title: "Review & Approval", description: "Theater oversight without micromanagement", tone: "bg-[var(--stage-mint)]", span: "lg:col-span-1" },
   { title: "Notifications", description: "In-app and email updates that actually matter", tone: "bg-[var(--stage-mint)]", span: "lg:col-span-1" },
-  { title: "Profiles", description: "Community participation and visibility for performers", tone: "bg-[var(--stage-gold)]", span: "lg:col-span-1" },
+  { title: "Profiles", description: "Community participation and visibility for performers", tone: "bg-[var(--stage-coral)]", span: "lg:col-span-1" },
   { title: "Casting Visibility", description: "Control who sees what with invite-only, theater, or public modes", tone: "bg-[var(--stage-coral)]", span: "lg:col-span-1" },
-  { title: "Contextual Roles", description: "Be a producer for one show and a performer in another", tone: "bg-[var(--stage-mint)]", span: "lg:col-span-1" },
+  { title: "Contextual Roles", description: "Be a producer for one show and a performer in another", tone: "bg-[var(--stage-coral)]", span: "lg:col-span-1" },
 ];
 
 const roles = {
@@ -92,13 +92,13 @@ const showcaseCards = [
   {
     title: "Show Setup",
     subtitle: "Clear ownership and casting controls",
-    tone: "bg-[var(--stage-mint)]",
+    tone: "bg-[var(--stage-gold)]",
     kind: "setup",
   },
   {
     title: "Cast Invitations",
     subtitle: "Track responses in real-time",
-    tone: "bg-[var(--stage-gold)]",
+    tone: "bg-[var(--stage-coral)]",
     kind: "invites",
   },
   {
@@ -149,8 +149,8 @@ const principles = [
 ];
 
 const inviteRows = [
-  { name: "Jordan Lee", status: "Accepted", tone: "bg-[var(--stage-mint)]" },
-  { name: "Sam Chen", status: "Accepted", tone: "bg-[var(--stage-mint)]" },
+  { name: "Jordan Lee", status: "Accepted", tone: "bg-[var(--stage-performer-soft)]" },
+  { name: "Sam Chen", status: "Accepted", tone: "bg-[var(--stage-performer-soft)]" },
   { name: "Taylor Wright", status: "Pending", tone: "bg-[var(--stage-paper-strong)]" },
   { name: "Casey Morgan", status: "Declined", tone: "bg-[var(--stage-coral)]" },
   { name: "Riley Park", status: "Pending", tone: "bg-[var(--stage-paper-strong)]" },
@@ -170,9 +170,9 @@ const reviewRows = [
 ];
 
 const notifications = [
-  { text: "Jordan accepted your invite", tone: "border-[var(--stage-mint)] bg-[rgba(130,191,182,0.12)]" },
-  { text: "New show needs approval", tone: "border-[var(--stage-coral)] bg-[rgba(199,96,86,0.12)]" },
-  { text: "Reminder: Show in 2 hours", tone: "border-[var(--stage-gold)] bg-[rgba(234,165,66,0.12)]" },
+  { text: "Jordan accepted your invite", tone: "border-[var(--stage-performer)] bg-[rgba(191,77,70,0.12)]" },
+  { text: "New show needs approval", tone: "border-[var(--stage-theater)] bg-[rgba(94,144,217,0.12)]" },
+  { text: "Reminder: Show in 2 hours", tone: "border-[var(--stage-event)] bg-[rgba(231,180,55,0.12)]" },
 ];
 </script>
 
@@ -186,8 +186,8 @@ const notifications = [
           <div class="space-y-8">
             <div class="inline-flex w-fit items-center gap-3 border-3 border-[var(--stage-ink)] bg-[var(--stage-paper-strong)] px-4 py-2">
               <span class="relative flex size-2.5">
-                <span class="absolute inline-flex size-full animate-ping bg-[var(--stage-mint)] opacity-75" />
-                <span class="relative inline-flex size-2.5 bg-[var(--stage-mint)]" />
+                <span class="absolute inline-flex size-full animate-ping bg-[var(--stage-theater)] opacity-75" />
+                <span class="relative inline-flex size-2.5 bg-[var(--stage-theater)]" />
               </span>
               <span class="text-sm font-semibold text-[var(--stage-ink)]">
                 Building with the community
@@ -211,7 +211,7 @@ const notifications = [
                 class="border-2 px-3 py-1 text-sm font-medium"
                 :class="
                   source === 'Stagecom'
-                    ? 'border-[var(--stage-ink)] bg-[var(--stage-mint)] text-[var(--stage-ink)]'
+                    ? 'border-[var(--stage-ink)] bg-[var(--stage-theater)] text-[var(--stage-ink)]'
                     : 'border-[rgba(43,41,38,0.28)] text-[rgba(43,41,38,0.58)] line-through decoration-[var(--stage-coral)] decoration-2'
                 "
               >
@@ -230,16 +230,16 @@ const notifications = [
 
             <div class="flex flex-wrap gap-6 pt-2">
               <div class="flex items-center gap-2">
+                <span class="size-5 border-2 border-[var(--stage-ink)] bg-[var(--stage-theater)]" />
+                <span class="text-sm font-semibold text-[var(--stage-ink)]">For theaters</span>
+              </div>
+              <div class="flex items-center gap-2">
                 <span class="size-5 border-2 border-[var(--stage-ink)] bg-[var(--stage-coral)]" />
                 <span class="text-sm font-semibold text-[var(--stage-ink)]">For performers</span>
               </div>
               <div class="flex items-center gap-2">
-                <span class="size-5 border-2 border-[var(--stage-ink)] bg-[var(--stage-mint)]" />
-                <span class="text-sm font-semibold text-[var(--stage-ink)]">For producers</span>
-              </div>
-              <div class="flex items-center gap-2">
                 <span class="size-5 border-2 border-[var(--stage-ink)] bg-[var(--stage-gold)]" />
-                <span class="text-sm font-semibold text-[var(--stage-ink)]">For theaters</span>
+                <span class="text-sm font-semibold text-[var(--stage-ink)]">For producers</span>
               </div>
             </div>
           </div>
@@ -271,7 +271,7 @@ const notifications = [
               </div>
 
               <div class="mt-6 flex gap-2">
-                <div class="flex-1 border-2 border-[var(--stage-ink)] bg-[var(--stage-gold)] px-4 py-2 text-center text-sm font-bold text-[var(--stage-ink)]">
+                <div class="flex-1 border-2 border-[var(--stage-ink)] bg-[var(--stage-event)] px-4 py-2 text-center text-sm font-bold text-[var(--stage-ink)]">
                   Add Show
                 </div>
                 <div class="flex-1 border-2 border-[var(--stage-ink)] bg-[var(--stage-paper-strong)] px-4 py-2 text-center text-sm font-bold text-[var(--stage-ink)]">
@@ -281,7 +281,7 @@ const notifications = [
             <template #left-callout>
               <div class="absolute -left-5 top-1/4 border-2 border-[var(--stage-ink)] bg-[var(--stage-cream)] px-3 py-2 shadow-[4px_4px_0_0_var(--stage-ink)]">
                 <div class="flex items-center gap-2">
-                  <div class="size-3 border border-[var(--stage-ink)] bg-green-500" />
+                  <div class="size-3 border border-[var(--stage-ink)] bg-[var(--stage-performer)]" />
                   <span class="text-xs font-bold text-[var(--stage-ink)]">Cast Confirmed</span>
                 </div>
               </div>
@@ -300,7 +300,7 @@ const notifications = [
     <section class="bg-[var(--stage-ink)] px-4 py-16 text-[var(--stage-cream)] sm:px-6 lg:px-8 lg:py-24">
       <div class="mx-auto max-w-7xl">
         <div class="mb-12 max-w-3xl space-y-4">
-          <span class="inline-block border-2 border-[var(--stage-gold)] bg-[var(--stage-gold)] px-3 py-1 text-sm font-bold uppercase text-[var(--stage-ink)]">
+          <span class="inline-block border-2 border-[var(--stage-event)] bg-[var(--stage-event)] px-3 py-1 text-sm font-bold uppercase text-[var(--stage-ink)]">
             The Problem
           </span>
           <h2 class="stage-section-title max-w-3xl text-[var(--stage-cream)]">
@@ -317,13 +317,13 @@ const notifications = [
           <article
             v-for="problem in problems"
             :key="problem.title"
-            class="group border-2 border-[rgba(251,247,239,0.2)] bg-[var(--stage-ink)] p-6 transition-all hover:border-[var(--stage-coral)] hover:bg-[rgba(251,247,239,0.05)]"
+            class="group stage-article-card-dark p-6 text-[var(--stage-cream)] transition-all hover:-translate-y-[1px] hover:bg-[rgba(251,247,239,0.12)] hover:shadow-[8px_8px_0_0_var(--stage-ink)]"
           >
             <div class="mb-4 flex items-center gap-3">
-              <div class="flex size-10 items-center justify-center border-2 border-[rgba(251,247,239,0.3)] text-[rgba(251,247,239,0.6)] transition-colors group-hover:border-[var(--stage-coral)] group-hover:text-[var(--stage-coral)]">
+              <div class="flex size-10 items-center justify-center border-2 border-[var(--stage-ink)] bg-[var(--stage-paper-strong)] text-[var(--stage-ink)] transition-colors group-hover:bg-[var(--stage-coral)]">
                 <span class="size-3 bg-current" />
               </div>
-              <span class="text-sm font-semibold text-[rgba(251,247,239,0.6)] line-through decoration-[var(--stage-coral)]">
+              <span class="text-sm font-semibold text-[rgba(251,247,239,0.74)] line-through decoration-[var(--stage-coral)]">
                 {{ problem.tool }}
               </span>
             </div>
@@ -339,7 +339,7 @@ const notifications = [
         <div class="mt-12 border-t-2 border-[rgba(251,247,239,0.2)] pt-8">
           <p class="text-center text-xl font-semibold md:text-2xl">
             There's no single, purpose-built tool that reflects how improv communities
-            <span class="text-[var(--stage-gold)]"> actually operate</span>.
+            <span class="text-[var(--stage-event)]"> actually operate</span>.
           </p>
         </div>
       </div>
@@ -348,7 +348,7 @@ const notifications = [
     <section id="features" class="bg-[var(--stage-cream)] px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
       <div class="mx-auto max-w-7xl">
         <div class="mb-12 text-center">
-          <span class="inline-block border-2 border-[var(--stage-ink)] bg-[var(--stage-mint)] px-3 py-1 text-sm font-bold uppercase text-[var(--stage-ink)]">
+          <span class="inline-block border-2 border-[var(--stage-ink)] bg-[var(--stage-theater)] px-3 py-1 text-sm font-bold uppercase text-[var(--stage-ink)]">
             The Solution
           </span>
           <h2 class="stage-section-title mx-auto mt-4 max-w-3xl">
@@ -381,7 +381,7 @@ const notifications = [
 
         <div class="mt-16 flex items-center justify-center gap-4">
           <div class="h-1 w-16 bg-[var(--stage-ink)]" />
-          <div class="size-3 rotate-45 border-2 border-[var(--stage-ink)] bg-[var(--stage-gold)]" />
+          <div class="size-3 rotate-45 border-2 border-[var(--stage-ink)] bg-[var(--stage-event)]" />
           <div class="h-1 w-16 bg-[var(--stage-ink)]" />
         </div>
       </div>
@@ -390,7 +390,7 @@ const notifications = [
     <section id="roles" class="bg-[var(--stage-paper-strong)] px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
       <div class="mx-auto max-w-7xl">
         <div class="mb-12 text-center">
-          <span class="inline-block border-2 border-[var(--stage-ink)] bg-[var(--stage-coral)] px-3 py-1 text-sm font-bold uppercase text-[var(--stage-ink)]">
+          <span class="inline-block border-2 border-[var(--stage-ink)] bg-[var(--stage-performer)] px-3 py-1 text-sm font-bold uppercase text-[var(--stage-ink)]">
             For Your Role
           </span>
           <h2 class="stage-section-title mx-auto mt-4 max-w-3xl">
@@ -482,7 +482,7 @@ const notifications = [
     <section id="product" class="bg-[var(--stage-ink)] px-4 py-16 text-[var(--stage-cream)] sm:px-6 lg:px-8 lg:py-24">
       <div class="mx-auto max-w-7xl">
         <div class="mb-12 text-center">
-          <span class="inline-block border-2 border-[var(--stage-gold)] bg-[var(--stage-gold)] px-3 py-1 text-sm font-bold uppercase text-[var(--stage-ink)]">
+          <span class="inline-block border-2 border-[var(--stage-event)] bg-[var(--stage-event)] px-3 py-1 text-sm font-bold uppercase text-[var(--stage-ink)]">
             The Product
           </span>
           <h2 class="stage-section-title mx-auto mt-4 max-w-3xl text-[var(--stage-cream)]">
@@ -508,7 +508,7 @@ const notifications = [
                     <div class="font-bold">Friday Night Showcase</div>
                     <div class="text-sm stage-muted">Jan 24, 2026 at 8:00 PM</div>
                   </div>
-                  <span class="border-2 border-[var(--stage-ink)] bg-[var(--stage-mint)] px-2 py-1 text-xs font-bold uppercase">
+                  <span class="border-2 border-[var(--stage-ink)] bg-[var(--stage-event)] px-2 py-1 text-xs font-bold uppercase">
                     Draft
                   </span>
                 </div>
@@ -523,16 +523,16 @@ const notifications = [
                   </div>
                 </div>
                 <div class="border-2 border-[rgba(43,41,38,0.18)] p-3">
-                  <div class="mb-2 text-xs font-semibold uppercase stage-muted">Cast Size</div>
+                    <div class="mb-2 text-xs font-semibold uppercase stage-muted">Cast Size</div>
                   <div class="flex items-center gap-2">
                     <div class="h-2 flex-1 bg-[rgba(43,41,38,0.12)]">
-                      <div class="h-full w-2/3 bg-[var(--stage-mint)]" />
+                      <div class="h-full w-2/3 bg-[var(--stage-coral)]" />
                     </div>
                     <span class="text-sm font-bold">4-6 performers</span>
                   </div>
                 </div>
                 <div class="flex gap-2">
-                  <button class="flex-1 border-2 border-[var(--stage-ink)] bg-[var(--stage-gold)] py-2 text-sm font-bold">
+                  <button class="flex-1 border-2 border-[var(--stage-ink)] bg-[var(--stage-coral)] py-2 text-sm font-bold text-[var(--stage-cream)]">
                     Invite Cast
                   </button>
                   <button class="flex-1 border-2 border-[var(--stage-ink)] bg-[var(--stage-cream)] py-2 text-sm font-bold">
@@ -600,7 +600,7 @@ const notifications = [
                     <div class="text-xs stage-muted">by {{ row.author }}</div>
                   </div>
                   <div v-if="row.pending" class="flex gap-1">
-                    <button class="border-2 border-[var(--stage-ink)] bg-[var(--stage-mint)] px-2 py-1 text-xs font-bold">
+                    <button class="border-2 border-[var(--stage-ink)] bg-[var(--stage-theater)] px-2 py-1 text-xs font-bold">
                       Approve
                     </button>
                     <button class="border-2 border-[var(--stage-ink)] bg-[var(--stage-cream)] px-2 py-1 text-xs font-bold">
@@ -609,7 +609,7 @@ const notifications = [
                   </div>
                   <span
                     v-else
-                    class="border-2 border-[var(--stage-ink)] bg-[var(--stage-mint)] px-2 py-1 text-xs font-bold"
+                    class="border-2 border-[var(--stage-ink)] bg-[var(--stage-theater)] px-2 py-1 text-xs font-bold"
                   >
                     Approved
                   </span>
@@ -649,7 +649,7 @@ const notifications = [
           <p class="mb-4 text-[rgba(251,247,239,0.7)]">
             Product screens are concept mockups. The real thing is being built right now.
           </p>
-          <a href="#waitlist" class="inline-flex items-center gap-2 font-bold text-[var(--stage-gold)] transition-colors hover:text-[var(--stage-coral)]">
+          <a href="#waitlist" class="inline-flex items-center gap-2 font-bold text-[var(--stage-event)] transition-colors hover:text-[var(--stage-theater)]">
             Follow the build
             <span aria-hidden="true">›</span>
           </a>
@@ -676,9 +676,9 @@ const notifications = [
           <article
             v-for="principle in principles"
             :key="principle.title"
-            class="group border-4 border-[var(--stage-ink)] bg-[var(--stage-paper-strong)] p-6 transition-all hover:bg-[var(--stage-ink)] hover:shadow-[8px_8px_0_0_var(--stage-gold)]"
+            class="group border-4 border-[var(--stage-ink)] bg-[var(--stage-paper-strong)] p-6 transition-all hover:bg-[var(--stage-ink)] hover:shadow-[8px_8px_0_0_var(--stage-theater)]"
           >
-            <div class="mb-4 flex size-12 items-center justify-center border-2 border-[var(--stage-ink)] bg-[var(--stage-cream)] transition-colors group-hover:bg-[var(--stage-gold)]">
+            <div class="mb-4 flex size-12 items-center justify-center border-2 border-[var(--stage-ink)] bg-[var(--stage-cream)] transition-colors group-hover:bg-[var(--stage-theater)]">
               <span class="size-4 bg-[var(--stage-ink)]" />
             </div>
             <h3 class="mb-2 text-lg font-bold text-[var(--stage-ink)] transition-colors group-hover:text-[var(--stage-cream)]">
@@ -696,14 +696,14 @@ const notifications = [
       <div class="absolute inset-0 opacity-[0.06]" style="background-image: repeating-linear-gradient(45deg, transparent, transparent 20px, #fdfcfb 20px, #fdfcfb 21px)" />
       <div class="relative mx-auto max-w-4xl text-center">
         <div class="relative">
-          <div class="absolute -inset-4 border-4 border-[var(--stage-gold)] md:-inset-8" />
+          <div class="absolute -inset-4 border-4 border-[var(--stage-theater)] md:-inset-8" />
           <div class="absolute -inset-2 border-4 border-[rgba(251,247,239,0.2)] md:-inset-6" />
 
           <div class="relative bg-[var(--stage-ink)] p-8 md:p-12">
             <div class="mb-6 inline-flex items-center gap-2 border-2 border-[rgba(251,247,239,0.3)] px-4 py-2">
               <span class="relative flex size-2.5">
-                <span class="absolute inline-flex size-full animate-ping bg-[var(--stage-mint)] opacity-75" />
-                <span class="relative inline-flex size-2.5 bg-[var(--stage-mint)]" />
+                <span class="absolute inline-flex size-full animate-ping bg-[var(--stage-theater)] opacity-75" />
+                <span class="relative inline-flex size-2.5 bg-[var(--stage-theater)]" />
               </span>
               <span class="text-sm font-semibold text-[var(--stage-cream)]">
                 Actively building with early partners
@@ -735,66 +735,13 @@ const notifications = [
         </div>
 
         <div class="mt-12 flex flex-wrap items-center justify-center gap-6 text-sm">
-          <a href="#roles" class="font-semibold text-[rgba(251,247,239,0.7)] transition-colors hover:text-[var(--stage-gold)]">For Theaters</a>
+          <a href="#roles" class="font-semibold text-[rgba(251,247,239,0.7)] transition-colors hover:text-[var(--stage-theater)]">For Theaters</a>
           <span class="text-[rgba(251,247,239,0.3)]">|</span>
-          <a href="#roles" class="font-semibold text-[rgba(251,247,239,0.7)] transition-colors hover:text-[var(--stage-gold)]">For Producers</a>
+          <a href="#roles" class="font-semibold text-[rgba(251,247,239,0.7)] transition-colors hover:text-[var(--stage-event)]">For Producers</a>
           <span class="text-[rgba(251,247,239,0.3)]">|</span>
-          <a href="#roles" class="font-semibold text-[rgba(251,247,239,0.7)] transition-colors hover:text-[var(--stage-gold)]">For Performers</a>
+          <a href="#roles" class="font-semibold text-[rgba(251,247,239,0.7)] transition-colors hover:text-[var(--stage-performer)]">For Performers</a>
         </div>
       </div>
     </section>
-
-    <footer class="border-t-4 border-[var(--stage-cream)] bg-[var(--stage-ink)] px-4 py-12 sm:px-6 lg:px-8">
-      <div class="mx-auto max-w-7xl">
-        <div class="grid gap-8 md:grid-cols-4">
-          <div class="md:col-span-2">
-            <NuxtLink to="/" class="inline-block font-display text-3xl text-[var(--stage-cream)]">
-              Stagecom
-            </NuxtLink>
-            <p class="mt-4 max-w-sm leading-7 text-[rgba(251,247,239,0.7)]">
-              The community management platform for improv theaters, ensembles,
-              and local performance communities.
-            </p>
-            <div class="mt-6 flex gap-3">
-              <a href="#" aria-label="Twitter" class="flex size-10 items-center justify-center border-2 border-[rgba(251,247,239,0.3)] text-[rgba(251,247,239,0.7)] transition-colors hover:border-[var(--stage-gold)] hover:text-[var(--stage-gold)]">
-                X
-              </a>
-              <a href="#" aria-label="Instagram" class="flex size-10 items-center justify-center border-2 border-[rgba(251,247,239,0.3)] text-[rgba(251,247,239,0.7)] transition-colors hover:border-[var(--stage-gold)] hover:text-[var(--stage-gold)]">
-                IG
-              </a>
-            </div>
-          </div>
-
-          <div>
-            <h3 class="mb-4 font-bold text-[var(--stage-cream)]">Product</h3>
-            <ul class="space-y-2 text-[rgba(251,247,239,0.7)]">
-              <li><a href="#features" class="transition-colors hover:text-[var(--stage-gold)]">Features</a></li>
-              <li><a href="#roles" class="transition-colors hover:text-[var(--stage-gold)]">For Your Role</a></li>
-              <li><a href="#product" class="transition-colors hover:text-[var(--stage-gold)]">Product Preview</a></li>
-              <li><a href="#waitlist" class="transition-colors hover:text-[var(--stage-gold)]">Join Waitlist</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 class="mb-4 font-bold text-[var(--stage-cream)]">Company</h3>
-            <ul class="space-y-2 text-[rgba(251,247,239,0.7)]">
-              <li><a href="#" class="transition-colors hover:text-[var(--stage-gold)]">About</a></li>
-              <li><a href="#" class="transition-colors hover:text-[var(--stage-gold)]">Contact</a></li>
-              <li><a href="#" class="transition-colors hover:text-[var(--stage-gold)]">Privacy</a></li>
-              <li><a href="#" class="transition-colors hover:text-[var(--stage-gold)]">Terms</a></li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="mt-12 flex flex-col items-center justify-between gap-4 border-t-2 border-[rgba(251,247,239,0.2)] pt-8 md:flex-row">
-          <p class="text-sm text-[rgba(251,247,239,0.5)]">
-            © 2026 Stagecom. Built for improv communities.
-          </p>
-          <p class="text-sm text-[rgba(251,247,239,0.5)]">
-            Made with care in the local scene.
-          </p>
-        </div>
-      </div>
-    </footer>
   </div>
 </template>

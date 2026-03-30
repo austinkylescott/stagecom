@@ -86,7 +86,7 @@ const nextOccurrence = computed(() => data.value?.occurrences?.[0] ?? null);
             {{ new Date(nextOccurrence.starts_at).toLocaleString() }}
           </p>
         </div>
-        <UBadge v-if="show.isCastFinalized" color="primary" variant="soft">
+        <UBadge v-if="show.isCastFinalized" color="error" variant="soft">
           Finalized
         </UBadge>
       </div>

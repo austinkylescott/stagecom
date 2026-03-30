@@ -72,7 +72,7 @@ const markAllRead = () => markRead({ all: true });
           v-for="tab in tabs"
           :key="tab.value"
           size="sm"
-          :color="filter === tab.value ? 'primary' : 'gray'"
+          :color="filter === tab.value ? 'primary' : 'neutral'"
           :variant="filter === tab.value ? 'soft' : 'ghost'"
           @click="switchFilter(tab.value)"
         >
@@ -93,7 +93,7 @@ const markAllRead = () => markRead({ all: true });
           as="NuxtLink"
           :title="n.read_at ? 'Seen update' : 'New update'"
           :subtitle="new Date(n.created_at).toLocaleString()"
-          :tone="n.read_at ? 'bg-[var(--stage-paper-strong)]' : 'bg-[var(--stage-mint)]'"
+          :tone="n.read_at ? 'bg-[var(--stage-paper-strong)]' : 'bg-[var(--stage-theater)]'"
           :to="formatNotification(n.type, n.payload).href ?? '#'"
           class="transition-colors"
           @click="!n.read_at && markRead({ ids: [n.id] })"
@@ -101,7 +101,7 @@ const markAllRead = () => markRead({ all: true });
           <div class="flex items-start gap-3">
             <span
               class="mt-1.5 size-2 shrink-0 border border-[var(--stage-ink)]"
-              :class="n.read_at ? 'bg-[var(--stage-paper-strong)]' : 'bg-[var(--stage-coral)]'"
+              :class="n.read_at ? 'bg-[var(--stage-paper-strong)]' : 'bg-[var(--stage-performer)]'"
             />
             <div class="min-w-0 flex-1">
               <p class="text-sm" :class="n.read_at ? 'stage-muted' : 'font-medium text-[var(--stage-ink)]'">

@@ -1,7 +1,7 @@
 export default defineAppConfig({
   ui: {
     colors: {
-      primary: "amber",
+      primary: "blue",
       neutral: "stone",
     },
     button: {
@@ -10,6 +10,14 @@ export default defineAppConfig({
         label: "truncate",
       },
       variants: {
+        color: {
+          primary: "",
+          success: "",
+          info: "",
+          warning: "",
+          error: "",
+          neutral: "",
+        },
         size: {
           xs: {
             base: "px-3 py-1.5 text-[10px]",
@@ -25,18 +33,99 @@ export default defineAppConfig({
           },
         },
         variant: {
-          solid:
-            "bg-[var(--stage-gold)] text-[var(--stage-ink)] hover:bg-[color:var(--stage-paper)]",
-          soft: "bg-[var(--stage-mint)] text-[var(--stage-ink)] hover:bg-[color:var(--stage-paper)]",
-          ghost:
-            "bg-[var(--stage-paper)]/80 text-[var(--stage-ink)] hover:bg-[var(--stage-paper)]",
-          outline:
-            "bg-transparent text-[var(--stage-ink)] hover:bg-[var(--stage-paper)]/65",
-          subtle:
-            "bg-[var(--stage-paper-strong)] text-[var(--stage-ink)] hover:bg-[var(--stage-paper)]",
+          solid: "",
+          soft: "",
+          ghost: "",
+          outline: "",
+          subtle: "",
           link: "shadow-none border-none underline underline-offset-4",
         },
       },
+      compoundVariants: [
+        {
+          color: ["primary", "info"],
+          variant: "solid",
+          class:
+            "bg-[var(--stage-theater)] text-[var(--stage-ink)] hover:bg-[color:color-mix(in_srgb,var(--stage-theater)_82%,white)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--stage-theater)]",
+        },
+        {
+          color: ["warning", "success"],
+          variant: "solid",
+          class:
+            "bg-[var(--stage-event)] text-[var(--stage-ink)] hover:bg-[color:color-mix(in_srgb,var(--stage-event)_82%,white)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--stage-event)]",
+        },
+        {
+          color: "error",
+          variant: "solid",
+          class:
+            "bg-[var(--stage-performer)] text-[var(--stage-cream)] hover:bg-[color:color-mix(in_srgb,var(--stage-performer)_88%,black)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--stage-performer)]",
+        },
+        {
+          color: "neutral",
+          variant: "solid",
+          class:
+            "bg-[var(--stage-ink)] text-[var(--stage-cream)] hover:bg-[color:color-mix(in_srgb,var(--stage-ink)_88%,white)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--stage-ink)]",
+        },
+        {
+          color: ["primary", "info"],
+          variant: ["soft", "ghost", "outline", "subtle"],
+          class:
+            "text-[var(--stage-ink)] ring-[var(--stage-ink)] hover:bg-[color:rgba(94,144,217,0.16)]",
+        },
+        {
+          color: ["warning", "success"],
+          variant: ["soft", "ghost", "outline", "subtle"],
+          class:
+            "text-[var(--stage-ink)] ring-[var(--stage-ink)] hover:bg-[color:rgba(231,180,55,0.18)]",
+        },
+        {
+          color: "error",
+          variant: ["soft", "ghost", "outline", "subtle"],
+          class:
+            "text-[var(--stage-ink)] ring-[var(--stage-ink)] hover:bg-[color:rgba(191,77,70,0.14)]",
+        },
+        {
+          color: "neutral",
+          variant: ["soft", "ghost", "outline", "subtle"],
+          class:
+            "text-[var(--stage-ink)] ring-[var(--stage-ink)] hover:bg-[var(--stage-paper)]",
+        },
+        {
+          color: ["primary", "info"],
+          variant: "soft",
+          class: "bg-[rgba(94,144,217,0.2)]",
+        },
+        {
+          color: ["warning", "success"],
+          variant: "soft",
+          class: "bg-[rgba(231,180,55,0.22)]",
+        },
+        {
+          color: "error",
+          variant: "soft",
+          class: "bg-[rgba(191,77,70,0.18)]",
+        },
+        {
+          color: "neutral",
+          variant: "soft",
+          class: "bg-[var(--stage-paper-strong)]",
+        },
+        {
+          color: ["primary", "info", "warning", "success", "error", "neutral"],
+          variant: "ghost",
+          class: "bg-[var(--stage-paper)]/80",
+        },
+        {
+          color: ["primary", "info", "warning", "success", "error", "neutral"],
+          variant: "outline",
+          class: "bg-transparent ring-[2px] ring-inset",
+        },
+        {
+          color: ["primary", "info", "warning", "success", "error", "neutral"],
+          variant: "subtle",
+          class: "ring-[2px] ring-inset bg-[var(--stage-paper-strong)]",
+        },
+      ],
       defaultVariants: {
         color: "primary",
         variant: "solid",
@@ -86,10 +175,43 @@ export default defineAppConfig({
     },
     badge: {
       variants: {
+        color: {
+          primary: "",
+          success: "",
+          info: "",
+          warning: "",
+          error: "",
+          neutral: "",
+        },
         variant: {
+          solid: "",
+          outline: "",
           soft: "border-2 border-[var(--stage-ink)] font-bold uppercase tracking-[0.12em]",
+          subtle: "",
         },
       },
+      compoundVariants: [
+        {
+          color: ["primary", "info"],
+          variant: "soft",
+          class: "bg-[rgba(94,144,217,0.18)] text-[var(--stage-ink)]",
+        },
+        {
+          color: ["warning", "success"],
+          variant: "soft",
+          class: "bg-[rgba(231,180,55,0.22)] text-[var(--stage-ink)]",
+        },
+        {
+          color: "error",
+          variant: "soft",
+          class: "bg-[rgba(191,77,70,0.18)] text-[var(--stage-ink)]",
+        },
+        {
+          color: "neutral",
+          variant: "soft",
+          class: "bg-[var(--stage-paper-strong)] text-[var(--stage-ink)]",
+        },
+      ],
       defaultVariants: {
         variant: "soft",
       },

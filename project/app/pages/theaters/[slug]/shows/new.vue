@@ -86,122 +86,122 @@ const submit = async (submitForReview: boolean) => {
       </div>
     </StageSection>
 
-    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.5)]" inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.5)]" inner-class="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
       <StageFeatureCard
-      title="Show Setup"
-      subtitle="Clear ownership and casting controls"
-      tone="bg-[var(--stage-mint)]"
-    >
-      <div class="space-y-6 text-[var(--stage-ink)]">
-        <div class="grid gap-4 md:grid-cols-2">
-          <UFormField label="Title" required>
-            <UInput v-model="form.title" placeholder="Harold Night" />
-          </UFormField>
-          <UFormField label="Event Type">
-            <URadioGroup
-              variant="table"
-              v-model="form.eventType"
-              :items="[
-                {
-                  label: 'Show',
-                  description: 'A ticketed performance open to the public',
-                  value: 'show',
-                },
-                {
-                  label: 'Practice',
-                  description: 'A rehearsal for a team or specific show',
-                  value: 'practice',
-                },
-                {
-                  label: 'Meeting',
-                  description: 'A meeting with working groups',
-                  value: 'meeting',
-                },
-                {
-                  label: 'Audition',
-                  description:
-                    'An audition for a specific show or general casting call',
-                  value: 'audition',
-                },
-                {
-                  label: 'Workshop',
-                  description: 'A short class open to community members',
-                  value: 'workshop',
-                },
-              ]"
-            />
-          </UFormField>
-        </div>
-
-        <UFormField
-          label="Description"
-          description="What is this about?"
-          required
-        >
-          <UTextarea v-model="form.description" :rows="4" />
-        </UFormField>
-
-        <div class="grid gap-4 md:grid-cols-2">
-          <UFormField
-            label="Casting mode"
-            description="Who can request or be invited?"
-          >
-            <USelect
-              v-model="form.castingMode"
-              :items="[
-                { label: 'Direct invite', value: 'direct_invite' },
-                { label: 'Theater casting', value: 'theater_casting' },
-                { label: 'Public casting', value: 'public_casting' },
-              ]"
-            />
-          </UFormField>
-          <div class="grid grid-cols-2 gap-3">
-            <UFormField label="Cast min">
-              <UInput
-                v-model.number="form.castMin"
-                type="number"
-                min="0"
-                placeholder="e.g. 6"
-              />
+        title="Show Setup"
+        subtitle="Clear ownership and casting controls"
+        tone="bg-[var(--stage-gold)]"
+      >
+        <div class="space-y-6 text-[var(--stage-ink)]">
+          <div class="grid gap-4 md:grid-cols-2">
+            <UFormField label="Title" required>
+              <UInput v-model="form.title" placeholder="Harold Night" />
             </UFormField>
-            <UFormField label="Cast max">
-              <UInput
-                v-model.number="form.castMax"
-                type="number"
-                min="0"
-                placeholder="e.g. 10"
+            <UFormField label="Event Type">
+              <URadioGroup
+                variant="table"
+                v-model="form.eventType"
+                :items="[
+                  {
+                    label: 'Show',
+                    description: 'A ticketed performance open to the public',
+                    value: 'show',
+                  },
+                  {
+                    label: 'Practice',
+                    description: 'A rehearsal for a team or specific show',
+                    value: 'practice',
+                  },
+                  {
+                    label: 'Meeting',
+                    description: 'A meeting with working groups',
+                    value: 'meeting',
+                  },
+                  {
+                    label: 'Audition',
+                    description:
+                      'An audition for a specific show or general casting call',
+                    value: 'audition',
+                  },
+                  {
+                    label: 'Workshop',
+                    description: 'A short class open to community members',
+                    value: 'workshop',
+                  },
+                ]"
               />
             </UFormField>
           </div>
-        </div>
 
-        <div class="grid gap-4 md:grid-cols-2">
-          <UFormField label="Start" description="Local time">
-            <UInput type="datetime-local" v-model="form.startsAt" />
+          <UFormField
+            label="Description"
+            description="What is this about?"
+            required
+          >
+            <UTextarea v-model="form.description" :rows="4" />
           </UFormField>
-          <UFormField label="End" description="Optional">
-            <UInput type="datetime-local" v-model="form.endsAt" />
+
+          <div class="grid gap-4 md:grid-cols-2">
+            <UFormField
+              label="Casting mode"
+              description="Who can request or be invited?"
+            >
+              <USelect
+                v-model="form.castingMode"
+                :items="[
+                  { label: 'Direct invite', value: 'direct_invite' },
+                  { label: 'Theater casting', value: 'theater_casting' },
+                  { label: 'Public casting', value: 'public_casting' },
+                ]"
+              />
+            </UFormField>
+            <div class="grid grid-cols-2 gap-3">
+              <UFormField label="Cast min">
+                <UInput
+                  v-model.number="form.castMin"
+                  type="number"
+                  min="0"
+                  placeholder="e.g. 6"
+                />
+              </UFormField>
+              <UFormField label="Cast max">
+                <UInput
+                  v-model.number="form.castMax"
+                  type="number"
+                  min="0"
+                  placeholder="e.g. 10"
+                />
+              </UFormField>
+            </div>
+          </div>
+
+          <div class="grid gap-4 md:grid-cols-2">
+            <UFormField label="Start" description="Local time">
+              <UInput type="datetime-local" v-model="form.startsAt" />
+            </UFormField>
+            <UFormField label="End" description="Optional">
+              <UInput type="datetime-local" v-model="form.endsAt" />
+            </UFormField>
+          </div>
+
+          <UFormField label="Ticket URL" description="Optional">
+            <UInput
+              v-model="form.ticketUrl"
+              placeholder="https://tickets.example.com"
+            />
           </UFormField>
-        </div>
 
-        <UFormField label="Ticket URL" description="Optional">
-          <UInput
-            v-model="form.ticketUrl"
-            placeholder="https://tickets.example.com"
-          />
-        </UFormField>
-
-        <div class="flex items-center gap-3 flex-wrap">
-          <UButton :loading="loading" color="primary" @click="submit(true)">
-            Submit for review
-          </UButton>
-          <UButton :loading="loading" variant="ghost" @click="submit(false)">
-            Save as draft
-          </UButton>
-          <p v-if="notice" class="text-sm text-emerald-600">{{ notice }}</p>
-          <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
+          <div class="flex items-center gap-3 flex-wrap">
+            <UButton :loading="loading" color="warning" @click="submit(true)">
+              Submit for review
+            </UButton>
+            <UButton :loading="loading" variant="ghost" @click="submit(false)">
+              Save as draft
+            </UButton>
+            <p v-if="notice" class="text-sm text-emerald-600">{{ notice }}</p>
+            <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
+          </div>
         </div>
-      </div>
       </StageFeatureCard>
     </StageSection>
   </div>

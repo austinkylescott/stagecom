@@ -40,13 +40,13 @@ const { formatLocation } = useLocationFormatter();
   <StageFeatureCard
     :title="theater.name"
     :subtitle="formatLocation(theater)"
-    tone="bg-[var(--stage-gold)]"
+    tone="bg-[var(--stage-theater)]"
   >
     <div class="space-y-4 text-[var(--stage-ink)]">
       <div class="flex flex-wrap items-center gap-2">
         <span
           v-if="isHome"
-          class="stage-chip bg-[var(--stage-mint)] text-[var(--stage-ink)]"
+          class="stage-chip bg-[var(--stage-theater)] text-[var(--stage-ink)]"
         >
           Home theater
         </span>

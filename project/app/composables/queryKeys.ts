@@ -20,6 +20,16 @@ export const queryKeys = {
 
   memberShows: () => ["member-shows"] as const,
 
+  memberShowsSchedule: (params: {
+    month: string;
+    theater: string;
+    type: string;
+    status: string;
+    timeline: string;
+  }) => ["member-shows-schedule", params] as const,
+
+  memberShowsSchedulePrefix: () => ["member-shows-schedule"] as const,
+
   performers: (params?: {
     search: string;
     page: number;

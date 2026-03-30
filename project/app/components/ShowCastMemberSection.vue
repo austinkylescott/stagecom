@@ -5,7 +5,7 @@ defineProps<{
   title: string;
   members: ShowCastMember[];
   badgeLabel?: string;
-  badgeColor?: "blue" | "gray" | "orange" | "primary" | "red";
+  badgeColor?: "neutral" | "warning" | "primary" | "error";
 }>();
 </script>
 

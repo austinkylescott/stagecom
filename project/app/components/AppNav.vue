@@ -16,13 +16,48 @@ const navItems = computed(() => {
     items.push(
       { label: "Shows", to: "/shows" },
       { label: "Review", to: "/review" },
-      { label: "Notifications", to: "/notifications" },
       { label: "Profile", to: "/profile" },
     );
   }
 
   return items;
 });
+
+const navToneClasses = (to: string, active: boolean) => {
+  const shared = "!text-[var(--stage-ink)]";
+
+  if (to.startsWith("/theaters") || to.startsWith("/review")) {
+    return [
+      active
+        ? "bg-[var(--stage-theater)] hover:bg-[var(--stage-theater-soft)] active:bg-[var(--stage-theater-soft)]"
+        : "bg-[rgba(251,247,239,0.78)] hover:bg-[var(--stage-theater-soft)] active:bg-[var(--stage-theater-soft)]",
+      shared,
+    ];
+  }
+
+  if (to.startsWith("/shows")) {
+    return [
+      active
+        ? "bg-[var(--stage-event)] hover:bg-[var(--stage-event-soft)] active:bg-[var(--stage-event-soft)]"
+        : "bg-[rgba(251,247,239,0.78)] hover:bg-[var(--stage-event-soft)] active:bg-[var(--stage-event-soft)]",
+      shared,
+    ];
+  }
+
+  if (to.startsWith("/performers") || to.startsWith("/profile")) {
+    return [
+      active
+        ? "bg-[var(--stage-performer)] hover:bg-[var(--stage-performer-soft)] active:bg-[var(--stage-performer-soft)]"
+        : "bg-[rgba(251,247,239,0.78)] hover:bg-[var(--stage-performer-soft)] active:bg-[var(--stage-performer-soft)]",
+      shared,
+    ];
+  }
+
+  return [
+    active ? "bg-[var(--stage-paper-strong)]" : "bg-[rgba(251,247,239,0.78)] hover:bg-[var(--stage-paper)]",
+    shared,
+  ];
+};
 
 const isActive = (to: string) => {
   if (to === "/") {
@@ -45,27 +80,26 @@ watch(
     class="sticky top-0 z-50 border-b-3 border-[var(--stage-ink)] bg-[rgba(247,241,229,0.94)] supports-[backdrop-filter]:bg-[rgba(247,241,229,0.86)] backdrop-blur-sm"
   >
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div class="flex flex-col gap-4 py-4 lg:py-5">
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <NuxtLink to="/" class="group flex flex-col gap-1">
-            <div class="flex items-center gap-2">
-              <span class="stage-overline">Run Your Scene</span>
-              <span class="stage-chip bg-[var(--stage-mint)] text-[var(--stage-ink)]">Beta</span>
-            </div>
-            <span class="font-display text-3xl leading-none uppercase tracking-[0.12em]">
+      <div class="flex flex-col gap-3 py-3 lg:py-3.5">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <NuxtLink to="/" class="group flex items-center gap-2">
+            <span class="font-display text-[1.7rem] leading-none uppercase tracking-[0.12em]">
               Stagecom
+            </span>
+            <span class="stage-chip bg-[var(--stage-theater)] text-[var(--stage-ink)]">
+              Beta
             </span>
           </NuxtLink>
         </div>
 
-        <div class="flex items-center justify-between gap-3 lg:grid lg:grid-cols-[1fr_auto] lg:items-center">
+        <div class="flex items-center justify-between gap-2 lg:grid lg:grid-cols-[1fr_auto] lg:items-center">
           <nav class="hidden lg:block">
             <ul class="flex flex-wrap items-center gap-2">
               <li v-for="item in navItems" :key="item.to">
                 <UButton
                   :to="item.to"
                   :variant="isActive(item.to) ? 'soft' : 'ghost'"
-                  :class="isActive(item.to) ? 'bg-[var(--stage-mint)]' : 'bg-[rgba(251,247,239,0.78)]'"
+                  :class="navToneClasses(item.to, isActive(item.to))"
                 >
                   {{ item.label }}
                 </UButton>
@@ -77,6 +111,8 @@ watch(
             <UDrawer
               v-model:open="mobileNavOpen"
               direction="bottom"
+              title="Stagecom menu"
+              description="Primary navigation for moving between Stagecom sections."
               :handle="true"
               :ui="{
                 content: 'rounded-none border-t-3 border-x-3 border-[var(--stage-ink)] bg-[var(--stage-cream)] shadow-[0_-8px_0_0_var(--stage-ink)]',
@@ -88,7 +124,6 @@ watch(
                 class="lg:hidden"
                 variant="ghost"
                 icon="i-heroicons-bars-3-bottom-left"
-                @click="mobileNavOpen = true"
               >
                 Menu
               </UButton>
@@ -112,7 +147,7 @@ watch(
                           block
                           :to="item.to"
                           :variant="isActive(item.to) ? 'soft' : 'ghost'"
-                          :class="isActive(item.to) ? 'bg-[var(--stage-mint)]' : 'bg-[rgba(251,247,239,0.78)]'"
+                          :class="navToneClasses(item.to, isActive(item.to))"
                         >
                           {{ item.label }}
                         </UButton>

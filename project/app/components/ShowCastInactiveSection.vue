@@ -14,7 +14,7 @@ const emit = defineEmits<{
 
 <template>
   <UCollapsible v-if="members.length">
-    <UButton size="xs" variant="ghost" color="gray">
+    <UButton size="xs" variant="ghost" color="neutral">
       Show declined / withdrawn / removed ({{ members.length }})
     </UButton>
     <template #content>
@@ -36,12 +36,12 @@ const emit = defineEmits<{
             </div>
           </div>
           <div class="flex items-center gap-2">
-            <UBadge size="xs" color="gray" variant="soft">
+            <UBadge size="xs" color="neutral" variant="soft">
               {{ member.status }}
             </UBadge>
             <UButton
               size="xs"
-              color="primary"
+              color="error"
               variant="soft"
               :loading="inviting"
               @click="emit('invite', member.userId)"

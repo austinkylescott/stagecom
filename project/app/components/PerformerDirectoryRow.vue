@@ -33,7 +33,7 @@ const comingSoonText = "Feature coming soon";
         <p class="truncate text-sm font-semibold text-slate-900">
           {{ displayName }}
         </p>
-        <UBadge size="xs" color="primary" variant="soft">
+        <UBadge size="xs" color="error" variant="soft">
           {{ sharedTheaterLabel }}
         </UBadge>
       </div>
@@ -44,7 +44,7 @@ const comingSoonText = "Feature coming soon";
         <span class="inline-flex">
           <UButton
             size="xs"
-            color="primary"
+            color="error"
             variant="soft"
             icon="i-heroicons-plus-circle"
             disabled

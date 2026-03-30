@@ -53,6 +53,10 @@ const updateStatusMutation = useMutation<
         key: queryKeys.memberShows(),
         exact: true,
       }),
+      queryCache.invalidateQueries({
+        key: queryKeys.memberShowsSchedulePrefix(),
+        exact: false,
+      }),
     ]);
   },
 });
@@ -186,7 +190,7 @@ const updateStatus = async (
           :key="show.id"
           title="Review Queue"
           subtitle="Theater approval workflow"
-          tone="bg-[var(--stage-mint)]"
+          tone="bg-[var(--stage-theater)]"
         >
           <div class="space-y-3 text-[var(--stage-ink)]">
             <div class="flex items-center justify-between gap-3 border-2 border-[rgba(43,41,38,0.1)] p-3">
@@ -197,7 +201,7 @@ const updateStatus = async (
               <div class="flex gap-1">
                 <UButton
                   size="xs"
-                  color="emerald"
+                  color="primary"
                   @click="updateStatus(show.id, 'approve')"
                 >
                   Approve
@@ -214,7 +218,7 @@ const updateStatus = async (
             <div class="flex flex-wrap gap-2">
               <UButton
                 size="xs"
-                color="red"
+                color="error"
                 variant="soft"
                 @click="updateStatus(show.id, 'reject')"
               >
@@ -222,7 +226,7 @@ const updateStatus = async (
               </UButton>
               <UButton
                 size="xs"
-                color="orange"
+                color="warning"
                 variant="soft"
                 @click="updateStatus(show.id, 'changes_requested')"
               >

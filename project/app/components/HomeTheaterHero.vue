@@ -146,7 +146,7 @@ const { formatLocation } = useLocationFormatter();
                   }}
                 </p>
               </div>
-              <span class="stage-chip bg-[var(--stage-gold)] text-[var(--stage-ink)]">
+              <span class="stage-chip bg-[var(--stage-event)] text-[var(--stage-ink)]">
                 Show
               </span>
             </div>
