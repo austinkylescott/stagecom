@@ -16,32 +16,32 @@ const markAllRead = () => markRead({ all: true });
 <template>
   <UPopover :content="{ side: 'bottom', align: 'end', sideOffset: 8 }">
     <UButton color="gray" variant="ghost" class="relative">
-      <UIcon name="i-heroicons-bell" class="w-5 h-5" />
+      <UIcon name="i-heroicons-bell" class="size-5" />
       <span
         v-if="unreadCount > 0"
-        class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-white text-xs font-medium"
+        class="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center border border-[var(--stage-ink)] bg-[var(--stage-coral)] px-0.5 text-[10px] font-medium text-[var(--stage-cream)]"
       >
         {{ unreadCount > 9 ? "9+" : unreadCount }}
       </span>
     </UButton>
 
     <template #content>
-      <div class="w-80">
+      <div class="w-80 border-3 border-[var(--stage-ink)] bg-[var(--stage-cream)] shadow-[8px_8px_0_0_var(--stage-ink)]">
         <div
-          class="flex items-center justify-between px-3 py-2 border-b border-slate-100"
+          class="flex items-center justify-between border-b-3 border-[var(--stage-ink)] bg-[var(--stage-gold)] px-3 py-2"
         >
-          <p class="text-sm font-medium">Notifications</p>
+          <p class="text-sm font-medium text-[var(--stage-ink)]">Notifications</p>
           <div class="flex gap-3">
             <button
               v-if="unreadCount > 0"
-              class="text-xs text-blue-600 hover:underline"
+              class="text-xs font-semibold text-[var(--stage-ink)] underline underline-offset-2"
               @click="markAllRead"
             >
               Mark all read
             </button>
             <NuxtLink
               to="/notifications"
-              class="text-xs text-slate-500 hover:underline"
+              class="text-xs font-semibold text-[var(--stage-ink)] underline underline-offset-2"
             >
               See all
             </NuxtLink>
@@ -50,7 +50,7 @@ const markAllRead = () => markRead({ all: true });
 
         <div
           v-if="!notifications.length"
-          class="px-3 py-6 text-sm text-slate-500 text-center"
+          class="px-3 py-6 text-center text-sm stage-muted"
         >
           No notifications yet.
         </div>
@@ -60,22 +60,22 @@ const markAllRead = () => markRead({ all: true });
             v-for="n in notifications"
             :key="n.id"
             :to="formatNotification(n.type, n.payload).href ?? '/notifications'"
-            class="flex items-start gap-2 px-3 py-2 hover:bg-slate-50 transition-colors"
-            :class="{ 'bg-blue-50': !n.read_at }"
+            class="flex items-start gap-2 border-b border-[rgba(43,41,38,0.12)] px-3 py-2 transition-colors hover:bg-[var(--stage-paper-strong)]"
+            :class="{ 'bg-[rgba(130,191,182,0.14)]': !n.read_at }"
             @click="!n.read_at && markRead({ ids: [n.id] })"
           >
             <span
-              class="mt-1.5 h-2 w-2 rounded-full shrink-0"
-              :class="n.read_at ? 'bg-transparent' : 'bg-blue-500'"
+              class="mt-1.5 size-2 shrink-0 border border-[var(--stage-ink)]"
+              :class="n.read_at ? 'bg-transparent' : 'bg-[var(--stage-coral)]'"
             />
             <div class="flex-1 min-w-0">
               <p
                 class="text-sm leading-snug"
-                :class="n.read_at ? 'text-slate-500' : 'text-slate-900'"
+                :class="n.read_at ? 'stage-muted' : 'text-[var(--stage-ink)] font-medium'"
               >
                 {{ formatNotification(n.type, n.payload).text }}
               </p>
-              <p class="text-xs text-slate-400 mt-0.5">
+              <p class="mt-0.5 text-xs stage-muted">
                 {{ new Date(n.created_at).toLocaleDateString() }}
               </p>
             </div>

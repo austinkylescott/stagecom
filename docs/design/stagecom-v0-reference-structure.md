@@ -1,0 +1,455 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e4]:
+      - link "Stagecom Beta" [ref=e5] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e6]:
+          - generic [ref=e7]: Stagecom
+          - generic [ref=e8]: Beta
+      - navigation [ref=e9]:
+        - link "Features" [ref=e10] [cursor=pointer]:
+          - /url: "#features"
+        - link "For Your Role" [ref=e11] [cursor=pointer]:
+          - /url: "#roles"
+        - link "Product" [ref=e12] [cursor=pointer]:
+          - /url: "#product"
+      - generic [ref=e13]:
+        - button "Sign In" [ref=e14]
+        - button "Join Waitlist" [ref=e15]
+    - generic [ref=e20]:
+      - generic [ref=e21]:
+        - generic [ref=e26]: Building with the community
+        - generic [ref=e27]:
+          - heading "A home for your improv community" [level=1] [ref=e28]
+          - paragraph [ref=e29]: The backstage system for your local scene. Run your theater together, not across six different tools.
+        - generic [ref=e30]:
+          - generic [ref=e31]: Spreadsheets
+          - generic [ref=e32]: Email threads
+          - generic [ref=e33]: Group texts
+          - generic [ref=e34]: Discord
+          - generic [ref=e35]: Social media
+          - generic [ref=e36]: Stagecom
+        - generic [ref=e37]:
+          - button "Join the Waitlist" [ref=e38]:
+            - text: Join the Waitlist
+            - img
+          - button "Explore Features" [ref=e39]
+        - generic [ref=e40]:
+          - generic [ref=e41]:
+            - img [ref=e42]
+            - generic [ref=e47]: For performers
+          - generic [ref=e48]:
+            - img [ref=e49]
+            - generic [ref=e51]: For producers
+          - generic [ref=e52]:
+            - img [ref=e53]
+            - generic [ref=e56]: For theaters
+      - generic [ref=e57]:
+        - generic [ref=e61]:
+          - generic [ref=e62]:
+            - generic [ref=e65]:
+              - generic [ref=e66]: The Improv Theater
+              - generic [ref=e67]: Tonight's Shows
+            - generic [ref=e68]: LIVE
+          - generic [ref=e69]:
+            - generic [ref=e70]:
+              - generic [ref=e71]:
+                - generic [ref=e72]: "4"
+                - generic [ref=e73]:
+                  - generic [ref=e74]: Friday Night Showcase
+                  - generic [ref=e75]: 8:00 PM
+              - generic [ref=e76]: Confirmed
+            - generic [ref=e77]:
+              - generic [ref=e78]:
+                - generic [ref=e79]: "6"
+                - generic [ref=e80]:
+                  - generic [ref=e81]: Late Night Jam
+                  - generic [ref=e82]: 10:30 PM
+              - generic [ref=e83]: Casting
+            - generic [ref=e84]:
+              - generic [ref=e85]:
+                - generic [ref=e86]: "12"
+                - generic [ref=e87]:
+                  - generic [ref=e88]: Weekend Workshop
+                  - generic [ref=e89]: 2:00 PM Sat
+              - generic [ref=e90]: Pending
+          - generic [ref=e91]:
+            - generic [ref=e92]: Add Show
+            - generic [ref=e93]: View All
+        - generic [ref=e97]: Cast Confirmed
+        - generic [ref=e100]: +3 invites sent
+    - generic [ref=e103]:
+      - generic [ref=e104]:
+        - generic [ref=e105]: The Problem
+        - heading "Running a show shouldn't require six different tools" [level=2] [ref=e106]
+        - paragraph [ref=e107]: Improv communities have been patching together solutions forever. The result? Missed lineups, confused performers, and producers drowning in coordination.
+      - generic [ref=e108]:
+        - generic [ref=e109]:
+          - generic [ref=e110]:
+            - img [ref=e112]
+            - generic [ref=e114]: Spreadsheets
+          - heading "Lineup changes get lost in version chaos" [level=3] [ref=e115]
+          - paragraph [ref=e116]: “Who updated it last? Is this the right one?”
+        - generic [ref=e117]:
+          - generic [ref=e118]:
+            - img [ref=e120]
+            - generic [ref=e123]: Email threads
+          - heading "Critical show info buried in reply-alls" [level=3] [ref=e124]
+          - paragraph [ref=e125]: “Scroll through 47 messages to find the call time”
+        - generic [ref=e126]:
+          - generic [ref=e127]:
+            - img [ref=e129]
+            - generic [ref=e131]: Group texts
+          - heading "Performers miss key updates in the noise" [level=3] [ref=e132]
+          - paragraph [ref=e133]: “Important details lost between memes”
+        - generic [ref=e134]:
+          - generic [ref=e135]:
+            - img [ref=e137]
+            - generic [ref=e140]: Discord servers
+          - heading "Producers repeat themselves across channels" [level=3] [ref=e141]
+          - paragraph [ref=e142]: "“Did I post this in #shows or #announcements?”"
+        - generic [ref=e143]:
+          - generic [ref=e144]:
+            - img [ref=e146]
+            - generic [ref=e148]: Social media DMs
+          - heading "Casting happens through personal contacts" [level=3] [ref=e149]
+          - paragraph [ref=e150]: “Hope they check their messages this time”
+        - generic [ref=e151]:
+          - generic [ref=e152]:
+            - img [ref=e154]
+            - generic [ref=e156]: No single source
+          - heading "Theater managers have zero visibility" [level=3] [ref=e157]
+          - paragraph [ref=e158]: “What shows are even happening this month?”
+      - paragraph [ref=e160]: There's no single, purpose-built tool that reflects how improv communities actually operate.
+    - generic [ref=e162]:
+      - generic [ref=e163]:
+        - generic [ref=e164]: The Solution
+        - heading "One platform for your entire improv community" [level=2] [ref=e165]
+        - paragraph [ref=e166]: Stagecom centralizes everything your theater needs. From casting to show day, keep your people connected.
+      - generic [ref=e167]:
+        - generic [ref=e168]:
+          - img [ref=e170]
+          - heading "Theater Membership" [level=3] [ref=e175]
+          - paragraph [ref=e176]: Organize your community with clear roles and relationships
+        - generic [ref=e177]:
+          - img [ref=e179]
+          - heading "Show & Event Creation" [level=3] [ref=e181]
+          - paragraph [ref=e182]: Schedule shows, practices, workshops, meetings, and auditions
+        - generic [ref=e183]:
+          - img [ref=e185]
+          - heading "Explicit Cast Management" [level=3] [ref=e189]
+          - paragraph [ref=e190]: People are only in a lineup when they are actually added
+        - generic [ref=e191]:
+          - img [ref=e193]
+          - heading "Invitations & Responses" [level=3] [ref=e196]
+          - paragraph [ref=e197]: Clear accept/decline flows with automatic tracking
+        - generic [ref=e198]:
+          - img [ref=e200]
+          - heading "Lineup & Rundown" [level=3] [ref=e203]
+          - paragraph [ref=e204]: Program order that everyone can see and trust
+        - generic [ref=e205]:
+          - img [ref=e207]
+          - heading "Review & Approval" [level=3] [ref=e209]
+          - paragraph [ref=e210]: Theater oversight without micromanagement
+        - generic [ref=e211]:
+          - img [ref=e213]
+          - heading "Notifications" [level=3] [ref=e216]
+          - paragraph [ref=e217]: In-app and email updates that actually matter
+        - generic [ref=e218]:
+          - img [ref=e220]
+          - heading "Profiles" [level=3] [ref=e224]
+          - paragraph [ref=e225]: Community participation and visibility for performers
+        - generic [ref=e226]:
+          - img [ref=e228]
+          - heading "Casting Visibility" [level=3] [ref=e231]
+          - paragraph [ref=e232]: Control who sees what with invite-only, theater, or public modes
+        - generic [ref=e233]:
+          - img [ref=e235]
+          - heading "Contextual Roles" [level=3] [ref=e239]
+          - paragraph [ref=e240]: Be a producer for one show and a performer in another
+    - generic [ref=e246]:
+      - generic [ref=e247]:
+        - generic [ref=e248]: For Your Role
+        - heading "Built for everyone in your community" [level=2] [ref=e249]
+        - paragraph [ref=e250]: Different roles, different needs. Stagecom gives each person in your theater exactly what they need to stay connected and effective.
+      - generic [ref=e251]:
+        - button "Theater Managers" [ref=e252]:
+          - img [ref=e253]
+          - generic [ref=e257]: Theater Managers
+        - button "Producers" [ref=e258]:
+          - img [ref=e259]
+          - generic [ref=e262]: Producers
+        - button "Performers" [ref=e263]:
+          - img [ref=e264]
+          - generic [ref=e273]: Performers
+      - generic [ref=e274]:
+        - generic [ref=e275]:
+          - generic [ref=e276]:
+            - heading "Producers" [level=3] [ref=e277]
+            - paragraph [ref=e278]: Operational clarity, not chaos
+          - list [ref=e279]:
+            - listitem [ref=e280]:
+              - img [ref=e282]
+              - generic [ref=e284]: Create shows with clear ownership
+            - listitem [ref=e285]:
+              - img [ref=e287]
+              - generic [ref=e289]: Build lineups with explicit cast management
+            - listitem [ref=e290]:
+              - img [ref=e292]
+              - generic [ref=e294]: Send invitations and track responses
+            - listitem [ref=e295]:
+              - img [ref=e297]
+              - generic [ref=e299]: Communicate show-day updates in one place
+            - listitem [ref=e300]:
+              - img [ref=e302]
+              - generic [ref=e304]: Manage changes without endless follow-up
+        - generic [ref=e307]:
+          - generic [ref=e308]:
+            - generic [ref=e309]: “
+            - blockquote [ref=e310]: I used to spend hours coordinating across text, email, and DMs. Now it's all in one place.
+          - generic [ref=e313]:
+            - generic [ref=e314]: Producer
+            - generic [ref=e315]: Local Improv Theater
+      - paragraph [ref=e317]:
+        - strong [ref=e318]: Roles are contextual, not permanent.
+        - text: You can be a producer for one show and a performer in another. Stagecom understands how improv communities actually work.
+    - generic [ref=e320]:
+      - generic [ref=e321]:
+        - generic [ref=e322]: The Product
+        - heading "See what Stagecom looks like in action" [level=2] [ref=e323]
+        - paragraph [ref=e324]: Clean, clear, and built for the real workflows of improv communities. No learning curve, no intimidation.
+      - generic [ref=e325]:
+        - generic [ref=e326]:
+          - generic [ref=e328]:
+            - generic [ref=e329]:
+              - heading "Show Setup" [level=3] [ref=e330]
+              - paragraph [ref=e331]: Clear ownership and casting controls
+            - img [ref=e332]
+          - generic [ref=e337]:
+            - generic [ref=e338]:
+              - generic [ref=e339]:
+                - generic [ref=e340]: Friday Night Showcase
+                - generic [ref=e341]: Jan 24, 2026 at 8:00 PM
+              - generic [ref=e342]: Draft
+            - generic [ref=e343]:
+              - generic [ref=e344]:
+                - generic [ref=e345]: Producer
+                - generic [ref=e346]: Alex Rivera
+              - generic [ref=e347]:
+                - generic [ref=e348]: Casting
+                - generic [ref=e349]: Theater Members
+            - generic [ref=e350]:
+              - generic [ref=e351]: Cast Size
+              - generic [ref=e355]: 4-6 performers
+            - generic [ref=e356]:
+              - button "Invite Cast" [ref=e357]
+              - button "Save Draft" [ref=e358]
+        - generic [ref=e359]:
+          - generic [ref=e361]:
+            - generic [ref=e362]:
+              - heading "Cast Invitations" [level=3] [ref=e363]
+              - paragraph [ref=e364]: Track responses in real-time
+            - img [ref=e365]
+          - generic [ref=e370]:
+            - generic [ref=e371]:
+              - generic [ref=e374]: Jordan Lee
+              - generic [ref=e375]:
+                - img [ref=e376]
+                - generic [ref=e378]: Accepted
+            - generic [ref=e379]:
+              - generic [ref=e382]: Sam Chen
+              - generic [ref=e383]:
+                - img [ref=e384]
+                - generic [ref=e386]: Accepted
+            - generic [ref=e387]:
+              - generic [ref=e390]: Taylor Wright
+              - generic [ref=e391]:
+                - img [ref=e392]
+                - generic [ref=e395]: Pending
+            - generic [ref=e396]:
+              - generic [ref=e399]: Casey Morgan
+              - generic [ref=e400]:
+                - img [ref=e401]
+                - generic [ref=e404]: Declined
+            - generic [ref=e405]:
+              - generic [ref=e408]: Riley Park
+              - generic [ref=e409]:
+                - img [ref=e410]
+                - generic [ref=e413]: Pending
+            - generic [ref=e414]:
+              - generic [ref=e415]: 2 confirmed, 2 pending
+              - button "Send Reminder" [ref=e416]
+        - generic [ref=e417]:
+          - generic [ref=e419]:
+            - generic [ref=e420]:
+              - heading "Lineup Order" [level=3] [ref=e421]
+              - paragraph [ref=e422]: Program everyone can trust
+            - img [ref=e423]
+          - generic [ref=e428]:
+            - generic [ref=e429]:
+              - generic [ref=e430]: "1"
+              - generic [ref=e431]:
+                - generic [ref=e432]: Opening Harold
+                - generic [ref=e433]: Team A
+              - generic [ref=e434]: 8:00
+            - generic [ref=e435]:
+              - generic [ref=e436]: "2"
+              - generic [ref=e437]:
+                - generic [ref=e438]: Musical Improv
+                - generic [ref=e439]: The Singers
+              - generic [ref=e440]: 8:25
+            - generic [ref=e441]:
+              - generic [ref=e442]: "3"
+              - generic [ref=e443]:
+                - generic [ref=e444]: Scene Night
+                - generic [ref=e445]: Veterans
+              - generic [ref=e446]: 8:50
+            - generic [ref=e447]:
+              - generic [ref=e448]: "4"
+              - generic [ref=e449]:
+                - generic [ref=e450]: Closing Set
+                - generic [ref=e451]: House Team
+              - generic [ref=e452]: 9:15
+            - generic [ref=e453]:
+              - img [ref=e454]
+              - generic [ref=e457]: "Estimated runtime: 1h 30m"
+        - generic [ref=e458]:
+          - generic [ref=e460]:
+            - generic [ref=e461]:
+              - heading "Review Queue" [level=3] [ref=e462]
+              - paragraph [ref=e463]: Theater approval workflow
+            - img [ref=e464]
+          - generic [ref=e469]:
+            - generic [ref=e470]:
+              - generic [ref=e471]:
+                - generic [ref=e472]: Saturday Night Special
+                - generic [ref=e473]: by Pat Davis
+              - generic [ref=e474]:
+                - button "Approve" [ref=e475]
+                - button "Review" [ref=e476]
+            - generic [ref=e477]:
+              - generic [ref=e478]:
+                - generic [ref=e479]: "Workshop: Scene Work 101"
+                - generic [ref=e480]: by Alex Rivera
+              - generic [ref=e481]: Approved
+            - generic [ref=e482]:
+              - generic [ref=e483]:
+                - generic [ref=e484]: Late Night Jam
+                - generic [ref=e485]: by Jordan Lee
+              - generic [ref=e486]:
+                - button "Approve" [ref=e487]
+                - button "Review" [ref=e488]
+            - generic [ref=e490]: 2 items need review
+      - generic [ref=e491]:
+        - generic [ref=e492]:
+          - img [ref=e494]
+          - generic [ref=e497]:
+            - generic [ref=e498]: Real-time Notifications
+            - generic [ref=e499]: In-app and email updates
+        - generic [ref=e500]:
+          - generic [ref=e501]: Jordan accepted your invite
+          - generic [ref=e502]: New show needs approval
+          - generic [ref=e503]: "Reminder: Show in 2 hours"
+      - generic [ref=e504]:
+        - paragraph [ref=e505]: Product screens are concept mockups. The real thing is being built right now.
+        - link "Follow the build" [ref=e506] [cursor=pointer]:
+          - /url: "#waitlist"
+          - text: Follow the build
+          - img [ref=e507]
+    - generic [ref=e510]:
+      - generic [ref=e511]:
+        - generic [ref=e512]: Our Principles
+        - heading "Built on how improv actually works" [level=2] [ref=e513]
+        - paragraph [ref=e514]: These aren't just features. They're the beliefs that shape every decision we make building Stagecom.
+      - generic [ref=e515]:
+        - generic [ref=e516]:
+          - img [ref=e518]
+          - heading "Privacy by Default" [level=3] [ref=e521]
+          - paragraph [ref=e522]: Not everything should be public. Internal coordination happens safely within your theater.
+        - generic [ref=e523]:
+          - img [ref=e525]
+          - heading "Contextual Roles" [level=3] [ref=e529]
+          - paragraph [ref=e530]: Be a producer for one show and a performer in another. Roles match reality, not rigid hierarchies.
+        - generic [ref=e531]:
+          - img [ref=e533]
+          - heading "Explicit Cast Membership" [level=3] [ref=e537]
+          - paragraph [ref=e538]: People are only in a lineup when they are actually added. No ambiguity, no assumptions.
+        - generic [ref=e539]:
+          - img [ref=e541]
+          - heading "Theater Oversight" [level=3] [ref=e545]
+          - paragraph [ref=e546]: Managers can see what's happening and approve shows without micromanaging every detail.
+        - generic [ref=e547]:
+          - img [ref=e549]
+          - heading "Reduced Off-Platform Chaos" [level=3] [ref=e553]
+          - paragraph [ref=e554]: Fewer side conversations, fewer missed updates, fewer unclear lineups. Everything in one place.
+        - generic [ref=e555]:
+          - img [ref=e557]
+          - heading "Community-Centered" [level=3] [ref=e562]
+          - paragraph [ref=e563]: Built for theaters, producers, and performers. Everyone in your community has a reason to be here.
+    - generic [ref=e567]:
+      - generic [ref=e571]:
+        - generic [ref=e576]: Actively building with early partners
+        - heading "Ready to simplify your theater operations?" [level=2] [ref=e577]
+        - paragraph [ref=e578]: Join the waitlist for early access. We're building Stagecom with real theaters and communities, and we'd love your input.
+        - generic [ref=e579]:
+          - button "Join the Waitlist" [ref=e580]:
+            - text: Join the Waitlist
+            - img
+          - button "Contact Us" [ref=e581]
+        - paragraph [ref=e582]: No spam. Just updates on what we're building for improv communities.
+      - generic [ref=e583]:
+        - link "For Theaters" [ref=e584] [cursor=pointer]:
+          - /url: "#"
+        - generic [ref=e585]: "|"
+        - link "For Producers" [ref=e586] [cursor=pointer]:
+          - /url: "#"
+        - generic [ref=e587]: "|"
+        - link "For Performers" [ref=e588] [cursor=pointer]:
+          - /url: "#"
+    - generic [ref=e590]:
+      - generic [ref=e591]:
+        - generic [ref=e592]:
+          - link "Stagecom" [ref=e593] [cursor=pointer]:
+            - /url: /
+          - paragraph [ref=e594]: The community management platform for improv theaters, ensembles, and local performance communities.
+          - generic [ref=e595]:
+            - link "Twitter" [ref=e596] [cursor=pointer]:
+              - /url: "#"
+              - img [ref=e597]
+            - link "Instagram" [ref=e599] [cursor=pointer]:
+              - /url: "#"
+              - img [ref=e600]
+        - generic [ref=e602]:
+          - heading "Product" [level=3] [ref=e603]
+          - list [ref=e604]:
+            - listitem [ref=e605]:
+              - link "Features" [ref=e606] [cursor=pointer]:
+                - /url: "#features"
+            - listitem [ref=e607]:
+              - link "For Your Role" [ref=e608] [cursor=pointer]:
+                - /url: "#roles"
+            - listitem [ref=e609]:
+              - link "Product Preview" [ref=e610] [cursor=pointer]:
+                - /url: "#product"
+            - listitem [ref=e611]:
+              - link "Join Waitlist" [ref=e612] [cursor=pointer]:
+                - /url: "#waitlist"
+        - generic [ref=e613]:
+          - heading "Company" [level=3] [ref=e614]
+          - list [ref=e615]:
+            - listitem [ref=e616]:
+              - link "About" [ref=e617] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e618]:
+              - link "Contact" [ref=e619] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e620]:
+              - link "Privacy" [ref=e621] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e622]:
+              - link "Terms" [ref=e623] [cursor=pointer]:
+                - /url: "#"
+      - generic [ref=e624]:
+        - paragraph [ref=e625]: © 2026 Stagecom. Built for improv communities.
+        - paragraph [ref=e626]: Made with care in the local scene.
+  - alert [ref=e627]

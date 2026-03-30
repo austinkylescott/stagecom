@@ -22,15 +22,15 @@ const emit = defineEmits<{
         <div
           v-for="member in members"
           :key="member.userId"
-          class="flex items-center justify-between rounded-lg border border-slate-100 px-3 py-2"
+          class="flex items-center justify-between border-2 border-[var(--stage-ink)] bg-[var(--stage-cream)] px-3 py-2"
         >
           <div class="flex min-w-0 items-center gap-2">
             <UAvatar :text="member.displayName?.[0] ?? '?'" size="xs" />
             <div class="min-w-0">
-              <p class="text-sm text-slate-700">
+              <p class="text-sm text-[var(--stage-ink)]">
                 {{ member.displayName ?? member.userId }}
               </p>
-              <p class="text-xs text-slate-500">
+              <p class="text-xs stage-muted">
                 {{ inactiveStatusLabel(member) }}
               </p>
             </div>

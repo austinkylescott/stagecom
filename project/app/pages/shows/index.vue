@@ -60,37 +60,52 @@ const occurrencesByDay = computed(() => {
   }
   return map;
 });
+
+const weekdayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 </script>
 
 <template>
-  <div class="space-y-8">
-    <div class="flex items-center justify-between flex-wrap gap-3">
-      <div>
-        <h1 class="text-2xl font-semibold">Shows</h1>
-        <p class="text-slate-600">
-          Upcoming shows for theaters you're a member of. Calendar highlights
-          the next occurrence per show.
-        </p>
+  <div class="space-y-0">
+    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[var(--stage-cream)]" inner-class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
+      <div class="grid gap-6 lg:grid-cols-[1.1fr_auto] lg:items-end">
+        <div class="space-y-4">
+          <span class="stage-kicker">Programming Board</span>
+          <div>
+            <h1 class="stage-section-title">Shows in motion.</h1>
+            <p class="mt-3 max-w-3xl text-lg leading-8 stage-muted">
+              Upcoming shows for theaters you're a member of. Calendar highlights
+              the next occurrence per show.
+            </p>
+          </div>
+        </div>
+        <div class="lg:justify-self-end">
+          <UButton color="primary" icon="i-heroicons-plus" :to="newShowLink">
+            New show
+          </UButton>
+        </div>
       </div>
-      <UButton color="primary" icon="i-heroicons-plus" :to="newShowLink">
-        New show
-      </UButton>
-    </div>
+    </StageSection>
 
-    <div v-if="error" class="text-sm text-red-600">
-      {{ error?.data?.message || error?.message }}
-    </div>
+    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.5)]" inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+      <div v-if="error" class="mb-6 stage-panel px-5 py-4 text-sm text-red-700">
+        {{ error?.data?.message || error?.message }}
+      </div>
 
-    <div class="grid gap-6 lg:grid-cols-[2fr,1fr]">
+      <div class="grid gap-6 lg:grid-cols-[2fr,1fr]">
       <UCard>
         <template #header>
-          <div class="font-semibold">Upcoming</div>
+          <div>
+            <p class="stage-overline">Upcoming</p>
+            <h2 class="mt-2 font-display text-4xl uppercase tracking-[0.08em]">
+              Active lineup
+            </h2>
+          </div>
         </template>
 
-        <div v-if="isLoading" class="text-sm text-slate-600">Loading...</div>
+        <div v-if="isLoading" class="text-sm stage-muted">Loading...</div>
         <div
           v-else-if="sortedShows.length === 0"
-          class="text-sm text-slate-600"
+          class="border-2 border-dashed border-[var(--stage-ink)] bg-[rgba(251,247,239,0.7)] px-4 py-6 text-sm stage-muted"
         >
           No shows yet. Join or create a theater, then add a show.
         </div>
@@ -99,42 +114,54 @@ const occurrencesByDay = computed(() => {
             v-for="show in sortedShows"
             :key="show.id"
             :to="showDetailLink(show)"
-            class="block rounded-lg border border-slate-200 px-4 py-3 transition-colors hover:border-blue-300 hover:bg-blue-50/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="stage-list-card block p-5"
           >
-            <div class="flex items-center justify-between gap-2">
+            <div class="flex items-start justify-between gap-3">
               <div>
-                <p class="font-semibold">{{ show.title }}</p>
-                <p class="text-xs text-slate-600">
+                <p class="font-display text-4xl uppercase tracking-[0.08em]">
+                  {{ show.title }}
+                </p>
+                <p class="mt-2 text-xs uppercase tracking-[0.14em] stage-muted">
                   {{ show.theaterName }} · {{ show.eventType || "show" }}
                 </p>
               </div>
-              <UBadge :color="show.status === 'approved' ? 'emerald' : 'gray'">
+              <UBadge :color="show.status === 'approved' ? 'success' : 'neutral'">
                 {{ show.status }}
               </UBadge>
             </div>
-            <p class="text-sm text-slate-600 mt-1 line-clamp-2">
+            <p class="mt-3 text-sm leading-7 stage-muted line-clamp-2">
               {{ show.description }}
             </p>
-            <p class="text-xs text-slate-700 mt-2">
+            <div class="mt-4 flex flex-wrap items-center gap-2">
+              <span class="stage-chip bg-[var(--stage-paper-strong)]">
+                Next
+              </span>
+              <p class="text-sm font-semibold">
               Next:
               {{
                 show.nextStartsAt
                   ? new Date(show.nextStartsAt).toLocaleString()
                   : "TBD"
               }}
-            </p>
+              </p>
+            </div>
           </NuxtLink>
         </div>
       </UCard>
 
       <UCard>
         <template #header>
-          <div class="font-semibold">This month</div>
+          <div>
+            <p class="stage-overline">This month</p>
+            <h2 class="mt-2 font-display text-4xl uppercase tracking-[0.08em]">
+              Calendar
+            </h2>
+          </div>
         </template>
         <div class="grid grid-cols-7 gap-2 text-xs">
           <div
-            class="text-slate-500 text-center"
-            v-for="d in ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']"
+            class="text-center stage-overline stage-muted"
+            v-for="d in weekdayLabels"
             :key="d"
           >
             {{ d }}
@@ -142,9 +169,9 @@ const occurrencesByDay = computed(() => {
           <div
             v-for="day in monthDays"
             :key="day.toISOString()"
-            class="border border-slate-200 rounded-md min-h-18 p-2 flex flex-col gap-1"
+            class="flex min-h-24 flex-col gap-1 border-2 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.8)] p-2"
           >
-            <div class="text-slate-700 font-medium">{{ day.getDate() }}</div>
+            <div class="font-semibold">{{ day.getDate() }}</div>
             <div class="flex flex-col gap-1">
               <template
                 v-for="occ in occurrencesByDay.get(
@@ -154,11 +181,11 @@ const occurrencesByDay = computed(() => {
               >
                 <NuxtLink
                   :to="showDetailLink(occ)"
-                  class="focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                  class="focus:outline-none"
                 >
                   <UBadge
                     size="xs"
-                    color="blue"
+                    color="secondary"
                     variant="soft"
                     class="truncate cursor-pointer"
                   >
@@ -170,6 +197,7 @@ const occurrencesByDay = computed(() => {
           </div>
         </div>
       </UCard>
-    </div>
+      </div>
+    </StageSection>
   </div>
 </template>

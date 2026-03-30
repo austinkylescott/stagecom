@@ -1,9 +1,288 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
+/* Cubano is expected to be self-hosted under project/public/fonts. */
+@font-face {
+  font-family: "Cubano";
+  src:
+    local("Cubano"),
+    url("/fonts/Cubano.woff2") format("woff2"),
+    url("/fonts/Cubano.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
-  --font-display: "Silkscreen";
-  --font-sans: "Space Grotesk", sans-serif;
+  --font-display: "Cubano", "Bebas Neue", "Impact", sans-serif;
+  --font-sans: "Public Sans", sans-serif;
   --font-serif: "Merriweather", serif;
-  --font-mono: "Fira Code", monospace;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+:root {
+  --stage-ink: #2b2926;
+  --stage-ink-soft: #4b4842;
+  --stage-paper: #f5efe2;
+  --stage-paper-strong: #efe3cd;
+  --stage-paper-muted: #d8ccb5;
+  --stage-gold: #eaa542;
+  --stage-mint: #82bfb6;
+  --stage-coral: #c76056;
+  --stage-cream: #fbf7ef;
+  --stage-shadow: 8px 8px 0 0 var(--stage-ink);
+  --stage-shadow-sm: 5px 5px 0 0 var(--stage-ink);
+  --ui-primary: var(--stage-gold);
+  --ui-secondary: var(--stage-mint);
+  --ui-success: #4f8e61;
+  --ui-info: var(--stage-mint);
+  --ui-warning: var(--stage-gold);
+  --ui-error: var(--stage-coral);
+  --ui-neutral: var(--stage-ink);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    background: var(--stage-ink);
+  }
+
+  body {
+    min-height: 100vh;
+    color: var(--stage-ink);
+    background:
+      radial-gradient(circle at top left, rgba(234, 165, 66, 0.18), transparent 34%),
+      radial-gradient(circle at top right, rgba(130, 191, 182, 0.16), transparent 28%),
+      linear-gradient(180deg, #fbf7ef 0%, #f3e7d4 38%, #efe0c4 100%);
+    font-family: var(--font-sans);
+  }
+
+  ::selection {
+    color: var(--stage-ink);
+    background: color-mix(in srgb, var(--stage-gold) 58%, white);
+  }
+
+  a,
+  button {
+    transition:
+      color 160ms ease,
+      background-color 160ms ease,
+      border-color 160ms ease,
+      box-shadow 160ms ease,
+      transform 160ms ease;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: var(--stage-ink);
+  }
+}
+
+@layer components {
+  .stage-frame {
+    border: 3px solid var(--stage-ink);
+    background: rgba(251, 247, 239, 0.9);
+    box-shadow: var(--stage-shadow);
+  }
+
+  .stage-panel {
+    border: 3px solid var(--stage-ink);
+    background: rgba(251, 247, 239, 0.95);
+    box-shadow: var(--stage-shadow);
+  }
+
+  .stage-panel-dark {
+    border: 3px solid var(--stage-ink);
+    color: var(--stage-cream);
+    background:
+      linear-gradient(145deg, rgba(43, 41, 38, 0.96), rgba(67, 62, 55, 0.98));
+    box-shadow: var(--stage-shadow);
+  }
+
+  .stage-panel-accent {
+    border: 3px solid var(--stage-ink);
+    background:
+      linear-gradient(180deg, rgba(234, 165, 66, 0.88), rgba(251, 247, 239, 0.96));
+    box-shadow: var(--stage-shadow);
+  }
+
+  .stage-message {
+    border: 3px solid var(--stage-ink);
+    border-radius: 1rem;
+    background: rgba(251, 247, 239, 0.95);
+    box-shadow: var(--stage-shadow);
+  }
+
+  .stage-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 2px solid var(--stage-ink);
+    padding: 0.35rem 0.8rem;
+    color: var(--stage-ink);
+    background: color-mix(in srgb, var(--stage-gold) 48%, white);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .stage-kicker::before {
+    width: 0.65rem;
+    height: 0.65rem;
+    background: var(--stage-coral);
+    box-shadow: 0 0 0 2px var(--stage-ink);
+    content: "";
+  }
+
+  .stage-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.8rem, 5vw, 5.8rem);
+    line-height: 0.94;
+    letter-spacing: 0.015em;
+  }
+
+  .stage-section-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 3vw, 3.5rem);
+    line-height: 0.98;
+    letter-spacing: 0.015em;
+  }
+
+  .stage-overline {
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .stage-grid-board {
+    background-image:
+      linear-gradient(rgba(43, 41, 38, 0.12) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(43, 41, 38, 0.12) 1px, transparent 1px);
+    background-size: 1.5rem 1.5rem;
+  }
+
+  .stage-dot-board {
+    background-image: radial-gradient(rgba(43, 41, 38, 0.14) 1px, transparent 1px);
+    background-size: 0.8rem 0.8rem;
+  }
+
+  .stage-rule {
+    height: 3px;
+    background: var(--stage-ink);
+  }
+
+  .stage-stat {
+    border: 3px solid var(--stage-ink);
+    padding: 1rem;
+    background: rgba(251, 247, 239, 0.92);
+    box-shadow: var(--stage-shadow-sm);
+  }
+
+  .stage-stat-value {
+    display: block;
+    font-family: var(--font-display);
+    font-size: clamp(1.9rem, 3vw, 2.8rem);
+    line-height: 0.95;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .stage-list-card {
+    border: 3px solid var(--stage-ink);
+    background: rgba(251, 247, 239, 0.94);
+    box-shadow: var(--stage-shadow-sm);
+  }
+
+  .stage-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    border: 2px solid var(--stage-ink);
+    padding: 0.28rem 0.72rem;
+    background: rgba(251, 247, 239, 0.9);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .stage-chip-dark {
+    color: var(--stage-cream);
+    background: rgba(43, 41, 38, 0.9);
+  }
+
+  .stage-link {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.18em;
+  }
+
+  .stage-muted {
+    color: color-mix(in srgb, var(--stage-ink) 72%, white);
+  }
+
+  .stage-texture {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stage-texture::before {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(0deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.18)),
+      radial-gradient(circle at 20% 20%, rgba(130, 191, 182, 0.18), transparent 24%),
+      radial-gradient(circle at 80% 0%, rgba(199, 96, 86, 0.18), transparent 28%);
+    mix-blend-mode: multiply;
+    opacity: 0.8;
+    pointer-events: none;
+    content: "";
+  }
+
+  .stage-page-grid {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .stage-page-grid-rail {
+    grid-template-columns: minmax(0, 1.55fr) minmax(18rem, 0.9fr);
+  }
+
+  .stage-data-table {
+    overflow: hidden;
+    border: 3px solid var(--stage-ink);
+    background: rgba(251, 247, 239, 0.92);
+    box-shadow: var(--stage-shadow);
+  }
+
+  .stage-data-table :where(table) {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .stage-data-table :where(th) {
+    background: rgba(239, 227, 205, 0.88);
+  }
+
+  .stage-data-table :where(td),
+  .stage-data-table :where(th) {
+    border-color: rgba(43, 41, 38, 0.12);
+  }
+}
+
+@media (max-width: 768px) {
+  .stage-title {
+    letter-spacing: 0.03em;
+  }
+}
+
+@media (max-width: 1024px) {
+  .stage-page-grid-rail {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

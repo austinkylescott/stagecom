@@ -18,20 +18,11 @@ const sharedTheaterLabel = computed(() => {
   return `${count} shared theater${count === 1 ? "" : "s"}`;
 });
 
-const actionUi = {
-  base: "rounded-full",
-} as const;
-
-const cardUi = {
-  root: "h-full rounded-2xl",
-  body: "space-y-4 p-4",
-} as const;
-
 const comingSoonText = "Feature coming soon";
 </script>
 
 <template>
-  <UCard :ui="cardUi">
+  <UCard :ui="{ root: 'h-full', body: 'space-y-4 p-4' }">
     <div class="flex min-w-0 items-start gap-3">
       <UAvatar
         :src="performer.avatar_url"
@@ -57,7 +48,6 @@ const comingSoonText = "Feature coming soon";
             variant="soft"
             icon="i-heroicons-plus-circle"
             disabled
-            :ui="actionUi"
           >
             Invite
           </UButton>
@@ -71,7 +61,6 @@ const comingSoonText = "Feature coming soon";
             variant="ghost"
             icon="i-heroicons-user-circle"
             disabled
-            :ui="actionUi"
           >
             Profile
           </UButton>

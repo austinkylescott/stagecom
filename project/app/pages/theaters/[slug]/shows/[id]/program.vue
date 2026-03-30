@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useRequestHeaders } from "#app";
+import StageFeatureCard from "~/components/StageFeatureCard.vue";
 import {
   useShowDetail,
   type ShowDetailResponse,
@@ -43,7 +44,7 @@ const nextOccurrence = computed(() => data.value?.occurrences?.[0] ?? null);
 </script>
 
 <template>
-  <div class="mx-auto max-w-xl space-y-6">
+  <div class="mx-auto max-w-3xl space-y-8">
     <div class="space-y-2">
       <NuxtLink
         :to="`/theaters/${slug}/shows/${id}`"
@@ -70,13 +71,18 @@ const nextOccurrence = computed(() => data.value?.occurrences?.[0] ?? null);
       Loading...
     </div>
 
-    <UCard v-if="show">
-      <div class="flex items-center justify-between gap-3">
+    <StageFeatureCard
+      v-if="show"
+      title="Lineup Order"
+      subtitle="Program everyone can trust"
+      tone="bg-[var(--stage-coral)]"
+    >
+      <div class="flex items-center justify-between gap-3 p-4">
         <div>
-          <p class="text-sm font-medium text-slate-700">
+          <p class="text-sm font-medium text-[var(--stage-ink)]">
             {{ acceptedCast.length }} performer{{ acceptedCast.length === 1 ? "" : "s" }}
           </p>
-          <p v-if="nextOccurrence" class="text-sm text-slate-500">
+          <p v-if="nextOccurrence" class="text-sm stage-muted">
             {{ new Date(nextOccurrence.starts_at).toLocaleString() }}
           </p>
         </div>
@@ -84,7 +90,7 @@ const nextOccurrence = computed(() => data.value?.occurrences?.[0] ?? null);
           Finalized
         </UBadge>
       </div>
-    </UCard>
+    </StageFeatureCard>
 
     <div
       v-if="show"
@@ -93,28 +99,28 @@ const nextOccurrence = computed(() => data.value?.occurrences?.[0] ?? null);
       <div
         v-for="(member, index) in acceptedCast"
         :key="member.userId"
-        class="rounded-2xl border border-slate-200 bg-white px-4 py-4 shadow-sm"
+        class="border-2 border-[rgba(43,41,38,0.12)] bg-[var(--stage-cream)] px-4 py-4"
       >
         <div class="flex items-center gap-3">
-          <div class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-sm font-semibold text-white">
+          <div class="flex size-10 items-center justify-center border-2 border-[var(--stage-ink)] bg-[var(--stage-ink)] text-sm font-semibold text-[var(--stage-cream)]">
             {{ member.programOrder ?? index + 1 }}
           </div>
           <div class="min-w-0">
-            <p class="truncate text-base font-semibold text-slate-900">
+            <p class="truncate text-base font-semibold text-[var(--stage-ink)]">
               {{ member.displayName ?? member.userId }}
             </p>
-            <p class="text-xs uppercase tracking-wide text-slate-500">
+            <p class="text-xs uppercase tracking-wide stage-muted">
               {{ member.programOrder ? `Program slot ${member.programOrder}` : "Performer" }}
             </p>
           </div>
         </div>
       </div>
 
-      <UCard v-if="acceptedCast.length === 0">
-        <p class="text-sm text-slate-500">
+      <div v-if="acceptedCast.length === 0" class="stage-panel px-4 py-5">
+        <p class="text-sm stage-muted">
           No accepted performers are in the program yet.
         </p>
-      </UCard>
+      </div>
     </div>
   </div>
 </template>

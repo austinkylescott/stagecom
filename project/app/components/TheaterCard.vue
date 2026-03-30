@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import StageFeatureCard from "~/components/StageFeatureCard.vue";
 import { useLocationFormatter } from "~/composables/useLocationFormatter";
 import TheaterFollowHomeButtons from "~/components/TheaterFollowHomeButtons.vue";
 
@@ -36,30 +37,42 @@ const { formatLocation } = useLocationFormatter();
 </script>
 
 <template>
-  <div
-    class="flex items-center justify-between rounded-lg border border-slate-200 px-4 py-3"
+  <StageFeatureCard
+    :title="theater.name"
+    :subtitle="formatLocation(theater)"
+    tone="bg-[var(--stage-gold)]"
   >
-    <div>
-      <p class="font-semibold">{{ theater.name }}</p>
-      <p class="text-xs text-slate-600">
-        {{ formatLocation(theater) }}
-      </p>
-      <p v-if="theater.tagline" class="text-xs text-slate-700 mt-1">
+    <div class="space-y-4 text-[var(--stage-ink)]">
+      <div class="flex flex-wrap items-center gap-2">
+        <span
+          v-if="isHome"
+          class="stage-chip bg-[var(--stage-mint)] text-[var(--stage-ink)]"
+        >
+          Home theater
+        </span>
+        <span
+          v-else-if="isMember"
+          class="stage-chip bg-[var(--stage-paper-strong)] text-[var(--stage-ink)]"
+        >
+          Following
+        </span>
+      </div>
+      <p v-if="theater.tagline" class="text-sm leading-6 stage-muted">
         {{ theater.tagline }}
       </p>
+      <div class="flex flex-wrap gap-2 items-center">
+        <UButton size="xs" :to="primaryTo || `/theaters/${theater.slug}`">
+          {{ primaryLabel || "View" }}
+        </UButton>
+        <TheaterFollowHomeButtons
+          v-if="showFollow"
+          :theater="theater"
+          :is-member="isMember"
+          :is-home="isHome"
+          size="xs"
+          @updated="(p) => emit('membership-changed', p)"
+        />
+      </div>
     </div>
-    <div class="flex gap-2 flex-wrap items-center">
-      <UButton size="xs" :to="primaryTo || `/theaters/${theater.slug}`">
-        {{ primaryLabel || "View" }}
-      </UButton>
-      <TheaterFollowHomeButtons
-        v-if="showFollow"
-        :theater="theater"
-        :is-member="isMember"
-        :is-home="isHome"
-        size="xs"
-        @updated="(p) => emit('membership-changed', p)"
-      />
-    </div>
-  </div>
+  </StageFeatureCard>
 </template>

@@ -20,10 +20,10 @@ export default defineNuxtConfig({
   fonts: {
     defaults: { weights: [400, 600, 700], styles: ["normal"] },
     families: [
-      { name: "Space Grotesk", global: true },
-      { name: "Silkscreen", global: true },
+      { name: "Public Sans", global: true },
+      { name: "Bebas Neue", global: true },
       { name: "Merriweather", global: true },
-      { name: "Fira Code", global: true },
+      { name: "JetBrains Mono", global: true },
     ],
   },
   pinia: {},

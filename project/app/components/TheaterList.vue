@@ -44,21 +44,26 @@ const emit = defineEmits<{
   <UCard>
     <template #header>
       <slot name="header">
-        <div class="flex items-center justify-between">
-          <p class="font-semibold">{{ title }}</p>
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <p class="stage-overline">{{ title }}</p>
+            <h2 class="mt-2 font-display text-3xl uppercase tracking-[0.08em]">
+              {{ title }}
+            </h2>
+          </div>
         </div>
       </slot>
     </template>
 
     <div
       v-if="pending && (!theaters || theaters.length === 0)"
-      class="text-sm text-slate-600"
+      class="border-2 border-dashed border-[var(--stage-ink)] bg-[rgba(251,247,239,0.7)] px-4 py-6 text-sm stage-muted"
     >
       Loading...
     </div>
     <div
       v-else-if="!theaters || theaters.length === 0"
-      class="text-sm text-slate-600"
+      class="border-2 border-dashed border-[var(--stage-ink)] bg-[rgba(251,247,239,0.7)] px-4 py-6 text-sm stage-muted"
     >
       {{ emptyMessage || "Nothing yet." }}
     </div>

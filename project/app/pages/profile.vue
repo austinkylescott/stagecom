@@ -125,78 +125,107 @@ const save = async () => {
 </script>
 
 <template>
-  <div class="space-y-6 max-w-xl">
-    <div>
-      <h1 class="text-2xl font-semibold">Profile</h1>
-      <p>Update how you appear to theaters and performers.</p>
-    </div>
-
-    <UAlert v-if="!user" color="yellow" variant="soft">
-      <template #title>Sign in required</template>
-      <template #description>Log in to edit your profile.</template>
-    </UAlert>
-
-    <UCard v-else>
-      <div class="space-y-4">
-        <UFormField label="Display name" required>
-          <UInput v-model="form.displayName" />
-        </UFormField>
-
-        <UFormField label="Avatar URL" description="Optional">
-          <UInput
-            v-model="form.avatarUrl"
-            placeholder="https://example.com/avatar.png"
-          />
-        </UFormField>
-
-        <UFormField label="Pronouns" description="Optional">
-          <USelectMenu
-            v-model="form.pronouns"
-            :items="pronounItems"
-            value-key="value"
-            class="w-full"
-          />
-        </UFormField>
-
-        <UFormField label="City" description="Helps theaters find locals">
-          <UInput v-model="form.city" placeholder="Chicago, IL" />
-        </UFormField>
-
-        <UFormField label="Bio" description="Short intro or team affiliation">
-          <UTextarea v-model="form.bio" :rows="3" />
-        </UFormField>
-
-        <UFormField
-          label="Timezone"
-          description="IANA name, e.g. America/New_York"
-        >
-          <UInput v-model="form.timezone" placeholder="UTC" />
-        </UFormField>
-
-        <UFormField
-          label="Profile visibility"
-          description="Who can see your profile details"
-        >
-          <USelectMenu
-            v-model="form.visibility"
-            :items="visibilityItems"
-            class="w-full"
-            value-key="value"
-          />
-        </UFormField>
-
-        <div class="flex items-center gap-2">
-          <UButton
-            :loading="loading"
-            :disabled="!isDirty"
-            color="primary"
-            @click="save"
-            >Save</UButton
-          >
-          <p v-if="notice" class="text-sm text-emerald-600">{{ notice }}</p>
-          <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
-        </div>
+  <div class="space-y-0">
+    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[var(--stage-cream)] stage-texture overflow-hidden" inner-class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
+      <div>
+        <span class="stage-kicker">Profile</span>
+        <h1 class="mt-4 stage-section-title">How you appear across the scene.</h1>
+        <p class="mt-3 max-w-3xl text-lg leading-8 stage-muted">
+          Your profile should read like the rest of the product: clear identity,
+          useful context for theaters, and explicit control over what stays
+          visible.
+        </p>
       </div>
-    </UCard>
+    </StageSection>
+
+    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.52)]" inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+      <UAlert v-if="!user" color="yellow" variant="soft">
+        <template #title>Sign in required</template>
+        <template #description>Log in to edit your profile.</template>
+      </UAlert>
+
+      <section v-else class="stage-page-grid stage-page-grid-rail">
+        <div class="stage-panel p-5 sm:p-6">
+          <div class="space-y-4">
+            <UFormField label="Display name" required>
+              <UInput v-model="form.displayName" />
+            </UFormField>
+
+            <UFormField label="Avatar URL" description="Optional">
+              <UInput
+                v-model="form.avatarUrl"
+                placeholder="https://example.com/avatar.png"
+              />
+            </UFormField>
+
+            <UFormField label="Pronouns" description="Optional">
+              <USelectMenu
+                v-model="form.pronouns"
+                :items="pronounItems"
+                value-key="value"
+                class="w-full"
+              />
+            </UFormField>
+
+            <UFormField label="City" description="Helps theaters find locals">
+              <UInput v-model="form.city" placeholder="Chicago, IL" />
+            </UFormField>
+
+            <UFormField label="Bio" description="Short intro or team affiliation">
+              <UTextarea v-model="form.bio" :rows="3" />
+            </UFormField>
+
+            <UFormField
+              label="Timezone"
+              description="IANA name, e.g. America/New_York"
+            >
+              <UInput v-model="form.timezone" placeholder="UTC" />
+            </UFormField>
+
+            <UFormField
+              label="Profile visibility"
+              description="Who can see your profile details"
+            >
+              <USelectMenu
+                v-model="form.visibility"
+                :items="visibilityItems"
+                class="w-full"
+                value-key="value"
+              />
+            </UFormField>
+
+            <div class="flex items-center gap-2 flex-wrap">
+              <UButton
+                :loading="loading"
+                :disabled="!isDirty"
+                color="primary"
+                @click="save"
+              >
+                Save
+              </UButton>
+              <p v-if="notice" class="text-sm text-emerald-600">{{ notice }}</p>
+              <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
+            </div>
+          </div>
+        </div>
+
+        <aside class="stage-panel-dark stage-grid-board p-5 sm:p-6">
+          <span class="stage-overline text-[var(--stage-cream)]">What this controls</span>
+          <h2 class="mt-3 text-2xl font-black tracking-[-0.03em] text-[var(--stage-cream)]">
+            Keep your basics current.
+          </h2>
+          <div class="mt-4 space-y-4 text-sm leading-6 text-[rgba(251,247,239,0.82)]">
+            <p>
+              Display name, city, pronouns, and bio help theaters and collaborators
+              recognize you without guessing.
+            </p>
+            <p>
+              Visibility determines how widely your details appear across the
+              network, while timezone keeps scheduling readable for everyone else.
+            </p>
+          </div>
+        </aside>
+      </section>
+    </StageSection>
   </div>
 </template>
