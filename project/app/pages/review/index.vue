@@ -185,8 +185,8 @@ const updateStatus = async (
 </script>
 
 <template>
-  <div class="space-y-8">
-    <section class="stage-panel stage-texture overflow-hidden px-6 py-7 sm:px-8 sm:py-8">
+  <div class="space-y-0">
+    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[var(--stage-cream)] stage-texture overflow-hidden" inner-class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
       <div class="stage-page-grid stage-page-grid-rail items-start">
         <div class="space-y-5">
           <span class="stage-kicker">Review board</span>
@@ -288,15 +288,18 @@ const updateStatus = async (
           </div>
         </aside>
       </div>
-    </section>
+    </StageSection>
 
-    <p v-if="notice" class="text-sm text-emerald-600">{{ notice }}</p>
-    <p v-if="mutationError" class="text-sm text-red-600">{{ mutationError }}</p>
-    <p v-if="error" class="text-sm text-red-600">
-      {{ error?.data?.statusMessage || error?.data?.message || error?.message }}
-    </p>
+    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.52)]" inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+      <div class="mb-6 space-y-2">
+        <p v-if="notice" class="text-sm text-emerald-600">{{ notice }}</p>
+        <p v-if="mutationError" class="text-sm text-red-600">{{ mutationError }}</p>
+        <p v-if="error" class="text-sm text-red-600">
+          {{ error?.data?.statusMessage || error?.data?.message || error?.message }}
+        </p>
+      </div>
 
-    <section class="stage-page-grid stage-page-grid-rail">
+      <section class="stage-page-grid stage-page-grid-rail">
       <div class="space-y-4">
         <div class="flex flex-wrap items-end justify-between gap-3">
           <div>
@@ -523,6 +526,7 @@ const updateStatus = async (
           </p>
         </section>
       </div>
-    </section>
+      </section>
+    </StageSection>
   </div>
 </template>

@@ -69,8 +69,8 @@ const submit = async (submitForReview: boolean) => {
 </script>
 
 <template>
-  <div class="space-y-8">
-    <section class="stage-panel stage-texture overflow-hidden px-6 py-7 sm:px-8 sm:py-8">
+  <div class="space-y-0">
+    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[var(--stage-cream)] stage-texture overflow-hidden" inner-class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
       <div class="flex items-center justify-between flex-wrap gap-3">
         <div>
           <span class="stage-kicker">Show setup</span>
@@ -84,9 +84,10 @@ const submit = async (submitForReview: boolean) => {
           Review queue
         </UButton>
       </div>
-    </section>
+    </StageSection>
 
-    <StageFeatureCard
+    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.5)]" inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+      <StageFeatureCard
       title="Show Setup"
       subtitle="Clear ownership and casting controls"
       tone="bg-[var(--stage-mint)]"
@@ -201,6 +202,7 @@ const submit = async (submitForReview: boolean) => {
           <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
         </div>
       </div>
-    </StageFeatureCard>
+      </StageFeatureCard>
+    </StageSection>
   </div>
 </template>

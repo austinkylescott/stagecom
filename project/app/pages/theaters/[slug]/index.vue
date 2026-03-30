@@ -69,8 +69,8 @@ const formatDateTime = (value: string | null) =>
 </script>
 
 <template>
-  <div class="space-y-8">
-    <section class="stage-panel-dark stage-grid-board p-6 sm:p-8">
+  <div class="space-y-0">
+    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[var(--stage-ink)] stage-grid-board" inner-class="mx-auto max-w-7xl px-4 py-10 text-[var(--stage-cream)] sm:px-6 sm:py-12 lg:px-8">
       <div class="stage-page-grid stage-page-grid-rail items-start">
         <div class="space-y-4">
           <div class="flex flex-wrap items-center gap-2">
@@ -186,7 +186,7 @@ const formatDateTime = (value: string | null) =>
               </UButton>
             </div>
             <template #left-callout>
-              <div class="absolute -left-5 top-1/4 border-2 border-[var(--stage-ink)] bg-[var(--stage-cream)] px-3 py-2 shadow-[4px_4px_0_0_var(--stage-ink)]">
+              <div class="absolute -left-5 top-1/4 border-2 border-[var(--stage-ink)] bg-[var(--stage-cream)] px-3 py-2">
                 <div class="flex items-center gap-2">
                   <div class="size-3 bg-[var(--stage-gold)]" />
                   <span class="text-xs font-bold text-[var(--stage-ink)]">
@@ -197,7 +197,7 @@ const formatDateTime = (value: string | null) =>
             </template>
 
             <template #right-callout>
-              <div class="absolute -right-4 bottom-1/4 border-2 border-[var(--stage-ink)] bg-[var(--stage-cream)] px-3 py-2 shadow-[4px_4px_0_0_var(--stage-ink)]">
+              <div class="absolute -right-4 bottom-1/4 border-2 border-[var(--stage-ink)] bg-[var(--stage-cream)] px-3 py-2">
                 <span class="text-xs font-bold text-[var(--stage-ink)]">
                   {{ canReview ? `${data?.stats.pendingReviewCount ?? 0} pending review` : isMember ? "Member access active" : "Public view" }}
                 </span>
@@ -206,13 +206,14 @@ const formatDateTime = (value: string | null) =>
           </StageStackedBoard>
         </aside>
       </div>
-    </section>
+    </StageSection>
 
-    <div v-if="error" class="stage-panel px-5 py-4 text-sm text-red-700">
-      {{ error?.data?.message || error?.message }}
-    </div>
+    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.52)]" inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+      <div v-if="error" class="mb-6 stage-panel px-5 py-4 text-sm text-red-700">
+        {{ error?.data?.message || error?.message }}
+      </div>
 
-    <section class="stage-page-grid stage-page-grid-rail">
+      <section class="stage-page-grid stage-page-grid-rail">
       <div class="space-y-4">
         <div class="flex items-center justify-between gap-3 flex-wrap">
           <div>
@@ -238,7 +239,7 @@ const formatDateTime = (value: string | null) =>
             class="block"
           >
             <article
-              class="stage-list-card h-full p-5 transition-transform hover:-translate-y-1 sm:p-6"
+              class="stage-list-card h-full p-5 sm:p-6"
             >
               <div class="flex flex-wrap items-start justify-between gap-3">
                 <div>
@@ -309,6 +310,7 @@ const formatDateTime = (value: string | null) =>
           </div>
         </section>
       </div>
-    </section>
+      </section>
+    </StageSection>
   </div>
 </template>

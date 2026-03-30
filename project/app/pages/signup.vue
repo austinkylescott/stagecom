@@ -114,7 +114,7 @@ const onSubmit = async (payload: FormSubmitEvent<Schema>) => {
 
 <template>
   <div class="space-y-8 px-4 py-6">
-    <section class="mx-auto w-full max-w-3xl stage-panel stage-texture overflow-hidden px-6 py-7 sm:px-8 sm:py-8">
+    <section class="mx-auto w-full max-w-3xl stage-message stage-texture overflow-hidden px-6 py-7 sm:px-8 sm:py-8">
       <span class="stage-kicker">Join Stagecom</span>
       <h1 class="mt-4 stage-section-title">Create your account.</h1>
       <p class="mt-3 max-w-2xl text-lg leading-8 stage-muted">

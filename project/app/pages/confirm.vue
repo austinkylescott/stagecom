@@ -24,7 +24,7 @@ watch(
 
 <template>
   <div class="mx-auto max-w-3xl space-y-8">
-    <section class="stage-panel stage-texture overflow-hidden px-6 py-7 sm:px-8 sm:py-8">
+    <section class="stage-message stage-texture overflow-hidden px-6 py-7 sm:px-8 sm:py-8">
       <span class="stage-kicker">Email confirmation</span>
       <h1 class="mt-4 stage-section-title">Confirming your account.</h1>
     </section>

@@ -45,8 +45,8 @@ const markAllRead = () => markRead({ all: true });
 </script>
 
 <template>
-  <div class="max-w-3xl space-y-8">
-    <section class="stage-panel stage-texture overflow-hidden px-6 py-7 sm:px-8 sm:py-8">
+  <div class="space-y-0">
+    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[var(--stage-cream)] stage-texture overflow-hidden" inner-class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
       <div class="flex items-end justify-between flex-wrap gap-4">
         <div>
           <span class="stage-kicker">Notifications</span>
@@ -64,61 +64,65 @@ const markAllRead = () => markRead({ all: true });
           Mark all read
         </UButton>
       </div>
-    </section>
+    </StageSection>
 
-    <div class="flex gap-2 flex-wrap">
-      <UButton
-        v-for="tab in tabs"
-        :key="tab.value"
-        size="sm"
-        :color="filter === tab.value ? 'primary' : 'gray'"
-        :variant="filter === tab.value ? 'soft' : 'ghost'"
-        @click="switchFilter(tab.value)"
-      >
-        {{ tab.label }}
-      </UButton>
-    </div>
+    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.52)]" inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+      <div class="mb-6 flex gap-2 flex-wrap">
+        <UButton
+          v-for="tab in tabs"
+          :key="tab.value"
+          size="sm"
+          :color="filter === tab.value ? 'primary' : 'gray'"
+          :variant="filter === tab.value ? 'soft' : 'ghost'"
+          @click="switchFilter(tab.value)"
+        >
+          {{ tab.label }}
+        </UButton>
+      </div>
 
-    <div v-if="isLoading" class="stage-panel px-5 py-6 text-sm stage-muted">Loading...</div>
+      <div v-if="isLoading" class="stage-panel px-5 py-6 text-sm stage-muted">Loading...</div>
 
-    <div v-else-if="!notifications.length" class="stage-panel px-5 py-6 text-sm stage-muted">
-      No notifications here yet.
-    </div>
+      <div v-else-if="!notifications.length" class="stage-panel px-5 py-6 text-sm stage-muted">
+        No notifications here yet.
+      </div>
 
-    <div v-else class="space-y-3">
-      <StageFeatureCard
-        v-for="n in notifications"
-        :key="n.id"
-        as="NuxtLink"
-        :title="n.read_at ? 'Seen update' : 'New update'"
-        :subtitle="new Date(n.created_at).toLocaleString()"
-        :tone="n.read_at ? 'bg-[var(--stage-paper-strong)]' : 'bg-[var(--stage-mint)]'"
-        :to="formatNotification(n.type, n.payload).href ?? '#'"
-        class="transition-transform hover:-translate-y-0.5"
-        @click="!n.read_at && markRead({ ids: [n.id] })"
-      >
-        <div class="flex items-start gap-3">
-          <span
-            class="mt-1.5 size-2 shrink-0 border border-[var(--stage-ink)]"
-            :class="n.read_at ? 'bg-[var(--stage-paper-strong)]' : 'bg-[var(--stage-coral)]'"
-          />
-          <div class="min-w-0 flex-1">
-            <p class="text-sm" :class="n.read_at ? 'stage-muted' : 'font-medium text-[var(--stage-ink)]'">
-              {{ formatNotification(n.type, n.payload).text }}
-            </p>
+      <div v-else class="space-y-3">
+        <StageFeatureCard
+          v-for="n in notifications"
+          :key="n.id"
+          as="NuxtLink"
+          :title="n.read_at ? 'Seen update' : 'New update'"
+          :subtitle="new Date(n.created_at).toLocaleString()"
+          :tone="n.read_at ? 'bg-[var(--stage-paper-strong)]' : 'bg-[var(--stage-mint)]'"
+          :to="formatNotification(n.type, n.payload).href ?? '#'"
+          class="transition-colors"
+          @click="!n.read_at && markRead({ ids: [n.id] })"
+        >
+          <div class="flex items-start gap-3">
+            <span
+              class="mt-1.5 size-2 shrink-0 border border-[var(--stage-ink)]"
+              :class="n.read_at ? 'bg-[var(--stage-paper-strong)]' : 'bg-[var(--stage-coral)]'"
+            />
+            <div class="min-w-0 flex-1">
+              <p class="text-sm" :class="n.read_at ? 'stage-muted' : 'font-medium text-[var(--stage-ink)]'">
+                {{ formatNotification(n.type, n.payload).text }}
+              </p>
+            </div>
           </div>
-        </div>
-      </StageFeatureCard>
-    </div>
+        </StageFeatureCard>
+      </div>
 
-    <UPagination
-      v-if="totalPages > 1"
-      :page="page"
-      :total="totalPages"
-      :items-per-page="1"
-      :disabled="isLoading"
-      :show-controls="true"
-      @update:page="(p) => (page = p)"
-    />
+      <div class="pt-6">
+        <UPagination
+          v-if="totalPages > 1"
+          :page="page"
+          :total="totalPages"
+          :items-per-page="1"
+          :disabled="isLoading"
+          :show-controls="true"
+          @update:page="(p) => (page = p)"
+        />
+      </div>
+    </StageSection>
   </div>
 </template>

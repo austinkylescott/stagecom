@@ -6,7 +6,7 @@ export default defineAppConfig({
     },
     button: {
       slots: {
-        base: "border-2 border-[var(--stage-ink)] font-semibold uppercase tracking-[0.14em] shadow-[4px_4px_0_0_var(--stage-ink)] data-[state=open]:translate-y-[1px] data-[state=open]:shadow-[2px_2px_0_0_var(--stage-ink)] hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_var(--stage-ink)] active:translate-y-[2px] active:shadow-none",
+        base: "rounded-none border-2 border-[var(--stage-ink)] font-semibold uppercase tracking-[0.14em] shadow-[4px_4px_0_0_var(--stage-ink)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[3px_3px_0_0_var(--stage-ink)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none",
         label: "truncate",
       },
       variants: {
@@ -45,7 +45,7 @@ export default defineAppConfig({
     },
     card: {
       slots: {
-        root: "overflow-hidden border-3 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.94)] shadow-[8px_8px_0_0_var(--stage-ink)]",
+        root: "overflow-hidden rounded-none border-3 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.94)] shadow-[8px_8px_0_0_var(--stage-ink)]",
         header: "px-5 py-4 sm:px-6 sm:py-5",
         body: "px-5 py-5 sm:px-6 sm:py-6",
         footer: "px-5 py-4 sm:px-6 sm:py-5",
@@ -96,7 +96,7 @@ export default defineAppConfig({
     },
     alert: {
       slots: {
-        root: "border-3 border-[var(--stage-ink)] bg-[var(--stage-cream)] text-[var(--stage-ink)] shadow-[6px_6px_0_0_var(--stage-ink)]",
+        root: "rounded-xl border-3 border-[var(--stage-ink)] bg-[var(--stage-cream)] text-[var(--stage-ink)] shadow-[6px_6px_0_0_var(--stage-ink)]",
         title: "font-display text-xl uppercase tracking-[0.08em]",
         description: "text-sm leading-6 text-[color:rgba(43,41,38,0.72)]",
       },

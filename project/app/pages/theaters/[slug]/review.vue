@@ -107,8 +107,8 @@ const updateStatus = async (
 </script>
 
 <template>
-  <div class="space-y-8">
-    <section class="stage-panel stage-texture overflow-hidden px-6 py-7 sm:px-8 sm:py-8">
+  <div class="space-y-0">
+    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[var(--stage-cream)] stage-texture overflow-hidden" inner-class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
       <div class="stage-page-grid stage-page-grid-rail items-start">
         <div class="space-y-5">
           <span class="stage-kicker">Theater review</span>
@@ -156,14 +156,17 @@ const updateStatus = async (
           </div>
         </aside>
       </div>
-    </section>
+    </StageSection>
 
-    <p v-if="message" class="text-sm text-emerald-600">{{ message }}</p>
-    <p v-if="error" class="text-sm text-red-600">
-      {{ error?.data?.message || error?.message }}
-    </p>
+    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.52)]" inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+      <div class="mb-6 space-y-2">
+        <p v-if="message" class="text-sm text-emerald-600">{{ message }}</p>
+        <p v-if="error" class="text-sm text-red-600">
+          {{ error?.data?.message || error?.message }}
+        </p>
+      </div>
 
-    <section class="stage-panel p-5 sm:p-6">
+      <section class="stage-panel p-5 sm:p-6">
       <div class="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p class="stage-overline">Queue ledger</p>
@@ -252,6 +255,7 @@ const updateStatus = async (
           Nothing to review yet.
         </div>
       </div>
-    </section>
+      </section>
+    </StageSection>
   </div>
 </template>

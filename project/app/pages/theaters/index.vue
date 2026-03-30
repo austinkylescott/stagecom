@@ -198,40 +198,41 @@ const cancelLeaveHome = () => {
 </script>
 
 <template>
-  <div class="space-y-8">
-    <section
-      class="stage-panel px-6 py-7 sm:px-8 sm:py-8 lg:grid lg:grid-cols-[1.1fr_auto] lg:items-end"
-    >
-      <div class="space-y-4">
-        <span class="stage-kicker">Theater Discovery</span>
-        <div>
-          <h1 class="stage-section-title">Find your local scene.</h1>
-          <p class="mt-3 max-w-3xl text-lg leading-8 stage-muted">
-            Follow theaters, set a home base, and move from public programming
-            into the community spaces where casting and operations actually
-            happen.
-          </p>
+  <div class="space-y-0">
+    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[var(--stage-cream)]" inner-class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
+      <div class="grid gap-6 lg:grid-cols-[1.1fr_auto] lg:items-end">
+        <div class="space-y-4">
+          <span class="stage-kicker">Theater Discovery</span>
+          <div>
+            <h1 class="stage-section-title">Find your local scene.</h1>
+            <p class="mt-3 max-w-3xl text-lg leading-8 stage-muted">
+              Follow theaters, set a home base, and move from public programming
+              into the community spaces where casting and operations actually
+              happen.
+            </p>
+          </div>
+        </div>
+        <div class="lg:justify-self-end">
+          <UButton color="primary" icon="i-heroicons-plus" to="/theaters/new">
+            Create theater
+          </UButton>
         </div>
       </div>
-      <div class="mt-5 lg:mt-0 lg:justify-self-end">
-        <UButton color="primary" icon="i-heroicons-plus" to="/theaters/new">
-          Create theater
-        </UButton>
+    </StageSection>
+
+    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.5)]" inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+      <HomeTheaterHero
+        :theater="homeTheater"
+        :shows="homeShows"
+        :candidates="homeCandidates"
+        :on-set-home="saveHome"
+      />
+
+      <div v-if="error" class="mt-6 stage-panel px-5 py-4 text-sm text-red-700">
+        {{ error?.data?.message || error?.message }}
       </div>
-    </section>
 
-    <HomeTheaterHero
-      :theater="homeTheater"
-      :shows="homeShows"
-      :candidates="homeCandidates"
-      :on-set-home="saveHome"
-    />
-
-    <div v-if="error" class="stage-panel px-5 py-4 text-sm text-red-700">
-      {{ error?.data?.message || error?.message }}
-    </div>
-
-    <div class="grid gap-6 lg:grid-cols-2">
+      <div class="mt-6 grid gap-6 lg:grid-cols-2">
       <TheaterList
         title="Following"
         :theaters="myTheaters"
@@ -300,7 +301,8 @@ const cancelLeaveHome = () => {
           </div>
         </template>
       </TheaterList>
-    </div>
+      </div>
+    </StageSection>
 
     <HomeTheaterPrompt
       v-model="showHomeModal"

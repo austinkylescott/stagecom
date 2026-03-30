@@ -53,8 +53,8 @@ const showPagination = computed(() => totalPages.value > 1);
 </script>
 
 <template>
-  <div class="space-y-8">
-    <section class="stage-panel stage-texture overflow-hidden px-6 py-7 sm:px-8 sm:py-8">
+  <div class="space-y-0">
+    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[var(--stage-cream)] stage-texture overflow-hidden" inner-class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
       <div class="flex items-end justify-between flex-wrap gap-4">
         <div>
           <span class="stage-kicker">Performer discovery</span>
@@ -75,43 +75,45 @@ const showPagination = computed(() => totalPages.value > 1);
           icon="i-heroicons-magnifying-glass"
         />
       </div>
-    </section>
+    </StageSection>
 
-    <div v-if="error" class="stage-panel px-5 py-4 text-sm text-red-700">
-      {{ error?.message || error?.data?.message }}
-    </div>
+    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.52)]" inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+      <div v-if="error" class="mb-6 stage-panel px-5 py-4 text-sm text-red-700">
+        {{ error?.message || error?.data?.message }}
+      </div>
 
-    <div v-if="isLoading" class="stage-panel px-5 py-6 text-sm stage-muted">
-      Loading performers...
-    </div>
+      <div v-if="isLoading" class="stage-panel px-5 py-6 text-sm stage-muted">
+        Loading performers...
+      </div>
 
-    <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <PerformerDirectoryRow
-        v-for="performer in performers"
-        :key="performer.id"
-        :performer="performer"
-        :shared-theater-count="sharedCounts.get(performer.id) || 0"
-      />
-      <p v-if="!performers.length" class="stage-panel px-5 py-6 text-sm stage-muted sm:col-span-2 lg:col-span-3">
-        No performers match that search yet.
-      </p>
-    </div>
+      <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <PerformerDirectoryRow
+          v-for="performer in performers"
+          :key="performer.id"
+          :performer="performer"
+          :shared-theater-count="sharedCounts.get(performer.id) || 0"
+        />
+        <p v-if="!performers.length" class="stage-panel px-5 py-6 text-sm stage-muted sm:col-span-2 lg:col-span-3">
+          No performers match that search yet.
+        </p>
+      </div>
 
-    <div class="pt-2">
-      <UPagination
-        v-if="showPagination"
-        :page="page"
-        :total="totalPages"
-        :items-per-page="1"
-        :disabled="isLoading"
-        :show-controls="true"
-        @update:page="(p) => (page = p)"
-      />
-    </div>
+      <div class="pt-6">
+        <UPagination
+          v-if="showPagination"
+          :page="page"
+          :total="totalPages"
+          :items-per-page="1"
+          :disabled="isLoading"
+          :show-controls="true"
+          @update:page="(p) => (page = p)"
+        />
+      </div>
 
-    <div class="text-xs stage-muted">
-      Social clustering v1 uses shared theater membership as a proxy for “play
-      together”. We can extend this to co-cast counts when cast data lands.
-    </div>
+      <div class="pt-6 text-xs stage-muted">
+        Social clustering v1 uses shared theater membership as a proxy for “play
+        together”. We can extend this to co-cast counts when cast data lands.
+      </div>
+    </StageSection>
   </div>
 </template>

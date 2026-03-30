@@ -65,32 +65,33 @@ const weekdayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 </script>
 
 <template>
-  <div class="space-y-8">
-    <section
-      class="stage-panel px-6 py-7 sm:px-8 sm:py-8 lg:grid lg:grid-cols-[1.1fr_auto] lg:items-end"
-    >
-      <div class="space-y-4">
-        <span class="stage-kicker">Programming Board</span>
-        <div>
-          <h1 class="stage-section-title">Shows in motion.</h1>
-          <p class="mt-3 max-w-3xl text-lg leading-8 stage-muted">
-          Upcoming shows for theaters you're a member of. Calendar highlights
-          the next occurrence per show.
-        </p>
+  <div class="space-y-0">
+    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[var(--stage-cream)]" inner-class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
+      <div class="grid gap-6 lg:grid-cols-[1.1fr_auto] lg:items-end">
+        <div class="space-y-4">
+          <span class="stage-kicker">Programming Board</span>
+          <div>
+            <h1 class="stage-section-title">Shows in motion.</h1>
+            <p class="mt-3 max-w-3xl text-lg leading-8 stage-muted">
+              Upcoming shows for theaters you're a member of. Calendar highlights
+              the next occurrence per show.
+            </p>
+          </div>
+        </div>
+        <div class="lg:justify-self-end">
+          <UButton color="primary" icon="i-heroicons-plus" :to="newShowLink">
+            New show
+          </UButton>
+        </div>
       </div>
-      </div>
-      <div class="mt-5 lg:mt-0 lg:justify-self-end">
-        <UButton color="primary" icon="i-heroicons-plus" :to="newShowLink">
-          New show
-        </UButton>
-      </div>
-    </section>
+    </StageSection>
 
-    <div v-if="error" class="stage-panel px-5 py-4 text-sm text-red-700">
-      {{ error?.data?.message || error?.message }}
-    </div>
+    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.5)]" inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+      <div v-if="error" class="mb-6 stage-panel px-5 py-4 text-sm text-red-700">
+        {{ error?.data?.message || error?.message }}
+      </div>
 
-    <div class="grid gap-6 lg:grid-cols-[2fr,1fr]">
+      <div class="grid gap-6 lg:grid-cols-[2fr,1fr]">
       <UCard>
         <template #header>
           <div>
@@ -113,7 +114,7 @@ const weekdayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
             v-for="show in sortedShows"
             :key="show.id"
             :to="showDetailLink(show)"
-            class="stage-list-card block p-5 transition-transform hover:-translate-y-1"
+            class="stage-list-card block p-5"
           >
             <div class="flex items-start justify-between gap-3">
               <div>
@@ -196,6 +197,7 @@ const weekdayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
           </div>
         </div>
       </UCard>
-    </div>
+      </div>
+    </StageSection>
   </div>
 </template>
