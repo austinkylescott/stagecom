@@ -33,21 +33,13 @@ const isActive = (to: string) => {
 </script>
 
 <template>
-  <header class="sticky top-0 z-40 px-4 pt-4 sm:px-6 lg:px-8">
-    <div
-      class="stage-frame stage-texture relative overflow-hidden rounded-[2rem] px-4 py-4 sm:px-6"
-    >
-      <div
-        class="absolute inset-x-0 top-0 h-3 border-b-[3px] border-[var(--stage-ink)] bg-[var(--stage-coral)]"
-      />
-
-      <div
-        class="mt-3 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
-      >
-        <div class="flex items-start justify-between gap-4">
+  <header class="sticky top-0 z-50 border-b-3 border-[var(--stage-ink)] bg-[rgba(247,241,229,0.94)] supports-[backdrop-filter]:bg-[rgba(247,241,229,0.86)] backdrop-blur-sm">
+    <div class="mx-auto max-w-[92rem] px-3 py-3 sm:px-6 lg:px-8">
+      <div class="stage-texture relative py-2">
+        <div class="flex flex-wrap items-center justify-between gap-3">
           <NuxtLink
             to="/"
-            class="group flex flex-col gap-1 rounded-[1.4rem] border-[3px] border-[var(--stage-ink)] bg-[var(--stage-paper)] px-4 py-3 shadow-[6px_6px_0_0_var(--stage-ink)]"
+            class="group flex flex-col gap-1 py-1"
           >
             <div class="flex items-center gap-2">
               <span class="stage-overline">Stagecom</span>
@@ -67,8 +59,8 @@ const isActive = (to: string) => {
           </div>
         </div>
 
-        <div class="flex flex-col gap-3 lg:items-end">
-          <nav class="overflow-x-auto pb-1">
+        <div class="mt-4 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+          <nav class="overflow-x-auto pb-1 xl:flex-1">
             <ul class="flex min-w-max items-center gap-2">
               <li v-for="item in navItems" :key="item.to">
                 <UButton
@@ -86,12 +78,10 @@ const isActive = (to: string) => {
             </ul>
           </nav>
 
-          <div class="flex flex-wrap items-center justify-end gap-2">
-            <div
-              class="hidden md:flex items-center gap-2 rounded-full border-[3px] border-[var(--stage-ink)] bg-[var(--stage-paper)] px-3 py-2"
-            >
+          <div class="flex flex-wrap items-center gap-2 xl:justify-end">
+            <div class="hidden items-center gap-2 px-1 py-2 md:flex">
               <span class="stage-overline">Community-first ops</span>
-              <span class="h-2.5 w-2.5 rounded-full bg-[var(--stage-gold)]" />
+              <span class="size-2.5 border border-[var(--stage-ink)] bg-[var(--stage-gold)]" />
             </div>
             <AppNotificationsBell v-if="isAuthed" />
             <AppAccountMenu />

@@ -84,40 +84,6 @@
 }
 
 @layer components {
-  .stage-shell {
-    position: relative;
-    min-height: 100vh;
-    overflow: hidden;
-  }
-
-  .stage-shell::before {
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(90deg, transparent 0, transparent calc(50% - 1px), rgba(43, 41, 38, 0.07) calc(50% - 1px), rgba(43, 41, 38, 0.07) calc(50% + 1px), transparent calc(50% + 1px), transparent 100%),
-      linear-gradient(rgba(43, 41, 38, 0.08) 1px, transparent 1px);
-    background-size: 100% 100%, 100% 2.65rem;
-    pointer-events: none;
-    content: "";
-    opacity: 0.45;
-  }
-
-  .stage-shell::after {
-    position: absolute;
-    inset: 1rem;
-    border: 2px solid rgba(43, 41, 38, 0.14);
-    pointer-events: none;
-    content: "";
-  }
-
-  .stage-main {
-    position: relative;
-    z-index: 1;
-    max-width: 92rem;
-    margin: 0 auto;
-    padding: 1rem 1rem 4rem;
-  }
-
   .stage-frame {
     border: 3px solid var(--stage-ink);
     background: rgba(251, 247, 239, 0.9);
@@ -126,14 +92,14 @@
 
   .stage-panel {
     border: 3px solid var(--stage-ink);
-    border-radius: 1.5rem;
+    border-radius: 0.65rem;
     background: rgba(251, 247, 239, 0.95);
     box-shadow: var(--stage-shadow);
   }
 
   .stage-panel-dark {
     border: 3px solid var(--stage-ink);
-    border-radius: 1.5rem;
+    border-radius: 0.65rem;
     color: var(--stage-cream);
     background:
       linear-gradient(145deg, rgba(43, 41, 38, 0.96), rgba(67, 62, 55, 0.98));
@@ -142,7 +108,7 @@
 
   .stage-panel-accent {
     border: 3px solid var(--stage-ink);
-    border-radius: 1.5rem;
+    border-radius: 0.65rem;
     background:
       linear-gradient(180deg, rgba(234, 165, 66, 0.88), rgba(251, 247, 239, 0.96));
     box-shadow: var(--stage-shadow);
@@ -153,7 +119,7 @@
     align-items: center;
     gap: 0.5rem;
     border: 2px solid var(--stage-ink);
-    border-radius: 999px;
+    border-radius: 0.4rem;
     padding: 0.35rem 0.8rem;
     color: var(--stage-ink);
     background: color-mix(in srgb, var(--stage-gold) 48%, white);
@@ -166,7 +132,6 @@
   .stage-kicker::before {
     width: 0.65rem;
     height: 0.65rem;
-    border-radius: 999px;
     background: var(--stage-coral);
     box-shadow: 0 0 0 2px var(--stage-ink);
     content: "";
@@ -213,7 +178,7 @@
 
   .stage-stat {
     border: 3px solid var(--stage-ink);
-    border-radius: 1.2rem;
+    border-radius: 0.5rem;
     padding: 1rem;
     background: rgba(251, 247, 239, 0.92);
     box-shadow: var(--stage-shadow-sm);
@@ -230,7 +195,7 @@
 
   .stage-list-card {
     border: 3px solid var(--stage-ink);
-    border-radius: 1.25rem;
+    border-radius: 0.5rem;
     background: rgba(251, 247, 239, 0.94);
     box-shadow: var(--stage-shadow-sm);
   }
@@ -240,7 +205,7 @@
     align-items: center;
     gap: 0.45rem;
     border: 2px solid var(--stage-ink);
-    border-radius: 999px;
+    border-radius: 0.35rem;
     padding: 0.28rem 0.72rem;
     background: rgba(251, 247, 239, 0.9);
     font-size: 0.72rem;
@@ -281,18 +246,48 @@
     pointer-events: none;
     content: "";
   }
+
+  .stage-page-grid {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .stage-page-grid-rail {
+    grid-template-columns: minmax(0, 1.55fr) minmax(18rem, 0.9fr);
+  }
+
+  .stage-data-table {
+    overflow: hidden;
+    border: 3px solid var(--stage-ink);
+    border-radius: 0.65rem;
+    background: rgba(251, 247, 239, 0.92);
+    box-shadow: var(--stage-shadow);
+  }
+
+  .stage-data-table :where(table) {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .stage-data-table :where(th) {
+    background: rgba(239, 227, 205, 0.88);
+  }
+
+  .stage-data-table :where(td),
+  .stage-data-table :where(th) {
+    border-color: rgba(43, 41, 38, 0.12);
+  }
 }
 
 @media (max-width: 768px) {
-  .stage-shell::after {
-    inset: 0.5rem;
-  }
-
-  .stage-main {
-    padding-inline: 0.75rem;
-  }
-
   .stage-title {
     letter-spacing: 0.03em;
+  }
+}
+
+@media (max-width: 1024px) {
+  .stage-page-grid-rail {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

@@ -54,31 +54,34 @@ const showPagination = computed(() => totalPages.value > 1);
 
 <template>
   <div class="space-y-8">
-    <div class="flex items-center justify-between flex-wrap gap-3">
-      <div>
-        <h1 class="text-2xl font-semibold">Performers</h1>
-        <p class="text-slate-600">
-          Discover performers, see who you share stages with, and invite new
-          voices.
-        </p>
+    <section class="stage-panel stage-texture overflow-hidden px-6 py-7 sm:px-8 sm:py-8">
+      <div class="flex items-end justify-between flex-wrap gap-4">
+        <div>
+          <span class="stage-kicker">Performer discovery</span>
+          <h1 class="mt-4 stage-section-title">Find people across your scene.</h1>
+          <p class="mt-3 max-w-3xl text-lg leading-8 stage-muted">
+            This page does not have a direct homepage feature card, so it should
+            still live inside the same board-heavy system and feel native to the product.
+          </p>
+        </div>
+        <UButton icon="i-heroicons-arrow-path" variant="ghost" @click="refresh">
+          Refresh
+        </UButton>
       </div>
-      <UButton icon="i-heroicons-arrow-path" variant="ghost" @click="refresh"
-        >Refresh</UButton
-      >
-    </div>
+      <div class="mt-5 max-w-md">
+        <UInput
+          v-model="searchInput"
+          placeholder="Search performers by name"
+          icon="i-heroicons-magnifying-glass"
+        />
+      </div>
+    </section>
 
-    <UInput
-      v-model="searchInput"
-      placeholder="Search performers by name"
-      icon="i-heroicons-magnifying-glass"
-      class="max-w-md"
-    />
-
-    <div v-if="error" class="text-sm text-red-600">
+    <div v-if="error" class="stage-panel px-5 py-4 text-sm text-red-700">
       {{ error?.message || error?.data?.message }}
     </div>
 
-    <div v-if="isLoading" class="text-sm text-slate-600">
+    <div v-if="isLoading" class="stage-panel px-5 py-6 text-sm stage-muted">
       Loading performers...
     </div>
 
@@ -89,7 +92,7 @@ const showPagination = computed(() => totalPages.value > 1);
         :performer="performer"
         :shared-theater-count="sharedCounts.get(performer.id) || 0"
       />
-      <p v-if="!performers.length" class="text-sm text-slate-500">
+      <p v-if="!performers.length" class="stage-panel px-5 py-6 text-sm stage-muted sm:col-span-2 lg:col-span-3">
         No performers match that search yet.
       </p>
     </div>
@@ -106,7 +109,7 @@ const showPagination = computed(() => totalPages.value > 1);
       />
     </div>
 
-    <div class="text-xs text-slate-500">
+    <div class="text-xs stage-muted">
       Social clustering v1 uses shared theater membership as a proxy for “play
       together”. We can extend this to co-cast counts when cast data lands.
     </div>

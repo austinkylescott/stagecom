@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { FetchError } from "ofetch";
+import StageFeatureCard from "~/components/StageFeatureCard.vue";
 import { useCreateShow } from "~/composables/useShowMutations";
 
 const route = useRoute();
@@ -68,21 +69,29 @@ const submit = async (submitForReview: boolean) => {
 </script>
 
 <template>
-  <div class="space-y-6">
-    <div class="flex items-center justify-between flex-wrap gap-3">
-      <div>
-        <h1 class="text-2xl font-semibold">Create event</h1>
-        <p class="text-slate-600 text-sm">
-          Set up a show, practice, meeting, or audition, then submit for review.
-        </p>
+  <div class="space-y-8">
+    <section class="stage-panel stage-texture overflow-hidden px-6 py-7 sm:px-8 sm:py-8">
+      <div class="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <span class="stage-kicker">Show setup</span>
+          <h1 class="mt-4 stage-section-title">Create an event with clear ownership.</h1>
+          <p class="mt-3 max-w-3xl text-lg leading-8 stage-muted">
+            This screen should read like the setup card from the homepage:
+            title, schedule, casting mode, range, then a clear path to draft or review.
+          </p>
+        </div>
+        <UButton variant="ghost" :to="`/theaters/${slug}/review`">
+          Review queue
+        </UButton>
       </div>
-      <UButton variant="ghost" :to="`/theaters/${slug}/review`"
-        >Review queue</UButton
-      >
-    </div>
+    </section>
 
-    <UCard>
-      <div class="space-y-6">
+    <StageFeatureCard
+      title="Show Setup"
+      subtitle="Clear ownership and casting controls"
+      tone="bg-[var(--stage-mint)]"
+    >
+      <div class="space-y-6 text-[var(--stage-ink)]">
         <div class="grid gap-4 md:grid-cols-2">
           <UFormField label="Title" required>
             <UInput v-model="form.title" placeholder="Harold Night" />
@@ -192,6 +201,6 @@ const submit = async (submitForReview: boolean) => {
           <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
         </div>
       </div>
-    </UCard>
+    </StageFeatureCard>
   </div>
 </template>

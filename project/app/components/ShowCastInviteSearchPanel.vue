@@ -23,8 +23,8 @@ const { filteredResults, scopeAll, search, searchInput, searchLoading } =
 </script>
 
 <template>
-  <div class="space-y-3 border-t border-slate-200 pt-4">
-    <p class="text-sm font-semibold text-slate-700">Invite a performer</p>
+  <div class="space-y-3 border-t-2 border-[var(--stage-ink)] pt-4">
+    <p class="text-sm font-semibold text-[var(--stage-ink)]">Invite a performer</p>
     <div class="flex flex-wrap items-center gap-2">
       <UInput
         v-model="searchInput"
@@ -50,14 +50,14 @@ const { filteredResults, scopeAll, search, searchInput, searchLoading } =
       </UButton>
     </div>
 
-    <div v-if="searchLoading" class="text-sm text-slate-500">
+    <div v-if="searchLoading" class="text-sm stage-muted">
       Searching...
     </div>
     <div v-else class="space-y-1">
       <div
         v-for="profile in filteredResults"
         :key="profile.id"
-        class="flex items-center justify-between rounded-lg border border-slate-100 px-3 py-2"
+        class="flex items-center justify-between border-2 border-[var(--stage-ink)] bg-[var(--stage-cream)] px-3 py-2"
       >
         <div class="flex items-center gap-2">
           <UAvatar :text="profile.display_name?.[0] ?? '?'" size="xs" />
@@ -81,18 +81,15 @@ const { filteredResults, scopeAll, search, searchInput, searchLoading } =
           {{ profile.alreadyCast ? "Invited" : "Invite" }}
         </UButton>
       </div>
-      <p
-        v-if="!filteredResults.length && search"
-        class="text-sm text-slate-500"
-      >
+      <p v-if="!filteredResults.length && search" class="text-sm stage-muted">
         No results for "{{ search }}".
       </p>
       <p
         v-if="!scopeAll && !filteredResults.length && !search"
-        class="text-sm text-slate-500"
+        class="text-sm stage-muted"
       >
         No theater members yet.
-        <button class="text-blue-600 underline" @click="scopeAll = true">
+        <button class="font-semibold underline underline-offset-2" @click="scopeAll = true">
           Search all performers
         </button>
       </p>

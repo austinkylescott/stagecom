@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useRequestHeaders } from "#app";
+import StageFeatureCard from "~/components/StageFeatureCard.vue";
 import {
   useNotificationsPage,
   useMarkRead,
@@ -44,23 +45,26 @@ const markAllRead = () => markRead({ all: true });
 </script>
 
 <template>
-  <div class="space-y-6 max-w-2xl">
-    <div class="flex items-center justify-between flex-wrap gap-3">
-      <div>
-        <h1 class="text-2xl font-semibold">Notifications</h1>
-        <p class="text-sm text-slate-600">
-          Stay up to date on your shows and invites.
-        </p>
+  <div class="max-w-3xl space-y-8">
+    <section class="stage-panel stage-texture overflow-hidden px-6 py-7 sm:px-8 sm:py-8">
+      <div class="flex items-end justify-between flex-wrap gap-4">
+        <div>
+          <span class="stage-kicker">Notifications</span>
+          <h1 class="mt-4 stage-section-title">Updates that actually matter.</h1>
+          <p class="mt-3 max-w-2xl text-lg leading-8 stage-muted">
+            The homepage sells clear, actionable communication. This page should look like that promise carried through.
+          </p>
+        </div>
+        <UButton
+          v-if="unreadCount > 0"
+          size="sm"
+          variant="ghost"
+          @click="markAllRead"
+        >
+          Mark all read
+        </UButton>
       </div>
-      <UButton
-        v-if="unreadCount > 0"
-        size="sm"
-        variant="ghost"
-        @click="markAllRead"
-      >
-        Mark all read
-      </UButton>
-    </div>
+    </section>
 
     <div class="flex gap-2 flex-wrap">
       <UButton
@@ -75,37 +79,36 @@ const markAllRead = () => markRead({ all: true });
       </UButton>
     </div>
 
-    <div v-if="isLoading" class="text-sm text-slate-500">Loading...</div>
+    <div v-if="isLoading" class="stage-panel px-5 py-6 text-sm stage-muted">Loading...</div>
 
-    <div v-else-if="!notifications.length" class="text-sm text-slate-500">
+    <div v-else-if="!notifications.length" class="stage-panel px-5 py-6 text-sm stage-muted">
       No notifications here yet.
     </div>
 
-    <div v-else class="space-y-1">
-      <NuxtLink
+    <div v-else class="space-y-3">
+      <StageFeatureCard
         v-for="n in notifications"
         :key="n.id"
+        as="NuxtLink"
+        :title="n.read_at ? 'Seen update' : 'New update'"
+        :subtitle="new Date(n.created_at).toLocaleString()"
+        :tone="n.read_at ? 'bg-[var(--stage-paper-strong)]' : 'bg-[var(--stage-mint)]'"
         :to="formatNotification(n.type, n.payload).href ?? '#'"
-        class="flex items-start gap-3 rounded-lg border px-4 py-3 transition-colors hover:bg-slate-50"
-        :class="n.read_at ? 'border-slate-100' : 'border-blue-100 bg-blue-50'"
+        class="transition-transform hover:-translate-y-0.5"
         @click="!n.read_at && markRead({ ids: [n.id] })"
       >
-        <span
-          class="mt-1.5 h-2 w-2 rounded-full shrink-0"
-          :class="n.read_at ? 'bg-transparent' : 'bg-blue-500'"
-        />
-        <div class="flex-1 min-w-0">
-          <p
-            class="text-sm"
-            :class="n.read_at ? 'text-slate-500' : 'text-slate-900 font-medium'"
-          >
-            {{ formatNotification(n.type, n.payload).text }}
-          </p>
-          <p class="text-xs text-slate-400 mt-0.5">
-            {{ new Date(n.created_at).toLocaleString() }}
-          </p>
+        <div class="flex items-start gap-3">
+          <span
+            class="mt-1.5 size-2 shrink-0 border border-[var(--stage-ink)]"
+            :class="n.read_at ? 'bg-[var(--stage-paper-strong)]' : 'bg-[var(--stage-coral)]'"
+          />
+          <div class="min-w-0 flex-1">
+            <p class="text-sm" :class="n.read_at ? 'stage-muted' : 'font-medium text-[var(--stage-ink)]'">
+              {{ formatNotification(n.type, n.payload).text }}
+            </p>
+          </div>
         </div>
-      </NuxtLink>
+      </StageFeatureCard>
     </div>
 
     <UPagination

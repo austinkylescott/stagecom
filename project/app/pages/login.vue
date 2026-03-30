@@ -95,8 +95,16 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-  <div class="flex flex-col items-center justify-center gap-4 p-4">
-    <UPageCard class="w-full max-w-md">
+  <div class="space-y-8 px-4 py-6">
+    <section class="mx-auto w-full max-w-3xl stage-panel stage-texture overflow-hidden px-6 py-7 sm:px-8 sm:py-8">
+      <span class="stage-kicker">Welcome back</span>
+      <h1 class="mt-4 stage-section-title">Sign in to run your scene.</h1>
+      <p class="mt-3 max-w-2xl text-lg leading-8 stage-muted">
+        Auth screens should live inside the same homepage system, even while relying on Nuxt UI form primitives.
+      </p>
+    </section>
+    <div class="flex flex-col items-center justify-center gap-4">
+      <UPageCard class="w-full max-w-md">
       <UAuthForm
         :schema="schema"
         :fields="fields"
@@ -129,6 +137,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
           >.
         </template>
       </UAuthForm>
-    </UPageCard>
+      </UPageCard>
+    </div>
   </div>
 </template>

@@ -104,7 +104,7 @@ const weekdayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
         <div v-if="isLoading" class="text-sm stage-muted">Loading...</div>
         <div
           v-else-if="sortedShows.length === 0"
-          class="rounded-[1rem] border-[2px] border-dashed border-[var(--stage-ink)] bg-[rgba(251,247,239,0.7)] px-4 py-6 text-sm stage-muted"
+          class="border-2 border-dashed border-[var(--stage-ink)] bg-[rgba(251,247,239,0.7)] px-4 py-6 text-sm stage-muted"
         >
           No shows yet. Join or create a theater, then add a show.
         </div>
@@ -168,7 +168,7 @@ const weekdayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
           <div
             v-for="day in monthDays"
             :key="day.toISOString()"
-            class="min-h-24 rounded-[1rem] border-[2px] border-[var(--stage-ink)] bg-[rgba(251,247,239,0.8)] p-2 flex flex-col gap-1"
+            class="flex min-h-24 flex-col gap-1 border-2 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.8)] p-2"
           >
             <div class="font-semibold">{{ day.getDate() }}</div>
             <div class="flex flex-col gap-1">
@@ -180,7 +180,7 @@ const weekdayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
               >
                 <NuxtLink
                   :to="showDetailLink(occ)"
-                  class="focus:outline-none rounded"
+                  class="focus:outline-none"
                 >
                   <UBadge
                     size="xs"

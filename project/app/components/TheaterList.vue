@@ -57,13 +57,13 @@ const emit = defineEmits<{
 
     <div
       v-if="pending && (!theaters || theaters.length === 0)"
-      class="rounded-[1rem] border-[2px] border-dashed border-[var(--stage-ink)] bg-[rgba(251,247,239,0.7)] px-4 py-6 text-sm stage-muted"
+      class="border-2 border-dashed border-[var(--stage-ink)] bg-[rgba(251,247,239,0.7)] px-4 py-6 text-sm stage-muted"
     >
       Loading...
     </div>
     <div
       v-else-if="!theaters || theaters.length === 0"
-      class="rounded-[1rem] border-[2px] border-dashed border-[var(--stage-ink)] bg-[rgba(251,247,239,0.7)] px-4 py-6 text-sm stage-muted"
+      class="border-2 border-dashed border-[var(--stage-ink)] bg-[rgba(251,247,239,0.7)] px-4 py-6 text-sm stage-muted"
     >
       {{ emptyMessage || "Nothing yet." }}
     </div>

@@ -6,7 +6,7 @@ export default defineAppConfig({
     },
     button: {
       slots: {
-        base: "font-semibold uppercase tracking-[0.14em] rounded-full border-2 border-[var(--stage-ink)] shadow-[4px_4px_0_0_var(--stage-ink)] data-[state=open]:translate-y-[1px] data-[state=open]:shadow-[2px_2px_0_0_var(--stage-ink)] hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_var(--stage-ink)] active:translate-y-[2px] active:shadow-none",
+        base: "border-2 border-[var(--stage-ink)] font-semibold uppercase tracking-[0.14em] shadow-[4px_4px_0_0_var(--stage-ink)] data-[state=open]:translate-y-[1px] data-[state=open]:shadow-[2px_2px_0_0_var(--stage-ink)] hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_var(--stage-ink)] active:translate-y-[2px] active:shadow-none",
         label: "truncate",
       },
       variants: {
@@ -45,13 +45,24 @@ export default defineAppConfig({
     },
     card: {
       slots: {
-        root: "rounded-[1.5rem] border-[3px] border-[var(--stage-ink)] bg-[rgba(251,247,239,0.94)] shadow-[8px_8px_0_0_var(--stage-ink)] overflow-hidden",
+        root: "overflow-hidden border-3 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.94)] shadow-[8px_8px_0_0_var(--stage-ink)]",
         header: "px-5 py-4 sm:px-6 sm:py-5",
         body: "px-5 py-5 sm:px-6 sm:py-6",
         footer: "px-5 py-4 sm:px-6 sm:py-5",
       },
     },
     input: {
+      variants: {
+        variant: {
+          outline:
+            "bg-[rgba(251,247,239,0.92)] text-[var(--stage-ink)] ring-[2px] ring-inset ring-[var(--stage-ink)] placeholder:text-[color:rgba(43,41,38,0.55)] focus:ring-[3px] focus:ring-[var(--stage-coral)]",
+        },
+      },
+      defaultVariants: {
+        variant: "outline",
+      },
+    },
+    textarea: {
       variants: {
         variant: {
           outline:
@@ -76,11 +87,23 @@ export default defineAppConfig({
     badge: {
       variants: {
         variant: {
-          soft: "border-2 border-[var(--stage-ink)] uppercase tracking-[0.12em] font-bold",
+          soft: "border-2 border-[var(--stage-ink)] font-bold uppercase tracking-[0.12em]",
         },
       },
       defaultVariants: {
         variant: "soft",
+      },
+    },
+    alert: {
+      slots: {
+        root: "border-3 border-[var(--stage-ink)] bg-[var(--stage-cream)] text-[var(--stage-ink)] shadow-[6px_6px_0_0_var(--stage-ink)]",
+        title: "font-display text-xl uppercase tracking-[0.08em]",
+        description: "text-sm leading-6 text-[color:rgba(43,41,38,0.72)]",
+      },
+    },
+    pagination: {
+      slots: {
+        list: "flex items-center gap-2",
       },
     },
   },

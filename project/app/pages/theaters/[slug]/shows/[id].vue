@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useRequestHeaders } from "#app";
+import StageFeatureCard from "~/components/StageFeatureCard.vue";
 import {
   useShowDetail,
   useUpdateShowSettings,
@@ -104,6 +105,30 @@ const hasCastOverflow = computed(
 const programLink = computed(() =>
   show.value ? `/theaters/${slug.value}/shows/${show.value.id}/program` : null,
 );
+const sortedProgramCast = computed(() =>
+  acceptedCast.value.slice().sort((a, b) => {
+    if (a.programOrder === null && b.programOrder === null) {
+      return (a.displayName ?? a.userId).localeCompare(b.displayName ?? b.userId);
+    }
+    if (a.programOrder === null) return 1;
+    if (b.programOrder === null) return -1;
+    if (a.programOrder !== b.programOrder) return a.programOrder - b.programOrder;
+    return (a.displayName ?? a.userId).localeCompare(b.displayName ?? b.userId);
+  }),
+);
+const pendingCast = computed(() =>
+  cast.value.filter((member) => member.status === "pending"),
+);
+const declinedCast = computed(() =>
+  cast.value.filter((member) => ["declined", "withdrawn"].includes(member.status)),
+);
+const inviteStatusClass = (status: string) => {
+  if (status === "accepted") return "bg-[var(--stage-mint)]";
+  if (status === "pending") return "bg-[var(--stage-paper-strong)]";
+  return "bg-[var(--stage-coral)]";
+};
+const formatDateTime = (value: string | null | undefined) =>
+  value ? new Date(value).toLocaleString() : "TBD";
 
 const updateShowStatus = useUpdateShowStatus(id, slug);
 const updateShowSettings = useUpdateShowSettings(id);
@@ -179,7 +204,7 @@ const statusColors = {
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="space-y-8">
     <div class="flex items-center gap-2 text-sm stage-muted">
       <NuxtLink :to="`/theaters/${slug}`" class="hover:underline">
         {{ show?.theaterName ?? slug }}
@@ -245,7 +270,7 @@ const statusColors = {
 
           <div class="grid gap-3 sm:grid-cols-3">
             <div
-              class="rounded-[1.15rem] border-[3px] border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.08)] p-4"
+              class="border-3 border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.08)] p-4"
             >
               <p class="stage-overline text-[var(--stage-paper-muted)]">
                 Cast count
@@ -258,7 +283,7 @@ const statusColors = {
               </p>
             </div>
             <div
-              class="rounded-[1.15rem] border-[3px] border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.08)] p-4"
+              class="border-3 border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.08)] p-4"
             >
               <p class="stage-overline text-[var(--stage-paper-muted)]">
                 Producers
@@ -271,7 +296,7 @@ const statusColors = {
               </p>
             </div>
             <div
-              class="rounded-[1.15rem] border-[3px] border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.08)] p-4"
+              class="border-3 border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.08)] p-4"
             >
               <p class="stage-overline text-[var(--stage-paper-muted)]">
                 Schedule
@@ -287,13 +312,13 @@ const statusColors = {
 
           <p
             v-if="hasCastOverflow"
-            class="rounded-[1rem] border-[3px] border-[var(--stage-gold)] bg-[rgba(234,165,66,0.14)] px-4 py-3 text-sm text-[var(--stage-cream)]"
+            class="border-3 border-[var(--stage-gold)] bg-[rgba(234,165,66,0.14)] px-4 py-3 text-sm text-[var(--stage-cream)]"
           >
             Confirmed cast exceeds the current max. v1 allows this, but it should be reviewed.
           </p>
         </div>
 
-        <div class="rounded-[1.4rem] border-[3px] border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.08)] p-5">
+        <div class="border-3 border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.08)] p-5">
           <p class="stage-overline text-[var(--stage-paper-muted)]">
             Producer actions
           </p>
@@ -351,14 +376,14 @@ const statusColors = {
 
           <div class="mt-4 grid gap-3 md:grid-cols-2">
             <div
-              class="rounded-[1rem] border-[2px] border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.08)] p-4 text-sm text-[var(--stage-paper-muted)]"
+              class="border-2 border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.08)] p-4 text-sm text-[var(--stage-paper-muted)]"
             >
               <span class="font-semibold text-[var(--stage-cream)]">Cast size:</span>
               {{ castCountSummary }}
             </div>
             <div
               v-if="show.ticketUrl"
-              class="rounded-[1rem] border-[2px] border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.08)] p-4 text-sm text-[var(--stage-paper-muted)]"
+              class="border-2 border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.08)] p-4 text-sm text-[var(--stage-paper-muted)]"
             >
               <span class="font-semibold text-[var(--stage-cream)]">Tickets:</span>
               <a
@@ -375,48 +400,150 @@ const statusColors = {
       </div>
     </section>
 
-    <UCard v-if="show">
-      <template #header>
-        <div>
-          <p class="stage-overline">Schedule</p>
-          <h2 class="mt-2 font-display text-4xl uppercase tracking-[0.08em]">
-            Occurrences
-          </h2>
-        </div>
-      </template>
-      <div v-if="!occurrences.length" class="text-sm stage-muted">
-        No occurrences scheduled yet.
-      </div>
-      <div v-else class="space-y-2">
-        <div
-          v-for="occ in occurrences"
-          :key="occ.id"
-          class="stage-list-card flex items-center justify-between gap-3 px-4 py-4 text-sm"
-        >
-          <span>{{ new Date(occ.starts_at).toLocaleString() }}</span>
-          <div class="flex items-center gap-2">
-            <span v-if="occ.ends_at" class="stage-muted">
-              → {{ new Date(occ.ends_at).toLocaleString() }}
+    <section v-if="show" class="grid gap-6 lg:grid-cols-3">
+      <StageFeatureCard
+        title="Show Setup"
+        subtitle="Clear ownership and casting controls"
+        tone="bg-[var(--stage-mint)]"
+      >
+        <div class="space-y-4 text-[var(--stage-ink)]">
+          <div class="flex items-center justify-between border-b-2 border-[rgba(43,41,38,0.1)] pb-3">
+            <div>
+              <div class="font-bold">{{ show.title }}</div>
+              <div class="text-sm stage-muted">
+                {{ formatDateTime(occurrences[0]?.starts_at) }}
+              </div>
+            </div>
+            <span class="border-2 border-[var(--stage-ink)] px-2 py-1 text-xs font-bold uppercase" :class="show.status === 'approved' ? 'bg-[var(--stage-mint)]' : show.status === 'pending_review' ? 'bg-[var(--stage-gold)]' : 'bg-[var(--stage-paper-strong)]'">
+              {{ show.status.replaceAll("_", " ") }}
             </span>
-            <UBadge
-              v-if="occ.status !== 'scheduled'"
-              size="xs"
-              color="warning"
-              variant="soft"
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="border-2 border-[rgba(43,41,38,0.18)] p-3">
+              <div class="text-xs font-semibold uppercase stage-muted">Producer</div>
+              <div class="font-medium">{{ producers[0]?.displayName || "Unassigned" }}</div>
+            </div>
+            <div class="border-2 border-[rgba(43,41,38,0.18)] p-3">
+              <div class="text-xs font-semibold uppercase stage-muted">Casting</div>
+              <div class="font-medium">{{ show.castingMode.replaceAll("_", " ") }}</div>
+            </div>
+          </div>
+          <div class="border-2 border-[rgba(43,41,38,0.18)] p-3">
+            <div class="mb-2 text-xs font-semibold uppercase stage-muted">Cast Size</div>
+            <div class="flex items-center gap-2">
+              <div class="h-2 flex-1 bg-[rgba(43,41,38,0.12)]">
+                <div class="h-full bg-[var(--stage-mint)]" :style="{ width: castRangeLabel ? `${Math.min((confirmedCount / Math.max(show.castMax || confirmedCount || 1, 1)) * 100, 100)}%` : '40%' }" />
+              </div>
+              <span class="text-sm font-bold">{{ castRangeLabel || "Open cast" }}</span>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <UButton
+              v-if="canSubmitForReview"
+              class="flex-1"
+              size="sm"
+              :loading="isUpdatingStatus"
+              @click="runStatusAction('submit_for_review')"
             >
-              {{ occ.status }}
-            </UBadge>
+              Submit
+            </UButton>
+            <UButton
+              v-if="isProducer"
+              class="flex-1"
+              size="sm"
+              variant="ghost"
+              :loading="isUpdatingSettings"
+              @click="toggleCastFinalized"
+            >
+              {{ show.isCastFinalized ? "Reopen Cast" : "Finalize Cast" }}
+            </UButton>
           </div>
         </div>
-      </div>
-    </UCard>
+      </StageFeatureCard>
 
-    <UCard v-if="show">
+      <StageFeatureCard
+        title="Cast Invitations"
+        subtitle="Track responses in real-time"
+        tone="bg-[var(--stage-gold)]"
+      >
+        <div class="space-y-3 text-[var(--stage-ink)]">
+          <div
+            v-for="member in cast.slice(0, 5)"
+            :key="member.userId"
+            class="flex items-center justify-between border-2 border-[rgba(43,41,38,0.1)] p-2"
+          >
+            <div class="flex items-center gap-3">
+              <div class="size-8 border-2 border-[rgba(43,41,38,0.18)] bg-[var(--stage-paper-strong)]" />
+              <span class="text-sm font-medium">{{ member.displayName ?? member.userId }}</span>
+            </div>
+            <div class="border-2 border-[var(--stage-ink)] px-2 py-0.5 text-xs font-bold uppercase" :class="inviteStatusClass(member.status)">
+              {{ member.status }}
+            </div>
+          </div>
+          <div class="mt-4 flex items-center justify-between border-t-2 border-[rgba(43,41,38,0.1)] pt-3">
+            <div class="text-sm stage-muted">
+              <span class="font-bold text-[var(--stage-ink)]">{{ confirmedCount }}</span>
+              confirmed,
+              <span class="font-bold text-[var(--stage-ink)]">{{ pendingCast.length }}</span>
+              pending
+            </div>
+            <UButton
+              v-if="isProducer"
+              size="xs"
+              variant="ghost"
+              to="#production-controls"
+            >
+              Manage Cast
+            </UButton>
+          </div>
+        </div>
+      </StageFeatureCard>
+
+      <StageFeatureCard
+        title="Lineup Order"
+        subtitle="Program everyone can trust"
+        tone="bg-[var(--stage-coral)]"
+      >
+        <div class="space-y-2 text-[var(--stage-ink)]">
+          <div
+            v-for="(member, index) in sortedProgramCast.slice(0, 4)"
+            :key="member.userId"
+            class="flex items-center gap-3 border-2 border-[rgba(43,41,38,0.1)] p-2"
+          >
+            <div class="flex size-8 items-center justify-center border-2 border-[var(--stage-ink)] bg-[var(--stage-ink)] text-sm font-bold text-[var(--stage-cream)]">
+              {{ member.programOrder ?? index + 1 }}
+            </div>
+            <div class="flex-1">
+              <div class="text-sm font-medium">{{ member.displayName ?? member.userId }}</div>
+              <div class="text-xs stage-muted">{{ member.note || "Performer" }}</div>
+            </div>
+            <div class="text-sm font-medium text-[rgba(43,41,38,0.7)]">
+              {{ occurrences[index]?.starts_at ? new Date(occurrences[index].starts_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : "Slot" }}
+            </div>
+          </div>
+          <div class="mt-4 flex items-center gap-2 text-sm stage-muted">
+            <span class="size-4 border-2 border-[var(--stage-ink)] bg-[var(--stage-paper-strong)]" />
+            <span>Estimated runtime: {{ occurrences.length ? `${occurrences.length} scheduled block${occurrences.length === 1 ? '' : 's'}` : "Not set" }}</span>
+          </div>
+          <UButton
+            v-if="programLink"
+            class="mt-2 w-full"
+            size="sm"
+            variant="ghost"
+            :to="programLink"
+          >
+            Open Program View
+          </UButton>
+        </div>
+      </StageFeatureCard>
+    </section>
+
+    <UCard v-if="show" id="production-controls">
       <template #header>
         <div>
-          <p class="stage-overline">Cast</p>
+          <p class="stage-overline">Production controls</p>
           <h2 class="mt-2 font-display text-4xl uppercase tracking-[0.08em]">
-            Lineup management
+            Cast and invitation management
           </h2>
         </div>
       </template>

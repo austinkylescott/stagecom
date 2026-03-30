@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import StageFeatureCard from "~/components/StageFeatureCard.vue";
+import StageStackedBoard from "~/components/StageStackedBoard.vue";
+
 const activeRole = ref<"managers" | "producers" | "performers">("producers");
 
 const workflowSources = [
@@ -181,10 +184,10 @@ const notifications = [
       <div class="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
         <div class="grid items-center gap-10 lg:grid-cols-[1fr_0.92fr] lg:gap-16">
           <div class="space-y-8">
-            <div class="inline-flex w-fit items-center gap-3 border-[3px] border-[var(--stage-ink)] bg-[var(--stage-paper-strong)] px-4 py-2">
-              <span class="relative flex h-2.5 w-2.5">
-                <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--stage-mint)] opacity-75" />
-                <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-[var(--stage-mint)]" />
+            <div class="inline-flex w-fit items-center gap-3 border-3 border-[var(--stage-ink)] bg-[var(--stage-paper-strong)] px-4 py-2">
+              <span class="relative flex size-2.5">
+                <span class="absolute inline-flex size-full animate-ping bg-[var(--stage-mint)] opacity-75" />
+                <span class="relative inline-flex size-2.5 bg-[var(--stage-mint)]" />
               </span>
               <span class="text-sm font-semibold text-[var(--stage-ink)]">
                 Building with the community
@@ -205,7 +208,7 @@ const notifications = [
               <span
                 v-for="source in workflowSources"
                 :key="source"
-                class="border-[2px] px-3 py-1 text-sm font-medium"
+                class="border-2 px-3 py-1 text-sm font-medium"
                 :class="
                   source === 'Stagecom'
                     ? 'border-[var(--stage-ink)] bg-[var(--stage-mint)] text-[var(--stage-ink)]'
@@ -227,46 +230,33 @@ const notifications = [
 
             <div class="flex flex-wrap gap-6 pt-2">
               <div class="flex items-center gap-2">
-                <span class="h-5 w-5 rounded-full border-[2px] border-[var(--stage-ink)] bg-[var(--stage-coral)]" />
+                <span class="size-5 border-2 border-[var(--stage-ink)] bg-[var(--stage-coral)]" />
                 <span class="text-sm font-semibold text-[var(--stage-ink)]">For performers</span>
               </div>
               <div class="flex items-center gap-2">
-                <span class="h-5 w-5 rounded-full border-[2px] border-[var(--stage-ink)] bg-[var(--stage-mint)]" />
+                <span class="size-5 border-2 border-[var(--stage-ink)] bg-[var(--stage-mint)]" />
                 <span class="text-sm font-semibold text-[var(--stage-ink)]">For producers</span>
               </div>
               <div class="flex items-center gap-2">
-                <span class="h-5 w-5 rounded-full border-[2px] border-[var(--stage-ink)] bg-[var(--stage-gold)]" />
+                <span class="size-5 border-2 border-[var(--stage-ink)] bg-[var(--stage-gold)]" />
                 <span class="text-sm font-semibold text-[var(--stage-ink)]">For theaters</span>
               </div>
             </div>
           </div>
 
-          <div class="relative">
-            <div class="absolute -right-4 -top-4 h-full w-full border-[4px] border-[var(--stage-ink)] bg-[var(--stage-coral)]" />
-            <div class="absolute -right-2 -top-2 h-full w-full border-[4px] border-[var(--stage-ink)] bg-[var(--stage-mint)]" />
-
-            <div class="relative border-[4px] border-[var(--stage-ink)] bg-[var(--stage-cream)] p-6 md:p-8">
-              <div class="mb-6 flex items-center justify-between border-b-[2px] border-[var(--stage-ink)] pb-4">
-                <div class="flex items-center gap-3">
-                  <div class="h-10 w-10 border-[2px] border-[var(--stage-ink)] bg-[var(--stage-gold)]" />
-                  <div>
-                    <div class="font-bold text-[var(--stage-ink)]">The Improv Theater</div>
-                    <div class="text-sm stage-muted">Tonight's Shows</div>
-                  </div>
-                </div>
-                <span class="border-[2px] border-[var(--stage-ink)] bg-[var(--stage-mint)] px-2 py-1 text-xs font-bold uppercase text-[var(--stage-ink)]">
-                  Live
-                </span>
-              </div>
-
+          <StageStackedBoard
+            title="The Improv Theater"
+            subtitle="Tonight's Shows"
+            badge="Live"
+          >
               <div class="space-y-4">
                 <div
                   v-for="show in heroPreviewShows"
                   :key="show.title"
-                  class="flex items-center justify-between gap-3 border-[2px] border-[var(--stage-ink)] p-3 transition-colors hover:bg-[var(--stage-paper-strong)]"
+                  class="flex items-center justify-between gap-3 border-2 border-[var(--stage-ink)] p-3 transition-colors hover:bg-[var(--stage-paper-strong)]"
                 >
                   <div class="flex items-center gap-3">
-                    <div class="flex h-8 w-8 items-center justify-center border-[2px] border-[var(--stage-ink)] bg-[var(--stage-ink)] text-xs font-bold text-[var(--stage-cream)]">
+                    <div class="flex size-8 items-center justify-center border-2 border-[var(--stage-ink)] bg-[var(--stage-ink)] text-xs font-bold text-[var(--stage-cream)]">
                       {{ show.cast }}
                     </div>
                     <div>
@@ -274,33 +264,35 @@ const notifications = [
                       <div class="text-xs stage-muted">{{ show.time }}</div>
                     </div>
                   </div>
-                  <span class="border-[2px] border-[var(--stage-ink)] px-2 py-0.5 text-xs font-bold text-[var(--stage-ink)]" :class="show.tone">
+                  <span class="border-2 border-[var(--stage-ink)] px-2 py-0.5 text-xs font-bold text-[var(--stage-ink)]" :class="show.tone">
                     {{ show.status }}
                   </span>
                 </div>
               </div>
 
               <div class="mt-6 flex gap-2">
-                <div class="flex-1 border-[2px] border-[var(--stage-ink)] bg-[var(--stage-gold)] px-4 py-2 text-center text-sm font-bold text-[var(--stage-ink)]">
+                <div class="flex-1 border-2 border-[var(--stage-ink)] bg-[var(--stage-gold)] px-4 py-2 text-center text-sm font-bold text-[var(--stage-ink)]">
                   Add Show
                 </div>
-                <div class="flex-1 border-[2px] border-[var(--stage-ink)] bg-[var(--stage-paper-strong)] px-4 py-2 text-center text-sm font-bold text-[var(--stage-ink)]">
+                <div class="flex-1 border-2 border-[var(--stage-ink)] bg-[var(--stage-paper-strong)] px-4 py-2 text-center text-sm font-bold text-[var(--stage-ink)]">
                   View All
                 </div>
               </div>
-            </div>
-
-            <div class="absolute -left-5 top-1/4 border-[2px] border-[var(--stage-ink)] bg-[var(--stage-cream)] px-3 py-2 shadow-[4px_4px_0_0_var(--stage-ink)]">
-              <div class="flex items-center gap-2">
-                <div class="h-3 w-3 rounded-full bg-green-500" />
-                <span class="text-xs font-bold text-[var(--stage-ink)]">Cast Confirmed</span>
+            <template #left-callout>
+              <div class="absolute -left-5 top-1/4 border-2 border-[var(--stage-ink)] bg-[var(--stage-cream)] px-3 py-2 shadow-[4px_4px_0_0_var(--stage-ink)]">
+                <div class="flex items-center gap-2">
+                  <div class="size-3 border border-[var(--stage-ink)] bg-green-500" />
+                  <span class="text-xs font-bold text-[var(--stage-ink)]">Cast Confirmed</span>
+                </div>
               </div>
-            </div>
+            </template>
 
-            <div class="absolute -right-4 bottom-1/4 border-[2px] border-[var(--stage-ink)] bg-[var(--stage-cream)] px-3 py-2 shadow-[4px_4px_0_0_var(--stage-ink)]">
-              <span class="text-xs font-bold text-[var(--stage-ink)]">+3 invites sent</span>
-            </div>
-          </div>
+            <template #right-callout>
+              <div class="absolute -right-4 bottom-1/4 border-2 border-[var(--stage-ink)] bg-[var(--stage-cream)] px-3 py-2 shadow-[4px_4px_0_0_var(--stage-ink)]">
+                <span class="text-xs font-bold text-[var(--stage-ink)]">+3 invites sent</span>
+              </div>
+            </template>
+          </StageStackedBoard>
         </div>
       </div>
     </section>
@@ -308,7 +300,7 @@ const notifications = [
     <section class="bg-[var(--stage-ink)] px-4 py-16 text-[var(--stage-cream)] sm:px-6 lg:px-8 lg:py-24">
       <div class="mx-auto max-w-7xl">
         <div class="mb-12 max-w-3xl space-y-4">
-          <span class="inline-block border-[2px] border-[var(--stage-gold)] bg-[var(--stage-gold)] px-3 py-1 text-sm font-bold uppercase text-[var(--stage-ink)]">
+          <span class="inline-block border-2 border-[var(--stage-gold)] bg-[var(--stage-gold)] px-3 py-1 text-sm font-bold uppercase text-[var(--stage-ink)]">
             The Problem
           </span>
           <h2 class="stage-section-title max-w-3xl text-[var(--stage-cream)]">
@@ -325,11 +317,11 @@ const notifications = [
           <article
             v-for="problem in problems"
             :key="problem.title"
-            class="group border-[2px] border-[rgba(251,247,239,0.2)] bg-[var(--stage-ink)] p-6 transition-all hover:border-[var(--stage-coral)] hover:bg-[rgba(251,247,239,0.05)]"
+            class="group border-2 border-[rgba(251,247,239,0.2)] bg-[var(--stage-ink)] p-6 transition-all hover:border-[var(--stage-coral)] hover:bg-[rgba(251,247,239,0.05)]"
           >
             <div class="mb-4 flex items-center gap-3">
-              <div class="flex h-10 w-10 items-center justify-center border-[2px] border-[rgba(251,247,239,0.3)] text-[rgba(251,247,239,0.6)] transition-colors group-hover:border-[var(--stage-coral)] group-hover:text-[var(--stage-coral)]">
-                <span class="h-3 w-3 rounded-full bg-current" />
+              <div class="flex size-10 items-center justify-center border-2 border-[rgba(251,247,239,0.3)] text-[rgba(251,247,239,0.6)] transition-colors group-hover:border-[var(--stage-coral)] group-hover:text-[var(--stage-coral)]">
+                <span class="size-3 bg-current" />
               </div>
               <span class="text-sm font-semibold text-[rgba(251,247,239,0.6)] line-through decoration-[var(--stage-coral)]">
                 {{ problem.tool }}
@@ -344,7 +336,7 @@ const notifications = [
           </article>
         </div>
 
-        <div class="mt-12 border-t-[2px] border-[rgba(251,247,239,0.2)] pt-8">
+        <div class="mt-12 border-t-2 border-[rgba(251,247,239,0.2)] pt-8">
           <p class="text-center text-xl font-semibold md:text-2xl">
             There's no single, purpose-built tool that reflects how improv communities
             <span class="text-[var(--stage-gold)]"> actually operate</span>.
@@ -356,7 +348,7 @@ const notifications = [
     <section id="features" class="bg-[var(--stage-cream)] px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
       <div class="mx-auto max-w-7xl">
         <div class="mb-12 text-center">
-          <span class="inline-block border-[2px] border-[var(--stage-ink)] bg-[var(--stage-mint)] px-3 py-1 text-sm font-bold uppercase text-[var(--stage-ink)]">
+          <span class="inline-block border-2 border-[var(--stage-ink)] bg-[var(--stage-mint)] px-3 py-1 text-sm font-bold uppercase text-[var(--stage-ink)]">
             The Solution
           </span>
           <h2 class="stage-section-title mx-auto mt-4 max-w-3xl">
@@ -372,10 +364,10 @@ const notifications = [
           <article
             v-for="feature in features"
             :key="feature.title"
-            class="group border-[4px] border-[var(--stage-ink)] bg-[var(--stage-paper-strong)] p-6 transition-all hover:shadow-[8px_8px_0_0_var(--stage-ink)]"
+            class="group border-4 border-[var(--stage-ink)] bg-[var(--stage-paper-strong)] p-6 transition-all hover:shadow-[8px_8px_0_0_var(--stage-ink)]"
             :class="[feature.span, feature.tone]"
           >
-            <div class="mb-4 flex h-12 w-12 items-center justify-center border-[2px] border-[var(--stage-ink)] bg-[var(--stage-cream)]">
+            <div class="mb-4 flex size-12 items-center justify-center border-2 border-[var(--stage-ink)] bg-[var(--stage-cream)]">
               <span class="text-lg font-black text-[var(--stage-ink)]">+</span>
             </div>
             <h3 class="mb-2 text-lg font-bold text-[var(--stage-ink)]">
@@ -389,7 +381,7 @@ const notifications = [
 
         <div class="mt-16 flex items-center justify-center gap-4">
           <div class="h-1 w-16 bg-[var(--stage-ink)]" />
-          <div class="h-3 w-3 rotate-45 border-[2px] border-[var(--stage-ink)] bg-[var(--stage-gold)]" />
+          <div class="size-3 rotate-45 border-2 border-[var(--stage-ink)] bg-[var(--stage-gold)]" />
           <div class="h-1 w-16 bg-[var(--stage-ink)]" />
         </div>
       </div>
@@ -398,7 +390,7 @@ const notifications = [
     <section id="roles" class="bg-[var(--stage-paper-strong)] px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
       <div class="mx-auto max-w-7xl">
         <div class="mb-12 text-center">
-          <span class="inline-block border-[2px] border-[var(--stage-ink)] bg-[var(--stage-coral)] px-3 py-1 text-sm font-bold uppercase text-[var(--stage-ink)]">
+          <span class="inline-block border-2 border-[var(--stage-ink)] bg-[var(--stage-coral)] px-3 py-1 text-sm font-bold uppercase text-[var(--stage-ink)]">
             For Your Role
           </span>
           <h2 class="stage-section-title mx-auto mt-4 max-w-3xl">
@@ -415,7 +407,7 @@ const notifications = [
             v-for="roleKey in Object.keys(roles)"
             :key="roleKey"
             type="button"
-            class="flex items-center gap-2 border-[4px] border-[var(--stage-ink)] px-6 py-3 font-bold transition-all"
+            class="flex items-center gap-2 border-4 border-[var(--stage-ink)] px-6 py-3 font-bold transition-all"
             :class="
               activeRole === roleKey
                 ? `${roles[roleKey as keyof typeof roles].tone} shadow-[4px_4px_0_0_var(--stage-ink)] text-[var(--stage-ink)]`
@@ -428,7 +420,7 @@ const notifications = [
         </div>
 
         <div class="grid gap-8 lg:grid-cols-2">
-          <div class="border-[4px] border-[var(--stage-ink)] bg-[var(--stage-cream)] p-8">
+          <div class="border-4 border-[var(--stage-ink)] bg-[var(--stage-cream)] p-8">
             <div class="mb-6">
               <h3 class="font-display text-3xl text-[var(--stage-ink)]">
                 {{ activeRoleData.label }}
@@ -443,7 +435,7 @@ const notifications = [
                 class="flex items-start gap-3"
               >
                 <div
-                  class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center border-[2px] border-[var(--stage-ink)] text-[var(--stage-ink)]"
+                  class="mt-0.5 flex size-6 shrink-0 items-center justify-center border-2 border-[var(--stage-ink)] text-[var(--stage-ink)]"
                   :class="activeRoleData.tone"
                 >
                   <span class="text-xs font-black">✓</span>
@@ -454,8 +446,8 @@ const notifications = [
           </div>
 
           <div class="relative">
-            <div class="absolute -right-2 -top-2 h-full w-full border-[4px] border-[var(--stage-ink)]" :class="activeRoleData.tone" />
-            <div class="relative flex h-full flex-col justify-between border-[4px] border-[var(--stage-ink)] bg-[var(--stage-ink)] p-8">
+            <div class="absolute -right-2 -top-2 size-full border-4 border-[var(--stage-ink)]" :class="activeRoleData.tone" />
+            <div class="relative flex h-full flex-col justify-between border-4 border-[var(--stage-ink)] bg-[var(--stage-ink)] p-8">
               <div>
                 <div class="mb-6 text-6xl font-black text-[rgba(251,247,239,0.2)]">“</div>
                 <blockquote class="text-xl font-medium leading-9 text-[var(--stage-cream)] md:text-2xl">
@@ -463,7 +455,7 @@ const notifications = [
                 </blockquote>
               </div>
               <div class="mt-8 flex items-center gap-3">
-                <div class="h-12 w-12 border-[2px] border-[rgba(251,247,239,0.3)]" :class="activeRoleData.tone" />
+                <div class="size-12 border-2 border-[rgba(251,247,239,0.3)]" :class="activeRoleData.tone" />
                 <div>
                   <div class="font-bold text-[var(--stage-cream)]">
                     {{ activeRoleData.label.replace(/s$/, "") }}
@@ -477,7 +469,7 @@ const notifications = [
           </div>
         </div>
 
-        <div class="mt-12 border-[4px] border-[var(--stage-ink)] bg-[var(--stage-cream)] p-6 text-center">
+        <div class="mt-12 border-4 border-[var(--stage-ink)] bg-[var(--stage-cream)] p-6 text-center">
           <p class="text-[var(--stage-ink)]">
             <strong>Roles are contextual, not permanent.</strong>
             You can be a producer for one show and a performer in another. Stagecom
@@ -490,7 +482,7 @@ const notifications = [
     <section id="product" class="bg-[var(--stage-ink)] px-4 py-16 text-[var(--stage-cream)] sm:px-6 lg:px-8 lg:py-24">
       <div class="mx-auto max-w-7xl">
         <div class="mb-12 text-center">
-          <span class="inline-block border-[2px] border-[var(--stage-gold)] bg-[var(--stage-gold)] px-3 py-1 text-sm font-bold uppercase text-[var(--stage-ink)]">
+          <span class="inline-block border-2 border-[var(--stage-gold)] bg-[var(--stage-gold)] px-3 py-1 text-sm font-bold uppercase text-[var(--stage-ink)]">
             The Product
           </span>
           <h2 class="stage-section-title mx-auto mt-4 max-w-3xl text-[var(--stage-cream)]">
@@ -503,43 +495,34 @@ const notifications = [
         </div>
 
         <div class="grid gap-6 lg:grid-cols-2">
-          <article
+          <StageFeatureCard
             v-for="card in showcaseCards"
             :key="card.title"
-            class="border-[4px] border-[rgba(251,247,239,0.2)] bg-[var(--stage-cream)]"
+            :title="card.title"
+            :subtitle="card.subtitle"
+            :tone="card.tone"
           >
-            <div class="border-b-[4px] border-[var(--stage-ink)] px-4 py-3" :class="card.tone">
-              <div class="flex items-center justify-between gap-3">
-                <div>
-                  <h3 class="font-bold text-[var(--stage-ink)]">{{ card.title }}</h3>
-                  <p class="text-sm text-[rgba(43,41,38,0.7)]">{{ card.subtitle }}</p>
-                </div>
-                <span class="text-xl text-[rgba(43,41,38,0.55)]">⋯</span>
-              </div>
-            </div>
-
-            <div class="p-4 text-[var(--stage-ink)]">
-              <div v-if="card.kind === 'setup'" class="space-y-4">
-                <div class="flex items-center justify-between border-b-[2px] border-[rgba(43,41,38,0.1)] pb-3">
+            <div v-if="card.kind === 'setup'" class="space-y-4">
+                <div class="flex items-center justify-between border-b-2 border-[rgba(43,41,38,0.1)] pb-3">
                   <div>
                     <div class="font-bold">Friday Night Showcase</div>
                     <div class="text-sm stage-muted">Jan 24, 2026 at 8:00 PM</div>
                   </div>
-                  <span class="border-[2px] border-[var(--stage-ink)] bg-[var(--stage-mint)] px-2 py-1 text-xs font-bold uppercase">
+                  <span class="border-2 border-[var(--stage-ink)] bg-[var(--stage-mint)] px-2 py-1 text-xs font-bold uppercase">
                     Draft
                   </span>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
-                  <div class="border-[2px] border-[rgba(43,41,38,0.18)] p-3">
+                  <div class="border-2 border-[rgba(43,41,38,0.18)] p-3">
                     <div class="text-xs font-semibold uppercase stage-muted">Producer</div>
                     <div class="font-medium">Alex Rivera</div>
                   </div>
-                  <div class="border-[2px] border-[rgba(43,41,38,0.18)] p-3">
+                  <div class="border-2 border-[rgba(43,41,38,0.18)] p-3">
                     <div class="text-xs font-semibold uppercase stage-muted">Casting</div>
                     <div class="font-medium">Theater Members</div>
                   </div>
                 </div>
-                <div class="border-[2px] border-[rgba(43,41,38,0.18)] p-3">
+                <div class="border-2 border-[rgba(43,41,38,0.18)] p-3">
                   <div class="mb-2 text-xs font-semibold uppercase stage-muted">Cast Size</div>
                   <div class="flex items-center gap-2">
                     <div class="h-2 flex-1 bg-[rgba(43,41,38,0.12)]">
@@ -549,10 +532,10 @@ const notifications = [
                   </div>
                 </div>
                 <div class="flex gap-2">
-                  <button class="flex-1 border-[2px] border-[var(--stage-ink)] bg-[var(--stage-gold)] py-2 text-sm font-bold">
+                  <button class="flex-1 border-2 border-[var(--stage-ink)] bg-[var(--stage-gold)] py-2 text-sm font-bold">
                     Invite Cast
                   </button>
-                  <button class="flex-1 border-[2px] border-[var(--stage-ink)] bg-[var(--stage-cream)] py-2 text-sm font-bold">
+                  <button class="flex-1 border-2 border-[var(--stage-ink)] bg-[var(--stage-cream)] py-2 text-sm font-bold">
                     Save Draft
                   </button>
                 </div>
@@ -562,22 +545,22 @@ const notifications = [
                 <div
                   v-for="invite in inviteRows"
                   :key="invite.name"
-                  class="flex items-center justify-between border-[2px] border-[rgba(43,41,38,0.1)] p-2"
+                  class="flex items-center justify-between border-2 border-[rgba(43,41,38,0.1)] p-2"
                 >
                   <div class="flex items-center gap-3">
-                    <div class="h-8 w-8 border-[2px] border-[rgba(43,41,38,0.18)] bg-[var(--stage-paper-strong)]" />
+                    <div class="size-8 border-2 border-[rgba(43,41,38,0.18)] bg-[var(--stage-paper-strong)]" />
                     <span class="text-sm font-medium">{{ invite.name }}</span>
                   </div>
-                  <div class="flex items-center gap-1 border-[2px] border-[var(--stage-ink)] px-2 py-0.5 text-xs font-bold" :class="invite.tone">
+                  <div class="flex items-center gap-1 border-2 border-[var(--stage-ink)] px-2 py-0.5 text-xs font-bold" :class="invite.tone">
                     <span>{{ invite.status }}</span>
                   </div>
                 </div>
-                <div class="mt-4 flex items-center justify-between border-t-[2px] border-[rgba(43,41,38,0.1)] pt-3">
+                <div class="mt-4 flex items-center justify-between border-t-2 border-[rgba(43,41,38,0.1)] pt-3">
                   <div class="text-sm stage-muted">
                     <span class="font-bold text-[var(--stage-ink)]">2</span> confirmed,
                     <span class="font-bold text-[var(--stage-ink)]"> 2</span> pending
                   </div>
-                  <button class="border-[2px] border-[var(--stage-ink)] bg-[var(--stage-cream)] px-3 py-1 text-xs font-bold">
+                  <button class="border-2 border-[var(--stage-ink)] bg-[var(--stage-cream)] px-3 py-1 text-xs font-bold">
                     Send Reminder
                   </button>
                 </div>
@@ -587,9 +570,9 @@ const notifications = [
                 <div
                   v-for="row in lineupRows"
                   :key="row.order"
-                  class="flex items-center gap-3 border-[2px] border-[rgba(43,41,38,0.1)] p-2"
+                  class="flex items-center gap-3 border-2 border-[rgba(43,41,38,0.1)] p-2"
                 >
-                  <div class="flex h-8 w-8 items-center justify-center border-[2px] border-[var(--stage-ink)] bg-[var(--stage-ink)] text-sm font-bold text-[var(--stage-cream)]">
+                  <div class="flex size-8 items-center justify-center border-2 border-[var(--stage-ink)] bg-[var(--stage-ink)] text-sm font-bold text-[var(--stage-cream)]">
                     {{ row.order }}
                   </div>
                   <div class="flex-1">
@@ -601,7 +584,7 @@ const notifications = [
                   </div>
                 </div>
                 <div class="mt-4 flex items-center gap-2 text-sm stage-muted">
-                  <span class="h-4 w-4 rounded-full border-[2px] border-[var(--stage-ink)] bg-[var(--stage-paper-strong)]" />
+                  <span class="size-4 border-2 border-[var(--stage-ink)] bg-[var(--stage-paper-strong)]" />
                   <span>Estimated runtime: 1h 30m</span>
                 </div>
               </div>
@@ -610,41 +593,40 @@ const notifications = [
                 <div
                   v-for="row in reviewRows"
                   :key="row.title"
-                  class="flex items-center justify-between gap-3 border-[2px] border-[rgba(43,41,38,0.1)] p-3"
+                  class="flex items-center justify-between gap-3 border-2 border-[rgba(43,41,38,0.1)] p-3"
                 >
                   <div>
                     <div class="text-sm font-medium">{{ row.title }}</div>
                     <div class="text-xs stage-muted">by {{ row.author }}</div>
                   </div>
                   <div v-if="row.pending" class="flex gap-1">
-                    <button class="border-[2px] border-[var(--stage-ink)] bg-[var(--stage-mint)] px-2 py-1 text-xs font-bold">
+                    <button class="border-2 border-[var(--stage-ink)] bg-[var(--stage-mint)] px-2 py-1 text-xs font-bold">
                       Approve
                     </button>
-                    <button class="border-[2px] border-[var(--stage-ink)] bg-[var(--stage-cream)] px-2 py-1 text-xs font-bold">
+                    <button class="border-2 border-[var(--stage-ink)] bg-[var(--stage-cream)] px-2 py-1 text-xs font-bold">
                       Review
                     </button>
                   </div>
                   <span
                     v-else
-                    class="border-[2px] border-[var(--stage-ink)] bg-[var(--stage-mint)] px-2 py-1 text-xs font-bold"
+                    class="border-2 border-[var(--stage-ink)] bg-[var(--stage-mint)] px-2 py-1 text-xs font-bold"
                   >
                     Approved
                   </span>
                 </div>
-                <div class="mt-4 border-t-[2px] border-[rgba(43,41,38,0.1)] pt-3 text-center">
+                <div class="mt-4 border-t-2 border-[rgba(43,41,38,0.1)] pt-3 text-center">
                   <span class="text-sm stage-muted">
                     <span class="font-bold text-[var(--stage-coral)]">2</span> items need review
                   </span>
                 </div>
-              </div>
             </div>
-          </article>
+          </StageFeatureCard>
         </div>
 
-        <div class="mt-8 border-[4px] border-[rgba(251,247,239,0.2)] bg-[var(--stage-ink)] p-6">
+        <div class="mt-8 border-4 border-[rgba(251,247,239,0.2)] bg-[var(--stage-ink)] p-6">
           <div class="mb-4 flex items-center gap-3">
-            <div class="flex h-10 w-10 items-center justify-center border-[2px] border-[rgba(251,247,239,0.3)]">
-              <span class="h-4 w-4 rounded-full bg-[var(--stage-cream)]" />
+            <div class="flex size-10 items-center justify-center border-2 border-[rgba(251,247,239,0.3)]">
+              <span class="size-4 bg-[var(--stage-cream)]" />
             </div>
             <div>
               <div class="font-bold text-[var(--stage-cream)]">Real-time Notifications</div>
@@ -655,7 +637,7 @@ const notifications = [
             <div
               v-for="item in notifications"
               :key="item.text"
-              class="border-[2px] px-3 py-2 text-sm text-[var(--stage-cream)]"
+              class="border-2 px-3 py-2 text-sm text-[var(--stage-cream)]"
               :class="item.tone"
             >
               {{ item.text }}
@@ -678,7 +660,7 @@ const notifications = [
     <section class="bg-[var(--stage-cream)] px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
       <div class="mx-auto max-w-7xl">
         <div class="mb-12 text-center">
-          <span class="inline-block border-[2px] border-[var(--stage-ink)] bg-[var(--stage-ink)] px-3 py-1 text-sm font-bold uppercase text-[var(--stage-cream)]">
+          <span class="inline-block border-2 border-[var(--stage-ink)] bg-[var(--stage-ink)] px-3 py-1 text-sm font-bold uppercase text-[var(--stage-cream)]">
             Our Principles
           </span>
           <h2 class="stage-section-title mx-auto mt-4 max-w-3xl">
@@ -694,10 +676,10 @@ const notifications = [
           <article
             v-for="principle in principles"
             :key="principle.title"
-            class="group border-[4px] border-[var(--stage-ink)] bg-[var(--stage-paper-strong)] p-6 transition-all hover:bg-[var(--stage-ink)] hover:shadow-[8px_8px_0_0_var(--stage-gold)]"
+            class="group border-4 border-[var(--stage-ink)] bg-[var(--stage-paper-strong)] p-6 transition-all hover:bg-[var(--stage-ink)] hover:shadow-[8px_8px_0_0_var(--stage-gold)]"
           >
-            <div class="mb-4 flex h-12 w-12 items-center justify-center border-[2px] border-[var(--stage-ink)] bg-[var(--stage-cream)] transition-colors group-hover:bg-[var(--stage-gold)]">
-              <span class="h-4 w-4 rounded-full bg-[var(--stage-ink)]" />
+            <div class="mb-4 flex size-12 items-center justify-center border-2 border-[var(--stage-ink)] bg-[var(--stage-cream)] transition-colors group-hover:bg-[var(--stage-gold)]">
+              <span class="size-4 bg-[var(--stage-ink)]" />
             </div>
             <h3 class="mb-2 text-lg font-bold text-[var(--stage-ink)] transition-colors group-hover:text-[var(--stage-cream)]">
               {{ principle.title }}
@@ -714,14 +696,14 @@ const notifications = [
       <div class="absolute inset-0 opacity-[0.06]" style="background-image: repeating-linear-gradient(45deg, transparent, transparent 20px, #fdfcfb 20px, #fdfcfb 21px)" />
       <div class="relative mx-auto max-w-4xl text-center">
         <div class="relative">
-          <div class="absolute -inset-4 border-[4px] border-[var(--stage-gold)] md:-inset-8" />
-          <div class="absolute -inset-2 border-[4px] border-[rgba(251,247,239,0.2)] md:-inset-6" />
+          <div class="absolute -inset-4 border-4 border-[var(--stage-gold)] md:-inset-8" />
+          <div class="absolute -inset-2 border-4 border-[rgba(251,247,239,0.2)] md:-inset-6" />
 
           <div class="relative bg-[var(--stage-ink)] p-8 md:p-12">
-            <div class="mb-6 inline-flex items-center gap-2 border-[2px] border-[rgba(251,247,239,0.3)] px-4 py-2">
-              <span class="relative flex h-2.5 w-2.5">
-                <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--stage-mint)] opacity-75" />
-                <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-[var(--stage-mint)]" />
+            <div class="mb-6 inline-flex items-center gap-2 border-2 border-[rgba(251,247,239,0.3)] px-4 py-2">
+              <span class="relative flex size-2.5">
+                <span class="absolute inline-flex size-full animate-ping bg-[var(--stage-mint)] opacity-75" />
+                <span class="relative inline-flex size-2.5 bg-[var(--stage-mint)]" />
               </span>
               <span class="text-sm font-semibold text-[var(--stage-cream)]">
                 Actively building with early partners
@@ -762,7 +744,7 @@ const notifications = [
       </div>
     </section>
 
-    <footer class="border-t-[4px] border-[var(--stage-cream)] bg-[var(--stage-ink)] px-4 py-12 sm:px-6 lg:px-8">
+    <footer class="border-t-4 border-[var(--stage-cream)] bg-[var(--stage-ink)] px-4 py-12 sm:px-6 lg:px-8">
       <div class="mx-auto max-w-7xl">
         <div class="grid gap-8 md:grid-cols-4">
           <div class="md:col-span-2">
@@ -774,10 +756,10 @@ const notifications = [
               and local performance communities.
             </p>
             <div class="mt-6 flex gap-3">
-              <a href="#" aria-label="Twitter" class="flex h-10 w-10 items-center justify-center border-[2px] border-[rgba(251,247,239,0.3)] text-[rgba(251,247,239,0.7)] transition-colors hover:border-[var(--stage-gold)] hover:text-[var(--stage-gold)]">
+              <a href="#" aria-label="Twitter" class="flex size-10 items-center justify-center border-2 border-[rgba(251,247,239,0.3)] text-[rgba(251,247,239,0.7)] transition-colors hover:border-[var(--stage-gold)] hover:text-[var(--stage-gold)]">
                 X
               </a>
-              <a href="#" aria-label="Instagram" class="flex h-10 w-10 items-center justify-center border-[2px] border-[rgba(251,247,239,0.3)] text-[rgba(251,247,239,0.7)] transition-colors hover:border-[var(--stage-gold)] hover:text-[var(--stage-gold)]">
+              <a href="#" aria-label="Instagram" class="flex size-10 items-center justify-center border-2 border-[rgba(251,247,239,0.3)] text-[rgba(251,247,239,0.7)] transition-colors hover:border-[var(--stage-gold)] hover:text-[var(--stage-gold)]">
                 IG
               </a>
             </div>
@@ -804,7 +786,7 @@ const notifications = [
           </div>
         </div>
 
-        <div class="mt-12 flex flex-col items-center justify-between gap-4 border-t-[2px] border-[rgba(251,247,239,0.2)] pt-8 md:flex-row">
+        <div class="mt-12 flex flex-col items-center justify-between gap-4 border-t-2 border-[rgba(251,247,239,0.2)] pt-8 md:flex-row">
           <p class="text-sm text-[rgba(251,247,239,0.5)]">
             © 2026 Stagecom. Built for improv communities.
           </p>

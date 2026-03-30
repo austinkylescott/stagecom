@@ -125,11 +125,14 @@ const save = async () => {
 </script>
 
 <template>
-  <div class="space-y-6 max-w-xl">
-    <div>
-      <h1 class="text-2xl font-semibold">Profile</h1>
-      <p>Update how you appear to theaters and performers.</p>
-    </div>
+  <div class="max-w-3xl space-y-8">
+    <section class="stage-panel stage-texture overflow-hidden px-6 py-7 sm:px-8 sm:py-8">
+      <span class="stage-kicker">Profile</span>
+      <h1 class="mt-4 stage-section-title">How you appear across the scene.</h1>
+      <p class="mt-3 max-w-2xl text-lg leading-8 stage-muted">
+        This page should support the homepage system without pretending to be a feature card.
+      </p>
+    </section>
 
     <UAlert v-if="!user" color="yellow" variant="soft">
       <template #title>Sign in required</template>

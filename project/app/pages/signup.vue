@@ -113,8 +113,16 @@ const onSubmit = async (payload: FormSubmitEvent<Schema>) => {
 </script>
 
 <template>
-  <div class="flex flex-col items-center justify-center gap-4 p-4">
-    <UPageCard class="w-full max-w-md">
+  <div class="space-y-8 px-4 py-6">
+    <section class="mx-auto w-full max-w-3xl stage-panel stage-texture overflow-hidden px-6 py-7 sm:px-8 sm:py-8">
+      <span class="stage-kicker">Join Stagecom</span>
+      <h1 class="mt-4 stage-section-title">Create your account.</h1>
+      <p class="mt-3 max-w-2xl text-lg leading-8 stage-muted">
+        The product promise starts here, so signup should already feel like the homepage system.
+      </p>
+    </section>
+    <div class="flex flex-col items-center justify-center gap-4">
+      <UPageCard class="w-full max-w-md">
       <UAuthForm
         :schema="schema"
         :fields="fields"
@@ -142,6 +150,7 @@ const onSubmit = async (payload: FormSubmitEvent<Schema>) => {
           >.
         </template>
       </UAuthForm>
-    </UPageCard>
+      </UPageCard>
+    </div>
   </div>
 </template>

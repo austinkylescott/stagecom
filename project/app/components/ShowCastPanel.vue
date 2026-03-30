@@ -319,9 +319,9 @@ const inactiveStatusLabel = (member: ShowCastMember) => {
 
     <div
       v-if="myCast?.status === 'pending' && myCast.source === 'invited'"
-      class="rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 space-y-2"
+      class="space-y-2 border-2 border-[var(--stage-ink)] bg-[rgba(234,165,66,0.18)] px-4 py-3"
     >
-      <p class="text-sm font-medium text-orange-800">
+      <p class="text-sm font-medium text-[var(--stage-ink)]">
         You have a pending invite for this show.
       </p>
       <div class="flex gap-2">
@@ -347,12 +347,12 @@ const inactiveStatusLabel = (member: ShowCastMember) => {
 
     <div
       v-if="canShowRequestPanel"
-      class="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 space-y-2"
+      class="space-y-2 border-2 border-[var(--stage-ink)] bg-[rgba(130,191,182,0.18)] px-4 py-3"
     >
-      <p class="text-sm font-medium text-blue-800">
+      <p class="text-sm font-medium text-[var(--stage-ink)]">
         This show is open for cast requests.
       </p>
-      <p v-if="hasPendingRequest" class="text-sm text-blue-700">
+      <p v-if="hasPendingRequest" class="text-sm stage-muted">
         Your request to join is pending review.
       </p>
       <UButton

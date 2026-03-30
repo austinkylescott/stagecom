@@ -87,7 +87,7 @@ const { formatLocation } = useLocationFormatter();
 
         <div class="grid gap-3 sm:grid-cols-3">
           <div
-            class="rounded-[1.15rem] border-[3px] border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.1)] p-4"
+            class="border-3 border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.1)] p-4"
           >
             <p class="stage-overline text-[var(--stage-paper-muted)]">Status</p>
             <p class="mt-2 font-display text-3xl uppercase tracking-[0.08em]">
@@ -95,7 +95,7 @@ const { formatLocation } = useLocationFormatter();
             </p>
           </div>
           <div
-            class="rounded-[1.15rem] border-[3px] border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.1)] p-4"
+            class="border-3 border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.1)] p-4"
           >
             <p class="stage-overline text-[var(--stage-paper-muted)]">
               Upcoming
@@ -105,7 +105,7 @@ const { formatLocation } = useLocationFormatter();
             </p>
           </div>
           <div
-            class="rounded-[1.15rem] border-[3px] border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.1)] p-4"
+            class="border-3 border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.1)] p-4"
           >
             <p class="stage-overline text-[var(--stage-paper-muted)]">
               Community
@@ -117,7 +117,7 @@ const { formatLocation } = useLocationFormatter();
         </div>
       </div>
 
-      <div class="rounded-[1.5rem] border-[3px] border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.08)] p-5">
+      <div class="border-3 border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.08)] p-5">
         <div class="flex items-center justify-between gap-3">
           <p class="stage-overline text-[var(--stage-paper-muted)]">
             Upcoming shows
@@ -135,7 +135,7 @@ const { formatLocation } = useLocationFormatter();
             v-for="show in shows"
             :key="show.id"
             :to="theater ? `/theaters/${theater.slug}/shows/${show.id}` : undefined"
-            class="block rounded-[1rem] border-[3px] border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.12)] p-4"
+            class="block border-3 border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.12)] p-4"
           >
             <div class="flex items-start justify-between gap-3">
               <div>
@@ -166,7 +166,7 @@ const { formatLocation } = useLocationFormatter();
 
     <div
       v-if="!theater && candidates?.length"
-      class="mt-6 border-t-[3px] border-[rgba(239,227,205,0.5)] pt-6"
+      class="mt-6 border-t-3 border-[rgba(239,227,205,0.5)] pt-6"
     >
       <div class="flex items-start justify-between gap-4 flex-wrap">
         <div>
@@ -183,7 +183,7 @@ const { formatLocation } = useLocationFormatter();
         <article
           v-for="c in candidates"
           :key="c.id"
-          class="rounded-[1.2rem] border-[3px] border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.1)] p-4"
+          class="border-3 border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.1)] p-4"
         >
           <div>
             <p class="font-display text-3xl uppercase tracking-[0.08em]">

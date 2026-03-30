@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useRequestHeaders } from "#app";
+import StageStackedBoard from "~/components/StageStackedBoard.vue";
 import { useLocationFormatter } from "~/composables/useLocationFormatter";
 import TheaterFollowHomeButtons from "~/components/TheaterFollowHomeButtons.vue";
 import { useHomeTheaterState } from "~/composables/useHomeTheaterState";
@@ -33,14 +34,44 @@ const isHome = computed(
   () => membership.value?.isHome || homeId.value === theater.value?.id || false,
 );
 const canReview = computed(() => data.value?.permissions?.canReview ?? false);
+const publicShows = computed(() => data.value?.shows.public || []);
+const nextShow = computed(() => publicShows.value[0] || null);
+const publicBoardRows = computed(() =>
+  publicShows.value.slice(0, 3).map((show, index) => ({
+    ...show,
+    marker: index + 1,
+    tone:
+      index === 0
+        ? "bg-[var(--stage-mint)]"
+        : index === 1
+          ? "bg-[var(--stage-gold)]"
+          : "bg-[var(--stage-paper-strong)]",
+  })),
+);
+const theaterActionLink = computed(() => {
+  if (canReview.value) return `/theaters/${slug.value}/review`;
+  if (isMember.value) return `/theaters/${slug.value}/shows/new`;
+  return "/theaters";
+});
+const theaterActionLabel = computed(() => {
+  if (canReview.value) return "Open review queue";
+  if (isMember.value) return "Create a show";
+  return "Browse theaters";
+});
+const theaterActionIcon = computed(() => {
+  if (canReview.value) return "i-heroicons-inbox-stack";
+  if (isMember.value) return "i-heroicons-plus";
+  return "i-heroicons-building-library";
+});
+
+const formatDateTime = (value: string | null) =>
+  value ? new Date(value).toLocaleString() : "TBD";
 </script>
 
 <template>
   <div class="space-y-8">
     <section class="stage-panel-dark stage-grid-board p-6 sm:p-8">
-      <div
-        class="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-start"
-      >
+      <div class="stage-page-grid stage-page-grid-rail items-start">
         <div class="space-y-4">
           <div class="flex flex-wrap items-center gap-2">
             <span class="stage-kicker">Theater detail</span>
@@ -68,7 +99,7 @@ const canReview = computed(() => data.value?.permissions?.canReview ?? false);
 
           <div class="grid gap-3 sm:grid-cols-3">
             <div
-              class="rounded-[1.1rem] border-[3px] border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.1)] p-4"
+              class="border-3 border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.1)] p-4"
             >
               <p class="stage-overline text-[var(--stage-paper-muted)]">
                 Members
@@ -78,7 +109,7 @@ const canReview = computed(() => data.value?.permissions?.canReview ?? false);
               </p>
             </div>
             <div
-              class="rounded-[1.1rem] border-[3px] border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.1)] p-4"
+              class="border-3 border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.1)] p-4"
             >
               <p class="stage-overline text-[var(--stage-paper-muted)]">Shows</p>
               <p class="mt-2 font-display text-3xl uppercase tracking-[0.08em]">
@@ -86,7 +117,7 @@ const canReview = computed(() => data.value?.permissions?.canReview ?? false);
               </p>
             </div>
             <div
-              class="rounded-[1.1rem] border-[3px] border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.1)] p-4"
+              class="border-3 border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.1)] p-4"
             >
               <p class="stage-overline text-[var(--stage-paper-muted)]">
                 Review
@@ -98,45 +129,82 @@ const canReview = computed(() => data.value?.permissions?.canReview ?? false);
           </div>
         </div>
 
-        <div
-          class="rounded-[1.4rem] border-[3px] border-[var(--stage-paper-muted)] bg-[rgba(251,247,239,0.08)] p-5"
-        >
-          <p class="stage-overline text-[var(--stage-paper-muted)]">
-            Theater controls
-          </p>
-          <div class="mt-4 flex flex-wrap gap-2">
-            <TheaterFollowHomeButtons
-              v-if="theater"
-              :theater="theater"
-              :is-member="isMember"
-              :is-home="isHome"
-              size="sm"
-            />
-            <UButton
-              v-if="canReview"
-              size="sm"
-              color="warning"
-              :to="`/theaters/${slug}/review`"
-              icon="i-heroicons-inbox-stack"
-            >
-              Review queue
-            </UButton>
-            <UButton
-              v-if="isMember"
-              size="sm"
-              color="success"
-              :to="`/theaters/${slug}/shows/new`"
-              icon="i-heroicons-plus"
-            >
-              New show
-            </UButton>
-          </div>
+        <aside class="px-2 pt-2">
+          <StageStackedBoard
+            :title="theater?.name || 'Theater'"
+            subtitle="Public board"
+            badge="Live"
+          >
+            <div class="space-y-4">
+              <div
+                v-for="show in publicBoardRows"
+                :key="show.id"
+                class="flex items-center justify-between gap-3 border-2 border-[var(--stage-ink)] p-3 transition-colors hover:bg-[var(--stage-paper-strong)]"
+              >
+                <div class="flex items-center gap-3">
+                  <div class="flex size-8 items-center justify-center border-2 border-[var(--stage-ink)] bg-[var(--stage-ink)] text-xs font-bold text-[var(--stage-cream)]">
+                    {{ show.marker }}
+                  </div>
+                  <div>
+                    <div class="text-sm font-semibold text-[var(--stage-ink)]">
+                      {{ show.title }}
+                    </div>
+                    <div class="text-xs stage-muted">
+                      {{ formatDateTime(show.startsAt) }}
+                    </div>
+                  </div>
+                </div>
+                <span class="border-2 border-[var(--stage-ink)] px-2 py-0.5 text-xs font-bold uppercase text-[var(--stage-ink)]" :class="show.tone">
+                  {{ show.eventType || "Show" }}
+                </span>
+              </div>
 
-          <p class="mt-5 text-sm leading-7 text-[var(--stage-paper-muted)]">
-            Public programming stays visible, while approvals and management
-            stay scoped to the people responsible for this theater.
-          </p>
-        </div>
+              <div
+                v-if="!publicBoardRows.length && !isLoading"
+                class="border-2 border-dashed border-[var(--stage-ink)] px-4 py-6 text-sm stage-muted"
+              >
+                This theater has not published any public programming yet.
+              </div>
+            </div>
+
+            <div class="mt-6 flex flex-wrap gap-2">
+              <UButton
+                size="sm"
+                :to="theaterActionLink"
+                :icon="theaterActionIcon"
+              >
+                {{ theaterActionLabel }}
+              </UButton>
+              <UButton
+                v-if="canReview"
+                size="sm"
+                variant="ghost"
+                :to="`/theaters/${slug}/shows/new`"
+                icon="i-heroicons-plus"
+              >
+                New show
+              </UButton>
+            </div>
+            <template #left-callout>
+              <div class="absolute -left-5 top-1/4 border-2 border-[var(--stage-ink)] bg-[var(--stage-cream)] px-3 py-2 shadow-[4px_4px_0_0_var(--stage-ink)]">
+                <div class="flex items-center gap-2">
+                  <div class="size-3 bg-[var(--stage-gold)]" />
+                  <span class="text-xs font-bold text-[var(--stage-ink)]">
+                    {{ data?.stats.publicShowCount ?? 0 }} public listings
+                  </span>
+                </div>
+              </div>
+            </template>
+
+            <template #right-callout>
+              <div class="absolute -right-4 bottom-1/4 border-2 border-[var(--stage-ink)] bg-[var(--stage-cream)] px-3 py-2 shadow-[4px_4px_0_0_var(--stage-ink)]">
+                <span class="text-xs font-bold text-[var(--stage-ink)]">
+                  {{ canReview ? `${data?.stats.pendingReviewCount ?? 0} pending review` : isMember ? "Member access active" : "Public view" }}
+                </span>
+              </div>
+            </template>
+          </StageStackedBoard>
+        </aside>
       </div>
     </section>
 
@@ -144,61 +212,102 @@ const canReview = computed(() => data.value?.permissions?.canReview ?? false);
       {{ error?.data?.message || error?.message }}
     </div>
 
-    <section class="space-y-4">
-      <div class="flex items-center justify-between gap-3 flex-wrap">
-        <div>
-          <p class="stage-overline">Public shows</p>
-          <h2 class="mt-2 font-display text-4xl uppercase tracking-[0.08em]">
-            Current programming
-          </h2>
-          <p class="mt-2 text-sm leading-7 stage-muted">
-            Approved and publicly listed shows with their next occurrence.
-          </p>
+    <section class="stage-page-grid stage-page-grid-rail">
+      <div class="space-y-4">
+        <div class="flex items-center justify-between gap-3 flex-wrap">
+          <div>
+            <p class="stage-overline">Public shows</p>
+            <h2 class="mt-2 font-display text-4xl uppercase tracking-[0.08em]">
+              Current programming
+            </h2>
+            <p class="mt-2 text-sm leading-7 stage-muted">
+              Approved and publicly listed shows with their next occurrence.
+            </p>
+          </div>
+          <p v-if="isLoading" class="text-sm stage-muted">Loading…</p>
         </div>
-        <p v-if="isLoading" class="text-sm stage-muted">Loading…</p>
+
+        <div
+          v-if="!isLoading && publicShows.length"
+          class="grid gap-4"
+        >
+          <NuxtLink
+            v-for="show in publicShows"
+            :key="show.id"
+            :to="`/theaters/${slug}/shows/${show.id}`"
+            class="block"
+          >
+            <article
+              class="stage-list-card h-full p-5 transition-transform hover:-translate-y-1 sm:p-6"
+            >
+              <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <div class="flex flex-wrap items-center gap-2">
+                    <span class="stage-chip bg-[var(--stage-gold)]">
+                      Public
+                    </span>
+                    <span class="stage-chip bg-[var(--stage-paper-strong)]">
+                      {{ show.eventType || "show" }}
+                    </span>
+                  </div>
+                  <h3 class="mt-3 font-display text-4xl uppercase tracking-[0.08em]">
+                    {{ show.title }}
+                  </h3>
+                </div>
+                <div class="border-2 border-[var(--stage-ink)] bg-[var(--stage-cream)] px-3 py-2 text-right">
+                  <p class="stage-overline">Next</p>
+                  <p class="mt-2 text-sm font-semibold text-[var(--stage-ink)]">
+                    {{ formatDateTime(show.startsAt) }}
+                  </p>
+                </div>
+              </div>
+              <p v-if="show.description" class="mt-4 text-sm leading-7 stage-muted">
+                {{ show.description }}
+              </p>
+            </article>
+          </NuxtLink>
+        </div>
+        <div
+          v-else-if="!isLoading"
+          class="stage-panel px-5 py-6 text-sm stage-muted"
+        >
+          No public shows yet.
+        </div>
       </div>
 
-      <div
-        v-if="!isLoading && data?.shows.public?.length"
-        class="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
-      >
-        <NuxtLink
-          v-for="show in data?.shows.public"
-          :key="show.id"
-          :to="`/theaters/${slug}/shows/${show.id}`"
-          class="block"
-        >
-          <article
-            class="stage-list-card h-full p-5 transition-transform hover:-translate-y-1"
-          >
-            <div class="flex items-start justify-between gap-3">
-              <h3 class="font-display text-4xl uppercase tracking-[0.08em]">
-                {{ show.title }}
-              </h3>
-              <span class="stage-chip bg-[var(--stage-gold)]">
-                Public
-              </span>
+      <div class="space-y-4">
+        <section class="stage-panel p-5 sm:p-6">
+          <p class="stage-overline">How this theater runs</p>
+          <h2 class="mt-2 font-display text-4xl uppercase tracking-[0.08em]">
+            Operating notes
+          </h2>
+          <div class="mt-4 space-y-3 text-sm leading-7 stage-muted">
+            <p>Managers can maintain visibility and approvals without micromanaging every lineup choice.</p>
+            <p>Producers keep show setup, cast communication, and review feedback attached to the actual theater context.</p>
+            <p>Performers and audiences get a cleaner public board with clearer upcoming programming.</p>
+          </div>
+        </section>
+
+        <section class="stage-panel p-5 sm:p-6">
+          <p class="stage-overline">At a glance</p>
+          <h2 class="mt-2 font-display text-4xl uppercase tracking-[0.08em]">
+            Theater snapshot
+          </h2>
+          <div class="mt-4 grid gap-3">
+            <div class="stage-stat">
+              <span class="stage-overline">Public shows</span>
+              <span class="stage-stat-value">{{ data?.stats.publicShowCount ?? 0 }}</span>
             </div>
-            <p class="mt-3 text-xs uppercase tracking-[0.14em] stage-muted">
-              {{ show.eventType || "show" }}
-            </p>
-            <p v-if="show.description" class="mt-3 text-sm leading-7 stage-muted">
-              {{ show.description }}
-            </p>
-            <p class="mt-4 text-sm font-semibold">
-              Next:
-              {{
-                show.startsAt ? new Date(show.startsAt).toLocaleString() : "TBD"
-              }}
-            </p>
-          </article>
-        </NuxtLink>
-      </div>
-      <div
-        v-else-if="!isLoading"
-        class="stage-panel px-5 py-6 text-sm stage-muted"
-      >
-        No public shows yet.
+            <div class="stage-stat">
+              <span class="stage-overline">Pending review</span>
+              <span class="stage-stat-value">{{ data?.stats.pendingReviewCount ?? 0 }}</span>
+            </div>
+            <div class="stage-stat">
+              <span class="stage-overline">Members</span>
+              <span class="stage-stat-value">{{ data?.stats.memberCount ?? 0 }}</span>
+            </div>
+          </div>
+        </section>
       </div>
     </section>
   </div>

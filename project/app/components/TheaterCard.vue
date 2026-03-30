@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import StageFeatureCard from "~/components/StageFeatureCard.vue";
 import { useLocationFormatter } from "~/composables/useLocationFormatter";
 import TheaterFollowHomeButtons from "~/components/TheaterFollowHomeButtons.vue";
 
@@ -36,10 +37,12 @@ const { formatLocation } = useLocationFormatter();
 </script>
 
 <template>
-  <div
-    class="stage-list-card flex flex-col gap-4 px-4 py-4 lg:flex-row lg:items-start lg:justify-between"
+  <StageFeatureCard
+    :title="theater.name"
+    :subtitle="formatLocation(theater)"
+    tone="bg-[var(--stage-gold)]"
   >
-    <div class="space-y-2">
+    <div class="space-y-4 text-[var(--stage-ink)]">
       <div class="flex flex-wrap items-center gap-2">
         <span
           v-if="isHome"
@@ -54,28 +57,22 @@ const { formatLocation } = useLocationFormatter();
           Following
         </span>
       </div>
-      <p class="font-display text-3xl uppercase tracking-[0.08em]">
-        {{ theater.name }}
-      </p>
-      <p class="text-xs stage-overline stage-muted">
-        {{ formatLocation(theater) }}
-      </p>
-      <p v-if="theater.tagline" class="max-w-xl text-sm leading-6 stage-muted">
+      <p v-if="theater.tagline" class="text-sm leading-6 stage-muted">
         {{ theater.tagline }}
       </p>
+      <div class="flex flex-wrap gap-2 items-center">
+        <UButton size="xs" :to="primaryTo || `/theaters/${theater.slug}`">
+          {{ primaryLabel || "View" }}
+        </UButton>
+        <TheaterFollowHomeButtons
+          v-if="showFollow"
+          :theater="theater"
+          :is-member="isMember"
+          :is-home="isHome"
+          size="xs"
+          @updated="(p) => emit('membership-changed', p)"
+        />
+      </div>
     </div>
-    <div class="flex flex-wrap gap-2 items-center">
-      <UButton size="xs" :to="primaryTo || `/theaters/${theater.slug}`">
-        {{ primaryLabel || "View" }}
-      </UButton>
-      <TheaterFollowHomeButtons
-        v-if="showFollow"
-        :theater="theater"
-        :is-member="isMember"
-        :is-home="isHome"
-        size="xs"
-        @updated="(p) => emit('membership-changed', p)"
-      />
-    </div>
-  </div>
+  </StageFeatureCard>
 </template>

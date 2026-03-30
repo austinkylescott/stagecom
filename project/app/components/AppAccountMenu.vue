@@ -52,17 +52,17 @@ const guestItems: DropdownMenuItem[] = [
     <UButton
       color="gray"
       variant="ghost"
-      class="flex items-center gap-2"
+      class="flex items-center gap-2 border-2 border-[var(--stage-ink)] bg-[var(--stage-paper)]"
       :loading="loggingOut"
     >
       <UAvatar
         :src="avatarUrl"
         :text="initials"
         size="xs"
-        class="bg-slate-200 text-slate-700"
+        class="border border-[var(--stage-ink)] bg-[var(--stage-paper-strong)] text-[var(--stage-ink)]"
       />
       <span class="text-sm">{{ isAuthed ? displayName : "Account" }}</span>
-      <UIcon name="i-heroicons-chevron-down" class="w-4 h-4" />
+      <UIcon name="i-heroicons-chevron-down" class="size-4" />
     </UButton>
   </UDropdownMenu>
 </template>
