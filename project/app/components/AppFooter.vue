@@ -1,6 +1,6 @@
 <template>
-  <footer class="border-t-4 border-[var(--stage-cream)] bg-[var(--stage-ink)] px-4 py-12 sm:px-6 lg:px-8">
-    <div class="mx-auto max-w-7xl">
+  <footer class="bg-[var(--stage-ink)]">
+    <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
       <div class="grid gap-8 md:grid-cols-4">
         <div class="md:col-span-2">
           <NuxtLink to="/" class="inline-block font-display text-3xl text-[var(--stage-cream)]">
