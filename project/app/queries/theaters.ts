@@ -1,5 +1,6 @@
 import { defineQueryOptions } from "@pinia/colada";
 import { useRequestHeaders } from "#app";
+import type { Enums } from "~/types/database.types";
 import type { Tables } from "~/types/database.types";
 import { queryKeys } from "~/composables/queryKeys";
 
@@ -73,6 +74,7 @@ export type TheaterDetails = {
     totalShows: number;
     pendingReviewCount: number;
     publicShowCount: number;
+    upcomingPublicOccurrenceCount: number;
   };
   shows: {
     public: {
@@ -81,7 +83,55 @@ export type TheaterDetails = {
       description: string | null;
       eventType?: string | null;
       startsAt: string | null;
+      ticketUrl: string | null;
+      producers: {
+        userId: string;
+        displayName: string | null;
+        avatarUrl: string | null;
+      }[];
+      cast: {
+        userId: string;
+        displayName: string | null;
+        avatarUrl: string | null;
+      }[];
     }[];
+  };
+};
+
+export type TheaterScheduleParams = {
+  slug: string;
+  month: string;
+  type: string;
+  status: string;
+  timeline: "all" | "upcoming" | "past";
+};
+
+export type TheaterScheduleItem = {
+  occurrenceId: string;
+  startsAt: string;
+  endsAt: string | null;
+  occurrenceStatus: Enums<"show_occurrence_status">;
+  show: {
+    id: string;
+    title: string;
+    status: Enums<"show_status">;
+    eventType: Enums<"event_type"> | null;
+    theaterId: string;
+    theaterName: string;
+    theaterSlug: string;
+  };
+};
+
+export type TheaterScheduleResponse = {
+  theater: {
+    id: string;
+    name: string;
+    slug: string;
+  };
+  items: TheaterScheduleItem[];
+  filters: {
+    eventTypes: { label: string; value: Enums<"event_type"> }[];
+    statuses: { label: string; value: Enums<"show_status"> }[];
   };
 };
 
@@ -127,6 +177,36 @@ export const reviewQueueQueryOptions = defineQueryOptions<
       }),
     enabled: Boolean(params?.slug),
     staleTime: 10_000,
+  } as const;
+});
+
+export const theaterScheduleQueryOptions = defineQueryOptions<
+  TheaterScheduleParams,
+  TheaterScheduleResponse
+>((params) => {
+  const headers = getRequestHeaders();
+
+  return {
+    key: queryKeys.theaterSchedule({
+      slug: params?.slug ?? "",
+      month: params?.month ?? "",
+      type: params?.type ?? "",
+      status: params?.status ?? "",
+      timeline: params?.timeline ?? "all",
+    }),
+    query: () =>
+      $fetch<TheaterScheduleResponse>(`/api/theaters/${params?.slug}/schedule`, {
+        credentials: "include",
+        headers,
+        params: {
+          month: params?.month || undefined,
+          type: params?.type || undefined,
+          status: params?.status || undefined,
+          timeline: params?.timeline ?? "all",
+        },
+      }),
+    enabled: Boolean(params?.slug),
+    staleTime: 20_000,
   } as const;
 });
 

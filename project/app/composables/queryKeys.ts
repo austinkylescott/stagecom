@@ -10,9 +10,19 @@ export const queryKeys = {
 
   theaterReview: (slug: string) => ["theater-review", { slug }] as const,
 
+  theaterSchedule: (params: {
+    slug: string;
+    month: string;
+    type: string;
+    status: string;
+    timeline: string;
+  }) => ["theater-schedule", params] as const,
+
   theaterPrefix: () => ["theater"] as const,
 
   theaterReviewPrefix: () => ["theater-review"] as const,
+
+  theaterSchedulePrefix: () => ["theater-schedule"] as const,
 
   reviewInbox: () => ["review-inbox"] as const,
 

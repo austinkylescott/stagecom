@@ -1,5 +1,6 @@
 import { serverSupabaseClient } from "#supabase/server";
-import type { Tables } from "~/types/database.types";
+import type { Enums, Tables } from "~/types/database.types";
+import { hasStaffRole } from "~~/server/utils/permissions";
 
 type HomeTheater = Pick<
   Tables<"theaters">,
@@ -17,6 +18,20 @@ type HomePayload = {
   theater: HomeTheater | null;
   shows: HomeShow[];
   candidates?: HomeTheater[];
+  membership: {
+    status: Enums<"membership_status"> | null;
+    roles: Enums<"theater_role">[];
+  };
+  permissions: {
+    isMember: boolean;
+    canCreateShow: boolean;
+    canReview: boolean;
+  };
+  stats: {
+    pendingReviewCount: number;
+    publicShowCount: number;
+    upcomingPublicCount: number;
+  };
 };
 
 export default defineEventHandler(async (event): Promise<HomePayload> => {
@@ -52,7 +67,22 @@ export default defineEventHandler(async (event): Promise<HomePayload> => {
       (membership) => membership.theater_id,
     );
     if (theaterIds.length === 0) {
-      return { theater: null, shows: [], candidates: [] };
+      return {
+        theater: null,
+        shows: [],
+        candidates: [],
+        membership: { status: null, roles: [] },
+        permissions: {
+          isMember: false,
+          canCreateShow: false,
+          canReview: false,
+        },
+        stats: {
+          pendingReviewCount: 0,
+          publicShowCount: 0,
+          upcomingPublicCount: 0,
+        },
+      };
     }
 
     const { data: candidateRows, error: candidatesError } = await supabase
@@ -69,7 +99,22 @@ export default defineEventHandler(async (event): Promise<HomePayload> => {
 
     const candidates = candidateRows || [];
 
-    return { theater: null, shows: [], candidates };
+    return {
+      theater: null,
+      shows: [],
+      candidates,
+      membership: { status: null, roles: [] },
+      permissions: {
+        isMember: false,
+        canCreateShow: false,
+        canReview: false,
+      },
+      stats: {
+        pendingReviewCount: 0,
+        publicShowCount: 0,
+        upcomingPublicCount: 0,
+      },
+    };
   }
 
   const { data: theater, error: theaterError } = await supabase
@@ -81,7 +126,45 @@ export default defineEventHandler(async (event): Promise<HomePayload> => {
   if (theaterError) {
     throw createError({ statusCode: 500, statusMessage: theaterError.message });
   }
-  if (!theater) return { theater: null, shows: [] };
+  if (!theater) {
+    return {
+      theater: null,
+      shows: [],
+      membership: { status: null, roles: [] },
+      permissions: {
+        isMember: false,
+        canCreateShow: false,
+        canReview: false,
+      },
+      stats: {
+        pendingReviewCount: 0,
+        publicShowCount: 0,
+        upcomingPublicCount: 0,
+      },
+    };
+  }
+
+  const { data: membershipRow, error: membershipError } = await supabase
+    .from("theater_memberships")
+    .select("status,roles")
+    .eq("theater_id", theater.id)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (membershipError) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: membershipError.message,
+    });
+  }
+
+  const membership = {
+    status: membershipRow?.status ?? null,
+    roles: membershipRow?.roles ?? [],
+  };
+  const isMember = membership.status === "active";
+  const canReview = isMember && hasStaffRole(membership.roles);
+  const canCreateShow = isMember;
 
   // Upcoming shows (next occurrences)
   const { data: shows, error: showsError } = await supabase
@@ -128,5 +211,38 @@ export default defineEventHandler(async (event): Promise<HomePayload> => {
     })
     .slice(0, 4); // preview count
 
-  return { theater, shows: upcoming };
+  let pendingReviewCount = 0;
+
+  if (canReview) {
+    const { count, error: pendingError } = await supabase
+      .from("shows")
+      .select("id", { count: "exact", head: true })
+      .eq("theater_id", theater.id)
+      .eq("status", "pending_review");
+
+    if (pendingError) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: pendingError.message,
+      });
+    }
+
+    pendingReviewCount = count ?? 0;
+  }
+
+  return {
+    theater,
+    shows: upcoming,
+    membership,
+    permissions: {
+      isMember,
+      canCreateShow,
+      canReview,
+    },
+    stats: {
+      pendingReviewCount,
+      publicShowCount: shows?.length ?? 0,
+      upcomingPublicCount: upcoming.length,
+    },
+  };
 });

@@ -1,4 +1,4 @@
-# Current Feature
+# Current Feature: Authenticated Work Experience Refinement v1
 
 ## Status
 
@@ -6,15 +6,26 @@ In Progress
 
 ## Goals
 
-- Make the authenticated product easier to understand at a glance.
-- Reframe primary screens around role, state, and next action instead of design-system narration.
-- Improve UI hierarchy on schedule, show detail, review, and notifications surfaces without backend changes.
+- Decompose overloaded authenticated surfaces into clearer jobs.
+- Separate theater discovery, member-facing home theater use, and oversight operations into clearer surfaces.
+- Align page structure with real concern levels: general authenticated user, theater member, relationship-based participant, oversight user, and self-only surfaces.
+- Use the visibility policy as a first-class UX organizing principle for modules, fields, and actions.
+- Establish a unified dashboard language that is readable, durable, and reusable across authenticated surfaces.
 
 ## Notes
 
-- Focus on PRD-aligned usability cleanup.
-- Preserve the established brutalist theme, but use quieter layouts where state clarity matters more than spectacle.
-- Keep changes targeted to existing surfaces and data.
+- Spec: `docs/specs/feature-spec-authenticated-work-experience-refinement-v1.md`
+- Primary route direction:
+  - `/theaters/[slug]` as the main home theater page for steady-state use
+  - `/theaters/browse` as secondary discovery and context switching
+  - `/theaters/[slug]/admin` as theater-wide oversight workspace
+  - `/shows` as cross-theater work board
+  - `/review` as cross-theater approvals queue
+  - `/notifications` as self-only personal updates
+- The theater detail page should be member-facing first, with readable operational modules instead of a dark identity hero.
+- Oversight users should get a dedicated theater admin surface instead of forcing theater-wide controls into the default member page.
+- Dashboard direction should favor readable cream/ink operational modules over dark hero-style wrappers for dense dashboard content.
+- Preserve existing role, permission, cast, notification, and visibility-policy invariants while making the UI easier to organize by concern level.
 
 ## History
 
