@@ -76,6 +76,7 @@ create table theaters (
     name text not null,
     slug text not null unique,
     tagline text,
+    timezone text not null default 'UTC',
     street text,
     city text,
     state_region text,

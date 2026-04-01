@@ -19,6 +19,20 @@ export type HomePayload = {
   theater: HomeTheater | null;
   shows: HomeShow[];
   candidates?: HomeTheater[];
+  membership: {
+    status: string | null;
+    roles: string[];
+  };
+  permissions: {
+    isMember: boolean;
+    canCreateShow: boolean;
+    canReview: boolean;
+  };
+  stats: {
+    pendingReviewCount: number;
+    publicShowCount: number;
+    upcomingPublicCount: number;
+  };
 };
 
 export type SaveHomeInput = {
@@ -54,7 +68,22 @@ export const homeTheaterQueryOptions = defineQueryOptions<void, HomePayload>(
         } catch (err: unknown) {
           const httpError = err as { status?: number; statusCode?: number };
           if (httpError.status === 401 || httpError.statusCode === 401) {
-            return { theater: null, shows: [], candidates: [] };
+            return {
+              theater: null,
+              shows: [],
+              candidates: [],
+              membership: { status: null, roles: [] },
+              permissions: {
+                isMember: false,
+                canCreateShow: false,
+                canReview: false,
+              },
+              stats: {
+                pendingReviewCount: 0,
+                publicShowCount: 0,
+                upcomingPublicCount: 0,
+              },
+            };
           }
           throw err;
         }
@@ -83,7 +112,22 @@ export const applyOptimisticHomeTheaterUpdate = (
     queryCache.setQueryData(queryKeys.homeTheater(), (value: unknown) => {
       if (!value) return value;
       const payload = value as HomePayload;
-      return { ...payload, theater: null, shows: [] };
+      return {
+        ...payload,
+        theater: null,
+        shows: [],
+        membership: { status: null, roles: [] },
+        permissions: {
+          isMember: false,
+          canCreateShow: false,
+          canReview: false,
+        },
+        stats: {
+          pendingReviewCount: 0,
+          publicShowCount: 0,
+          upcomingPublicCount: 0,
+        },
+      };
     });
   } else if (previous?.candidates) {
     const candidate = previous.candidates.find((c) => c.id === theaterId);
@@ -134,8 +178,23 @@ export const applyOptimisticHomeClearOnLeave = (
 
   queryCache.setQueryData(queryKeys.homeTheater(), (previous: unknown) => {
     if (!previous) return previous;
-    const payload = previous as HomePayload;
-    if (!payload.theater || payload.theater.id !== theaterId) return payload;
-    return { ...payload, theater: null, shows: [] };
+      const payload = previous as HomePayload;
+      if (!payload.theater || payload.theater.id !== theaterId) return payload;
+    return {
+      ...payload,
+      theater: null,
+      shows: [],
+      membership: { status: null, roles: [] },
+      permissions: {
+        isMember: false,
+        canCreateShow: false,
+        canReview: false,
+      },
+      stats: {
+        pendingReviewCount: 0,
+        publicShowCount: 0,
+        upcomingPublicCount: 0,
+      },
+    };
   });
 };

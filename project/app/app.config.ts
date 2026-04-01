@@ -6,7 +6,7 @@ export default defineAppConfig({
     },
     button: {
       slots: {
-        base: "rounded-none border-2 border-[var(--stage-ink)] font-semibold uppercase tracking-[0.14em] shadow-[4px_4px_0_0_var(--stage-ink)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[3px_3px_0_0_var(--stage-ink)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none",
+        base: "rounded-none border-2 border-[var(--stage-ink)] font-semibold uppercase tracking-[0.14em] transition-[background-color,color,border-color,transform] duration-150 ease-out hover:-translate-y-px active:translate-y-0",
         label: "truncate",
       },
       variants: {
@@ -46,49 +46,49 @@ export default defineAppConfig({
           color: ["primary", "info"],
           variant: "solid",
           class:
-            "bg-[var(--stage-theater)] text-[var(--stage-ink)] hover:bg-[color:color-mix(in_srgb,var(--stage-theater)_82%,white)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--stage-theater)]",
+            "bg-[var(--stage-theater)] text-[var(--stage-ink)] hover:bg-[var(--stage-theater-soft)] active:bg-[var(--stage-theater)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--stage-theater)]",
         },
         {
           color: ["warning", "success"],
           variant: "solid",
           class:
-            "bg-[var(--stage-event)] text-[var(--stage-ink)] hover:bg-[color:color-mix(in_srgb,var(--stage-event)_82%,white)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--stage-event)]",
+            "bg-[var(--stage-event)] text-[var(--stage-ink)] hover:bg-[var(--stage-event-soft)] active:bg-[var(--stage-event)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--stage-event)]",
         },
         {
           color: "error",
           variant: "solid",
           class:
-            "bg-[var(--stage-performer)] text-[var(--stage-cream)] hover:bg-[color:color-mix(in_srgb,var(--stage-performer)_88%,black)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--stage-performer)]",
+            "bg-[var(--stage-performer)] text-[var(--stage-cream)] hover:bg-[var(--stage-performer-soft)] hover:text-[var(--stage-ink)] active:bg-[var(--stage-performer)] active:text-[var(--stage-cream)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--stage-performer)]",
         },
         {
           color: "neutral",
           variant: "solid",
           class:
-            "bg-[var(--stage-ink)] text-[var(--stage-cream)] hover:bg-[color:color-mix(in_srgb,var(--stage-ink)_88%,white)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--stage-ink)]",
+            "bg-[var(--stage-ink)] text-[var(--stage-cream)] hover:bg-[color:color-mix(in_srgb,var(--stage-ink)_92%,white)] active:bg-[color:color-mix(in_srgb,var(--stage-ink)_78%,white)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--stage-ink)]",
         },
         {
           color: ["primary", "info"],
           variant: ["soft", "ghost", "outline", "subtle"],
           class:
-            "text-[var(--stage-ink)] ring-[var(--stage-ink)] hover:bg-[color:rgba(94,144,217,0.16)]",
+            "text-[var(--stage-ink)] ring-[var(--stage-ink)] hover:bg-[var(--stage-theater-soft)] active:bg-[var(--stage-theater)]",
         },
         {
           color: ["warning", "success"],
           variant: ["soft", "ghost", "outline", "subtle"],
           class:
-            "text-[var(--stage-ink)] ring-[var(--stage-ink)] hover:bg-[color:rgba(231,180,55,0.18)]",
+            "text-[var(--stage-ink)] ring-[var(--stage-ink)] hover:bg-[var(--stage-event-soft)] active:bg-[var(--stage-event)]",
         },
         {
           color: "error",
           variant: ["soft", "ghost", "outline", "subtle"],
           class:
-            "text-[var(--stage-ink)] ring-[var(--stage-ink)] hover:bg-[color:rgba(191,77,70,0.14)]",
+            "text-[var(--stage-ink)] ring-[var(--stage-ink)] hover:bg-[var(--stage-performer-soft)] active:bg-[var(--stage-performer)] active:text-[var(--stage-cream)]",
         },
         {
           color: "neutral",
           variant: ["soft", "ghost", "outline", "subtle"],
           class:
-            "text-[var(--stage-ink)] ring-[var(--stage-ink)] hover:bg-[var(--stage-paper)]",
+            "text-[var(--stage-ink)] ring-[var(--stage-ink)] hover:bg-[var(--stage-paper)] active:bg-[var(--stage-paper-strong)]",
         },
         {
           color: ["primary", "info"],
@@ -113,7 +113,7 @@ export default defineAppConfig({
         {
           color: ["primary", "info", "warning", "success", "error", "neutral"],
           variant: "ghost",
-          class: "bg-[var(--stage-paper)]/80",
+          class: "bg-[rgba(251,247,239,0.78)]",
         },
         {
           color: ["primary", "info", "warning", "success", "error", "neutral"],

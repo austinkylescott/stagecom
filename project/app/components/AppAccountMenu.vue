@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from "@nuxt/ui";
+import { stageButtonToneClasses } from "~/utils/stageButtonTone";
 
 const supabase = useSupabaseClient();
 const toast = useToast();
@@ -65,10 +66,11 @@ const guestItems = [[
     :items="isAuthed ? authedItems : guestItems"
     header-tone-class="bg-[var(--stage-performer-soft)]"
   >
+    <template #default="{ open }">
     <UButton
       color="neutral"
       variant="ghost"
-      class="flex items-center gap-2 border-2 border-[var(--stage-ink)] bg-[var(--stage-paper)]"
+      :class="['flex items-center gap-2', stageButtonToneClasses('performer', open)]"
       :loading="loggingOut"
     >
       <UAvatar
@@ -80,6 +82,7 @@ const guestItems = [[
       <span class="text-sm">{{ isAuthed ? displayName : "Account" }}</span>
       <UIcon name="i-heroicons-chevron-down" class="size-4" />
     </UButton>
+    </template>
 
     <template #header>
       <div class="flex min-w-0 items-center gap-3">

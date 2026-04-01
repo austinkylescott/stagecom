@@ -2,24 +2,21 @@
 import { useRequestHeaders } from "#app";
 import TheaterList from "~/components/TheaterList.vue";
 import HomeTheaterHero from "~/components/HomeTheaterHero.vue";
-import HomeTheaterPrompt from "~/components/HomeTheaterPrompt.vue";
-import HomeTheaterLeavePrompt from "~/components/HomeTheaterLeavePrompt.vue";
-import { useMembershipToggle } from "~/composables/useMembershipToggle";
 import { useHomeTheaterState } from "~/composables/useHomeTheaterState";
 import { useHomeTheaterMutation } from "~/composables/useHomeTheaterMutation";
-import { useSearchQuery } from "~/composables/useSearchQuery";
 import { useTheaterSearch } from "~/composables/useTheaterSearch";
 import type { Theater, TheatersResponse } from "~/queries/theaters";
-import { ref } from "vue";
 
-type TheaterLike = {
-  id?: string;
-  slug?: string;
-  name?: string;
-  isMember?: boolean;
-};
-
-const { homeTheater, homeShows, homeCandidates, homeId, hasHome } =
+const {
+  homeTheater,
+  homeShows,
+  homeCandidates,
+  homeMembership,
+  homePermissions,
+  homeStats,
+  homeId,
+  hasHome,
+} =
   useHomeTheaterState();
 const { saveHome } = useHomeTheaterMutation();
 
@@ -35,27 +32,18 @@ const { data: initialTheaters } = await useAsyncData(() =>
   }),
 );
 
-const {
-  searchInput: search,
-  search: debouncedSearch,
-  sort,
-  page,
-} = useSearchQuery<"name_asc" | "recent">({
-  initialSort: "name_asc",
-  debounce: 300,
-  maxWait: 800,
-});
+const search = ref("");
+const sort = ref<"name_asc" | "recent">("name_asc");
+const page = ref(1);
 
-const { data, isLoading, error, refresh } = useTheaterSearch(
+const { data, isLoading, error } = useTheaterSearch(
   {
-    search: debouncedSearch,
+    search,
     sort,
     page,
   },
   initialTheaters,
 );
-
-const { toggleMembership } = useMembershipToggle();
 
 const myTheaters = computed<Theater[]>(() =>
   (data.value?.myTheaters || []).map((t) => ({
@@ -65,136 +53,7 @@ const myTheaters = computed<Theater[]>(() =>
   })),
 );
 
-const allTheaters = computed<Theater[]>(() =>
-  (data.value?.theaters || []).map((t) => ({
-    ...t,
-    isHome: homeId.value === t.id,
-  })),
-);
-
-const totalPages = computed(() => data.value?.totalPages ?? 1);
-const showPagination = computed(() => totalPages.value > 1);
-
-const membershipBusyIds = ref<Set<string>>(new Set());
-const homeBusyIds = ref<Set<string>>(new Set());
-const showHomeModal = ref(false);
-const pendingHomeTheater = ref<TheaterLike | null>(null);
-const showLeaveHomeModal = ref(false);
-const pendingLeaveTheater = ref<TheaterLike | null>(null);
-const settingHome = ref(false);
-const leavingHome = ref(false);
-
-const openHomePrompt = (theater: TheaterLike) => {
-  pendingHomeTheater.value = theater;
-  showHomeModal.value = true;
-};
-
-const openLeaveHomePrompt = (theater: TheaterLike) => {
-  pendingLeaveTheater.value = theater;
-  showLeaveHomeModal.value = true;
-};
-
-const handleToggle = async (action: "join" | "leave", theater: TheaterLike) => {
-  if (!theater?.id) return;
-  if (action === "leave" && homeId.value === theater.id) {
-    openLeaveHomePrompt(theater);
-    return;
-  }
-
-  const next = new Set(membershipBusyIds.value);
-  next.add(theater.id);
-  membershipBusyIds.value = next;
-
-  try {
-    await toggleMembership(theater as { slug: string; id?: string }, action);
-    await refresh();
-    if (action === "join" && !hasHome.value) openHomePrompt(theater);
-  } finally {
-    const after = new Set(membershipBusyIds.value);
-    after.delete(theater.id);
-    membershipBusyIds.value = after;
-  }
-};
-
-const handleHome = async (action: "set" | "clear", theater: TheaterLike) => {
-  if (!theater?.id) return;
-
-  const homeBusy = new Set(homeBusyIds.value);
-  homeBusy.add(theater.id);
-  homeBusyIds.value = homeBusy;
-
-  const needsJoin = action === "set" && !theater.isMember;
-  if (needsJoin) {
-    const memberBusy = new Set(membershipBusyIds.value);
-    memberBusy.add(theater.id);
-    membershipBusyIds.value = memberBusy;
-  }
-
-  try {
-    if (action === "set") {
-      if (needsJoin) {
-        await toggleMembership(
-          theater as { slug: string; id?: string },
-          "join",
-        );
-      }
-      await saveHome(theater.id);
-    } else if (homeId.value === theater.id) {
-      await saveHome(null);
-    }
-  } finally {
-    const afterHome = new Set(homeBusyIds.value);
-    afterHome.delete(theater.id);
-    homeBusyIds.value = afterHome;
-
-    if (needsJoin) {
-      const afterMember = new Set(membershipBusyIds.value);
-      afterMember.delete(theater.id);
-      membershipBusyIds.value = afterMember;
-    }
-  }
-};
-
-const confirmHomeChoice = async (makeHome: boolean) => {
-  if (!pendingHomeTheater.value) {
-    showHomeModal.value = false;
-    return;
-  }
-
-  settingHome.value = true;
-  try {
-    if (makeHome) {
-      await saveHome(pendingHomeTheater.value.id || null);
-    }
-  } finally {
-    settingHome.value = false;
-    showHomeModal.value = false;
-    pendingHomeTheater.value = null;
-  }
-};
-
-const confirmLeaveHome = async () => {
-  if (!pendingLeaveTheater.value?.id) {
-    showLeaveHomeModal.value = false;
-    return;
-  }
-
-  leavingHome.value = true;
-  try {
-    const theater = pendingLeaveTheater.value;
-    await toggleMembership(theater as { slug: string; id?: string }, "leave");
-    await saveHome(null);
-  } finally {
-    leavingHome.value = false;
-    showLeaveHomeModal.value = false;
-    pendingLeaveTheater.value = null;
-  }
-};
-
-const cancelLeaveHome = () => {
-  showLeaveHomeModal.value = false;
-  pendingLeaveTheater.value = null;
-};
+const followingCount = computed(() => myTheaters.value.length);
 </script>
 
 <template>
@@ -202,17 +61,18 @@ const cancelLeaveHome = () => {
     <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[var(--stage-cream)]" inner-class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
       <div class="grid gap-6 lg:grid-cols-[1.1fr_auto] lg:items-end">
         <div class="space-y-4">
-          <span class="stage-kicker">Theater Discovery</span>
+          <span class="stage-kicker">Theater hub</span>
           <div>
-            <h1 class="stage-section-title">Find your local scene.</h1>
+            <h1 class="stage-section-title">Operate from your home theater.</h1>
             <p class="mt-3 max-w-3xl text-lg leading-8 stage-muted">
-              Follow theaters, set a home base, and move from public programming
-              into the community spaces where casting and operations actually
-              happen.
+              Logging in should feel like checking into your theater first. Use this route to see what matters now for your role, then branch into schedule, review, or discovery only when needed.
             </p>
           </div>
         </div>
-        <div class="lg:justify-self-end">
+        <div class="flex flex-wrap gap-2 lg:justify-self-end">
+          <UButton variant="ghost" icon="i-heroicons-magnifying-glass" to="/theaters/browse">
+            Browse theaters
+          </UButton>
           <UButton color="primary" icon="i-heroicons-plus" to="/theaters/new">
             Create theater
           </UButton>
@@ -225,6 +85,9 @@ const cancelLeaveHome = () => {
         :theater="homeTheater"
         :shows="homeShows"
         :candidates="homeCandidates"
+        :membership="homeMembership"
+        :permissions="homePermissions"
+        :stats="homeStats"
         :on-set-home="saveHome"
       />
 
@@ -232,92 +95,68 @@ const cancelLeaveHome = () => {
         {{ error?.data?.message || error?.message }}
       </div>
 
-      <div class="mt-6 grid gap-6 lg:grid-cols-2">
-      <TheaterList
-        title="Following"
-        :theaters="myTheaters"
-        :pending="isLoading"
-        empty-message="You're not a member yet. Follow or create a theater to see it here."
-        primary-label="Open"
-        :show-follow="true"
-        :loading-ids="membershipBusyIds"
-        :home-loading-ids="homeBusyIds"
-        @toggle="(action, theater) => handleToggle(action, theater)"
-        @home="(action, theater) => handleHome(action, theater)"
-      />
-
-      <TheaterList
-        title="All theaters"
-        :theaters="allTheaters"
-        :pending="isLoading"
-        primary-label="View"
-        :show-follow="true"
-        :loading-ids="membershipBusyIds"
-        :home-loading-ids="homeBusyIds"
-        @toggle="(action, theater) => handleToggle(action, theater)"
-        @home="(action, theater) => handleHome(action, theater)"
-      >
-        <template #header>
-          <div class="flex flex-col gap-3 w-full">
+      <div class="mt-6 grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+        <TheaterList
+          title="Your theaters"
+          :theaters="myTheaters"
+          :pending="isLoading"
+          empty-message="You are not following any theaters yet. Browse theaters to build out the communities you work with."
+          primary-label="Open"
+          :show-follow="true"
+        >
+          <template #header>
             <div class="flex items-center justify-between gap-3 flex-wrap">
               <div>
-                <p class="stage-overline">All theaters</p>
+                <p class="stage-overline">Following</p>
                 <h2
                   class="mt-2 font-display text-3xl uppercase tracking-[0.08em]"
                 >
-                  Browse the board
+                  Your theater footprint
                 </h2>
-              </div>
-              <div class="flex gap-2 flex-wrap">
-                <UInput
-                  v-model="search"
-                  icon="i-heroicons-magnifying-glass"
-                  placeholder="Search theaters"
-                  class="w-full sm:w-64"
-                />
-                <USelect
-                  v-model="sort"
-                  :items="[
-                    { label: 'Name A→Z', value: 'name_asc' },
-                    { label: 'Recently added', value: 'recent' },
-                  ]"
-                  class="w-full sm:w-48"
-                />
+                <p class="mt-2 max-w-xl text-sm leading-7 stage-muted">
+                  Keep the theater hub focused on the communities you already work with. Use browse when you want to discover or switch context.
+                </p>
               </div>
             </div>
+          </template>
+        </TheaterList>
+
+        <aside class="stage-panel p-5 sm:p-6">
+          <p class="stage-overline">Manage theater context</p>
+          <h2 class="mt-2 font-display text-4xl uppercase tracking-[0.08em]">
+            Keep discovery secondary
+          </h2>
+          <p class="mt-3 text-sm leading-7 stage-muted">
+            Once a home theater is set, this route should stay useful as an operations hub. When you want to discover, join, or switch theaters, step into a dedicated browse flow instead.
+          </p>
+
+          <div class="mt-5 grid gap-3 sm:grid-cols-2">
+            <div class="stage-stat">
+              <span class="stage-overline">Home theater</span>
+              <span class="stage-stat-value">{{ hasHome ? "Set" : "Unset" }}</span>
+              <p class="mt-2 text-sm stage-muted">
+                {{ hasHome ? "Your hub is anchored." : "Choose a home base to make this route fully useful." }}
+              </p>
+            </div>
+            <div class="stage-stat">
+              <span class="stage-overline">Following</span>
+              <span class="stage-stat-value">{{ followingCount }}</span>
+              <p class="mt-2 text-sm stage-muted">
+                Theaters you already belong to or track.
+              </p>
+            </div>
           </div>
-        </template>
-        <template #footer>
-          <div class="pt-4">
-            <UPagination
-              v-if="showPagination"
-              :page="page"
-              :total="totalPages"
-              :items-per-page="1"
-              :disabled="isLoading"
-              :show-controls="true"
-              @update:page="(p) => (page = p)"
-            />
+
+          <div class="mt-5 flex flex-wrap gap-2">
+            <UButton to="/theaters/browse" icon="i-heroicons-magnifying-glass">
+              Browse theaters
+            </UButton>
+            <UButton to="/shows" variant="ghost" icon="i-heroicons-calendar-days">
+              Open schedule
+            </UButton>
           </div>
-        </template>
-      </TheaterList>
+        </aside>
       </div>
     </StageSection>
-
-    <HomeTheaterPrompt
-      v-model="showHomeModal"
-      :theater-name="pendingHomeTheater?.name || 'This theater'"
-      :loading="settingHome"
-      @confirm="confirmHomeChoice(true)"
-      @cancel="confirmHomeChoice(false)"
-    />
-
-    <HomeTheaterLeavePrompt
-      v-model="showLeaveHomeModal"
-      :theater-name="pendingLeaveTheater?.name || 'This theater'"
-      :loading="leavingHome"
-      @confirm="confirmLeaveHome"
-      @cancel="cancelLeaveHome"
-    />
   </div>
 </template>

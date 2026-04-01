@@ -1,62 +1,137 @@
 <script setup lang="ts">
+import type { NavigationMenuItem } from "@nuxt/ui";
 import AppNotificationsBell from "~/components/AppNotificationsBell.vue";
+import {
+  stageButtonToneClasses,
+  type StageButtonTone,
+} from "~/utils/stageButtonTone";
 
 const route = useRoute();
 const { isAuthed } = useUserIdentity();
+const { homeTheater, homePermissions } = useHomeTheaterState();
 const mobileNavOpen = ref(false);
 
 const navItems = computed(() => {
-  const items = [
-    { label: "Home", to: "/" },
-    { label: "Theaters", to: "/theaters" },
-    { label: "Performers", to: "/performers" },
-  ];
-
   if (isAuthed.value) {
-    items.push(
-      { label: "My Schedule", to: "/shows" },
+    return [
+      { label: "Schedule", to: "/shows" },
       { label: "Approvals", to: "/review" },
-    );
-  }
-
-  return items;
-});
-
-const navToneClasses = (to: string, active: boolean) => {
-  const shared = "!text-[var(--stage-ink)]";
-
-  if (to.startsWith("/theaters") || to.startsWith("/review")) {
-    return [
-      active
-        ? "bg-[var(--stage-theater)] hover:bg-[var(--stage-theater-soft)] active:bg-[var(--stage-theater-soft)]"
-        : "bg-[rgba(251,247,239,0.78)] hover:bg-[var(--stage-theater-soft)] active:bg-[var(--stage-theater-soft)]",
-      shared,
-    ];
-  }
-
-  if (to.startsWith("/shows")) {
-    return [
-      active
-        ? "bg-[var(--stage-event)] hover:bg-[var(--stage-event-soft)] active:bg-[var(--stage-event-soft)]"
-        : "bg-[rgba(251,247,239,0.78)] hover:bg-[var(--stage-event-soft)] active:bg-[var(--stage-event-soft)]",
-      shared,
-    ];
-  }
-
-  if (to.startsWith("/performers")) {
-    return [
-      active
-        ? "bg-[var(--stage-performer)] hover:bg-[var(--stage-performer-soft)] active:bg-[var(--stage-performer-soft)]"
-        : "bg-[rgba(251,247,239,0.78)] hover:bg-[var(--stage-performer-soft)] active:bg-[var(--stage-performer-soft)]",
-      shared,
+      { label: "People", to: "/performers" },
     ];
   }
 
   return [
-    active ? "bg-[var(--stage-paper-strong)]" : "bg-[rgba(251,247,239,0.78)] hover:bg-[var(--stage-paper)]",
-    shared,
+    { label: "Home", to: "/" },
+    { label: "Theaters", to: "/theaters" },
+    { label: "Performers", to: "/performers" },
   ];
+});
+
+const homeTheaterPrimaryTo = computed(() =>
+  homeTheater.value ? `/theaters/${homeTheater.value.slug}` : "/theaters",
+);
+
+const navTone = (to: string): StageButtonTone => {
+  if (to.startsWith("/theaters") || to.startsWith("/review")) return "theater";
+  if (to.startsWith("/shows")) return "event";
+  if (to.startsWith("/performers")) return "performer";
+
+  return "neutral";
 };
+
+const desktopNavToneClass = (to: string, active: boolean) =>
+  stageButtonToneClasses(navTone(to), active).join(" ");
+
+const desktopNavItems = computed<NavigationMenuItem[]>(() => {
+  if (!isAuthed.value) {
+    return navItems.value.map((item) => ({
+      label: item.label,
+      to: item.to,
+      active: isActive(item.to),
+      class: desktopNavToneClass(item.to, isActive(item.to)),
+    }));
+  }
+
+  const items: NavigationMenuItem[] = [
+    {
+      label: "My Theater",
+      to: homeTheaterPrimaryTo.value,
+      active: isTheaterNavActive.value,
+      class: desktopNavToneClass("/theaters", isTheaterNavActive.value),
+      children: [
+        {
+          label: homeTheater.value?.name || "Open My Theater",
+          description: "Go to your home theater page.",
+          icon: "i-heroicons-building-library",
+          to: homeTheaterPrimaryTo.value,
+        },
+        {
+          label: "Browse Shows",
+          description: "Open the schedule and browse current show work.",
+          icon: "i-heroicons-calendar-days",
+          to: "/shows",
+        },
+      ],
+    },
+    {
+      label: "Schedule",
+      to: "/shows",
+      active: isActive("/shows"),
+      class: desktopNavToneClass("/shows", isActive("/shows")),
+    },
+    {
+      label: "Approvals",
+      to: "/review",
+      active: isActive("/review"),
+      class: desktopNavToneClass("/review", isActive("/review")),
+    },
+    {
+      label: "People",
+      to: "/performers",
+      active: isActive("/performers"),
+      class: desktopNavToneClass("/performers", isActive("/performers")),
+    },
+  ];
+
+  if (homeTheater.value && homePermissions.value.canReview) {
+    items[0].children = [
+      ...(items[0].children || []),
+      {
+        label: "Theater Admin",
+        description: "Open theater-wide oversight, queue, and community signals.",
+        icon: "i-heroicons-shield-check",
+        to: `/theaters/${homeTheater.value.slug}/admin`,
+      },
+    ];
+  }
+
+  if (homeTheater.value && homePermissions.value.canCreateShow) {
+    items[0].children = [
+      ...(items[0].children || []),
+      {
+        label: "New Show",
+        description: "Create a new show inside your home theater.",
+        icon: "i-heroicons-plus",
+        to: `/theaters/${homeTheater.value.slug}/shows/new`,
+      },
+    ];
+  }
+
+  items[0].children = [
+    ...(items[0].children || []),
+    {
+      label: "Browse Theaters",
+      description: "Browse all theater communities across Stagecom.",
+      icon: "i-heroicons-magnifying-glass",
+      to: "/theaters/browse",
+    },
+  ];
+
+  return items;
+});
+
+const navToneClasses = (to: string, active: boolean) =>
+  stageButtonToneClasses(navTone(to), active);
 
 const isActive = (to: string) => {
   if (to === "/") {
@@ -65,6 +140,8 @@ const isActive = (to: string) => {
 
   return route.path === to || route.path.startsWith(`${to}/`);
 };
+
+const isTheaterNavActive = computed(() => route.path.startsWith("/theaters"));
 
 watch(
   () => route.path,
@@ -93,17 +170,24 @@ watch(
 
         <div class="flex items-center justify-between gap-2 lg:grid lg:grid-cols-[1fr_auto] lg:items-center">
           <nav class="hidden lg:block">
-            <ul class="flex flex-wrap items-center gap-2">
-              <li v-for="item in navItems" :key="item.to">
-                <UButton
-                  :to="item.to"
-                  :variant="isActive(item.to) ? 'soft' : 'ghost'"
-                  :class="navToneClasses(item.to, isActive(item.to))"
-                >
-                  {{ item.label }}
-                </UButton>
-              </li>
-            </ul>
+            <UNavigationMenu
+              :items="desktopNavItems"
+              :ui="{
+                root: 'w-full',
+                list: 'flex flex-wrap items-center gap-2',
+                item: 'relative',
+                link: 'w-full border-2 border-[var(--stage-ink)] rounded-none px-3 py-2 text-sm font-medium text-[var(--stage-ink)] transition-colors',
+                linkLeadingIcon: 'size-4',
+                content: 'min-w-80 rounded-none border-3 border-[var(--stage-ink)] bg-[var(--stage-cream)] p-0 shadow-[8px_8px_0_0_var(--stage-ink)]',
+                childList: 'grid gap-0',
+                childItem: 'rounded-none border-b border-[rgba(43,41,38,0.12)] transition-colors last:border-b-0 hover:bg-[var(--stage-theater-soft)] focus-within:bg-[var(--stage-theater-soft)]',
+                childLink: 'flex w-full items-start gap-3 rounded-none border-0 px-3 py-3 shadow-none',
+                childLinkWrapper: 'min-w-0 flex-1',
+                childLabel: 'text-sm font-medium text-[var(--stage-ink)]',
+                childDescription: 'mt-1 text-xs stage-muted'
+              }"
+              class="justify-start"
+            />
           </nav>
 
           <div class="flex flex-wrap items-center gap-2 lg:justify-end">
@@ -141,6 +225,62 @@ watch(
 
                   <nav>
                     <ul class="grid gap-3 sm:grid-cols-2">
+                      <li v-if="isAuthed" class="sm:col-span-2">
+                        <div class="rounded-none border-3 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.72)] p-3">
+                          <div class="flex items-center justify-between gap-3 border-b-2 border-[var(--stage-ink)] pb-3">
+                            <div>
+                              <p class="stage-overline">My theater</p>
+                              <p class="mt-1 text-sm stage-muted">
+                                {{ homeTheater?.name || "Home theater not set yet" }}
+                              </p>
+                            </div>
+                          </div>
+                          <div class="mt-3 grid gap-2 sm:grid-cols-2">
+                            <UButton
+                              block
+                              :to="homeTheaterPrimaryTo"
+                              :variant="isTheaterNavActive ? 'soft' : 'ghost'"
+                              :class="navToneClasses('/theaters', isTheaterNavActive)"
+                            >
+                              Open My Theater
+                            </UButton>
+                            <UButton
+                              block
+                              to="/shows"
+                              variant="ghost"
+                              :class="navToneClasses('/shows', isActive('/shows'))"
+                            >
+                              Browse Shows
+                            </UButton>
+                            <UButton
+                              v-if="homeTheater && homePermissions.canCreateShow"
+                              block
+                              :to="`/theaters/${homeTheater.slug}/shows/new`"
+                              variant="ghost"
+                              :class="navToneClasses('/theaters', isTheaterNavActive)"
+                            >
+                              New Show
+                            </UButton>
+                            <UButton
+                              v-if="homeTheater && homePermissions.canReview"
+                              block
+                              :to="`/theaters/${homeTheater.slug}/admin`"
+                              variant="ghost"
+                              :class="navToneClasses('/theaters', isTheaterNavActive)"
+                            >
+                              Theater Admin
+                            </UButton>
+                            <UButton
+                              block
+                              to="/theaters/browse"
+                              variant="ghost"
+                              :class="navToneClasses('/theaters', isActive('/theaters'))"
+                            >
+                              Browse Theaters
+                            </UButton>
+                          </div>
+                        </div>
+                      </li>
                       <li v-for="item in navItems" :key="`${item.to}-mobile`">
                         <UButton
                           block

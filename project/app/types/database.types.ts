@@ -457,6 +457,7 @@ export type Database = {
           state_region: string | null;
           street: string | null;
           tagline: string | null;
+          timezone: string;
           updated_at: string;
         };
         Insert: {
@@ -470,6 +471,7 @@ export type Database = {
           state_region?: string | null;
           street?: string | null;
           tagline?: string | null;
+          timezone?: string;
           updated_at?: string;
         };
         Update: {
@@ -483,6 +485,7 @@ export type Database = {
           state_region?: string | null;
           street?: string | null;
           tagline?: string | null;
+          timezone?: string;
           updated_at?: string;
         };
         Relationships: [];

@@ -11,6 +11,7 @@ Postgres-first, Supabase-friendly schema blueprint.
 - name
 - slug (unique)
 - tagline (promo blurb)
+- timezone (IANA timezone like `America/New_York`; event times display in the theater's local zone)
 - street
 - city
 - state_region
