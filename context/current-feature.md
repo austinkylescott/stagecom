@@ -1,24 +1,28 @@
-# Current Feature
-
-## Theater Dashboard Section Refinement v1
+# Current Feature: Theater Dashboard Section Refinement v1
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
 - Refine the top section of the theater page into a dedicated theater dashboard component.
-- Preserve theater identity, metadata, and actions across all breakpoints.
-- Replace stat boxes with `Up Next Event` and `Up Next Show` cards.
-- Eliminate horizontal overflow on small screens.
+- Preserve theater identity, metadata, relationship state, alerts, and actions across all breakpoints.
+- Replace the current page-local first-section markup with a dedicated `TheaterDashboardSection` component.
+- Replace the `Shows / Other Events / Next Date` stat boxes with `Up Next Event` and `Up Next Show` cards.
+- Keep Theater Alerts on a dedicated row below theater metadata and actions at every breakpoint.
+- Ensure the show card poster area preserves a `1080 / 1350` aspect ratio without distortion.
+- Eliminate horizontal overflow on small screens so the page never requires sideways scrolling.
 
 ## Notes
 
 - Spec: `docs/specs/2026-04-01/feature-spec-theater-dashboard-section-refinement-v1.md`
 - Scope is limited to the first `StageSection` on `project/app/pages/theaters/[slug]/index.vue`.
-- Keep Theater Alerts on a separate row from theater metadata.
-- Use Nuxt UI primitives and canonical Tailwind utilities.
+- Keep the existing theater-owned color treatment and broader page visual language.
+- Add a `UAvatar` placeholder aligned to the left of the theater title block.
+- Preserve all currently visible theater metadata and actions, allowing action density to collapse at smaller breakpoints without losing access.
+- Use Nuxt UI primitives and canonical Tailwind utilities, with `min-w-0` and single-column mobile defaults to prevent overflow.
+- Browser verification should explicitly check the layout around `1440px`, `1024px`, and `425px`.
 
 ## History
 
