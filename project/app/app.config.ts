@@ -216,6 +216,40 @@ export default defineAppConfig({
         variant: "soft",
       },
     },
+    dropdownMenu: {
+      slots: {
+        content:
+          "rounded-none border-3 border-(--stage-ink) bg-(--stage-cream) p-0 shadow-[8px_8px_0_0_var(--stage-ink)]",
+        viewport: "p-0",
+        group: "p-0",
+        item:
+          "rounded-none border-b border-[rgba(43,41,38,0.12)] px-3 py-3 last:border-b-0 data-[highlighted]:bg-(--stage-paper-strong) data-[highlighted]:text-(--stage-ink)",
+        itemLeadingIcon: "size-4 text-(--stage-ink)",
+        itemLabel: "text-sm font-medium text-(--stage-ink)",
+        itemDescription: "mt-0.5 text-xs stage-muted",
+        itemWrapper: "gap-0",
+      },
+    },
+    navigationMenu: {
+      slots: {
+        root: "w-full",
+        list: "flex flex-wrap items-center gap-2",
+        item: "relative",
+        link:
+          "w-full rounded-none border-2 border-(--stage-ink) px-3 py-2 text-sm font-medium text-(--stage-ink) transition-colors",
+        linkLeadingIcon: "size-4",
+        content:
+          "min-w-80 rounded-none border-3 border-(--stage-ink) bg-(--stage-cream) p-0 shadow-[8px_8px_0_0_var(--stage-ink)]",
+        childList: "grid gap-0",
+        childItem:
+          "rounded-none border-b border-[rgba(43,41,38,0.12)] transition-colors last:border-b-0 hover:bg-(--stage-theater-soft) focus-within:bg-(--stage-theater-soft)",
+        childLink:
+          "flex w-full items-start gap-3 rounded-none border-0 px-3 py-3 shadow-none",
+        childLinkWrapper: "min-w-0 flex-1",
+        childLinkLabel: "text-sm font-medium text-(--stage-ink)",
+        childLinkDescription: "mt-1 text-xs stage-muted",
+      },
+    },
     alert: {
       slots: {
         root: "rounded-xl border-3 border-(--stage-ink) bg-(--stage-cream) text-(--stage-ink) shadow-[6px_6px_0_0_var(--stage-ink)]",

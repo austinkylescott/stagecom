@@ -6,6 +6,7 @@ These rules exist to keep Stagecom aligned with the current product docs, data m
 
 - Every feature must map back to `docs/product/PRD.md`.
 - Follow `docs/development/ai-interaction.md` for AI workflow, branching, commit, and collaboration expectations.
+- Follow `docs/design/app-design-bible.md` for authenticated app UI and design-system decisions.
 - Do not introduce schema-level entities or change table meaning without updating `docs/data/data-model.md`.
 - Do not change schema, DB-backed assumptions, or seed expectations without updating the mock-data workflow and example config in the same change.
 - Significant behavior changes must update the relevant docs in the same change:
@@ -48,8 +49,10 @@ These rules exist to keep Stagecom aligned with the current product docs, data m
 ## 5. Nuxt UI and styling rules
 
 - Prefer Nuxt UI primitives such as `UButton`, `UCard`, `UInput`, `UFormField`, `UHeader`, `UNavigationMenu`, and related components before writing custom base UI.
+- Treat the theater dashboard and navbar/account controls as the primary reference surfaces for authenticated UI composition.
 - Match the visual language already configured in `project/app/assets/css/main.css` and `project/nuxt.config.ts`.
 - Reuse the configured font tokens and shared theme variables rather than importing ad hoc fonts per page or component.
+- Prefer `project/app/app.config.ts` for shared component theming and use component-level `:ui` overrides before introducing new custom wrappers.
 - Prefer utility classes and existing layout patterns over bespoke CSS files unless a shared style abstraction is clearly needed.
 
 ## 6. Data fetching and state rules

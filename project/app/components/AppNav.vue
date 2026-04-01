@@ -131,9 +131,6 @@ const desktopNavItems = computed<NavigationMenuItem[]>(() => {
   return items;
 });
 
-const navToneClasses = (to: string, active: boolean) =>
-  stageButtonToneClasses(navTone(to), active);
-
 const isActive = (to: string) => {
   if (to === "/") {
     return route.path === "/";
@@ -175,27 +172,7 @@ watch(
           class="flex items-center justify-between gap-2 lg:grid lg:grid-cols-[1fr_auto] lg:items-center"
         >
           <nav class="hidden lg:block">
-            <UNavigationMenu
-              :items="desktopNavItems"
-              :ui="{
-                root: 'w-full',
-                list: 'flex flex-wrap items-center gap-2',
-                item: 'relative',
-                link: 'w-full border-2 border-(--stage-ink) rounded-none px-3 py-2 text-sm font-medium text-(--stage-ink) transition-colors',
-                linkLeadingIcon: 'size-4',
-                content:
-                  'min-w-80 rounded-none border-3 border-(--stage-ink) bg-(--stage-cream) p-0 shadow-[8px_8px_0_0_var(--stage-ink)]',
-                childList: 'grid gap-0',
-                childItem:
-                  'rounded-none border-b border-[rgba(43,41,38,0.12)] transition-colors last:border-b-0 hover:bg-(--stage-theater-soft) focus-within:bg-(--stage-theater-soft)',
-                childLink:
-                  'flex w-full items-start gap-3 rounded-none border-0 px-3 py-3 shadow-none',
-                childLinkWrapper: 'min-w-0 flex-1',
-                childLabel: 'text-sm font-medium text-(--stage-ink)',
-                childDescription: 'mt-1 text-xs stage-muted',
-              }"
-              class="justify-start"
-            />
+            <UNavigationMenu :items="desktopNavItems" class="justify-start" />
           </nav>
 
           <div class="flex flex-wrap items-center gap-2 lg:justify-end">
@@ -212,13 +189,13 @@ watch(
                 overlay: 'bg-[rgba(43,41,38,0.45)]',
               }"
             >
-              <UButton
+              <StageButton
                 class="lg:hidden"
                 variant="ghost"
                 icon="i-heroicons-bars-3-bottom-left"
               >
                 Menu
-              </UButton>
+              </StageButton>
 
               <template #content>
                 <div
@@ -235,8 +212,9 @@ watch(
                         Menu
                       </h2>
                     </div>
-                    <UButton
+                    <StageButton
                       variant="ghost"
+                      tone="neutral"
                       icon="i-heroicons-x-mark"
                       @click="mobileNavOpen = false"
                     />
@@ -262,75 +240,68 @@ watch(
                             </div>
                           </div>
                           <div class="mt-3 grid gap-2 sm:grid-cols-2">
-                            <UButton
+                            <StageButton
                               block
                               :to="homeTheaterPrimaryTo"
-                              :variant="isTheaterNavActive ? 'soft' : 'ghost'"
-                              :class="
-                                navToneClasses('/theaters', isTheaterNavActive)
-                              "
+                              variant="ghost"
+                              tone="theater"
+                              :active="isTheaterNavActive"
                             >
                               Open My Theater
-                            </UButton>
-                            <UButton
+                            </StageButton>
+                            <StageButton
                               block
                               to="/shows"
                               variant="ghost"
-                              :class="
-                                navToneClasses('/shows', isActive('/shows'))
-                              "
+                              tone="event"
+                              :active="isActive('/shows')"
                             >
                               Browse Shows
-                            </UButton>
-                            <UButton
+                            </StageButton>
+                            <StageButton
                               v-if="
                                 homeTheater && homePermissions.canCreateShow
                               "
                               block
                               :to="`/theaters/${homeTheater.slug}/shows/new`"
                               variant="ghost"
-                              :class="
-                                navToneClasses('/theaters', isTheaterNavActive)
-                              "
+                              tone="theater"
+                              :active="isTheaterNavActive"
                             >
                               New Show
-                            </UButton>
-                            <UButton
+                            </StageButton>
+                            <StageButton
                               v-if="homeTheater && homePermissions.canReview"
                               block
                               :to="`/theaters/${homeTheater.slug}/admin`"
                               variant="ghost"
-                              :class="
-                                navToneClasses('/theaters', isTheaterNavActive)
-                              "
+                              tone="theater"
+                              :active="isTheaterNavActive"
                             >
                               Theater Admin
-                            </UButton>
-                            <UButton
+                            </StageButton>
+                            <StageButton
                               block
                               to="/theaters/browse"
                               variant="ghost"
-                              :class="
-                                navToneClasses(
-                                  '/theaters',
-                                  isActive('/theaters'),
-                                )
-                              "
+                              tone="theater"
+                              :active="isActive('/theaters')"
                             >
                               Browse Theaters
-                            </UButton>
+                            </StageButton>
                           </div>
                         </div>
                       </li>
                       <li v-for="item in navItems" :key="`${item.to}-mobile`">
-                        <UButton
+                        <StageButton
                           block
                           :to="item.to"
-                          :variant="isActive(item.to) ? 'soft' : 'ghost'"
-                          :class="navToneClasses(item.to, isActive(item.to))"
+                          variant="ghost"
+                          :tone="navTone(item.to)"
+                          :active="isActive(item.to)"
                         >
                           {{ item.label }}
-                        </UButton>
+                        </StageButton>
                       </li>
                     </ul>
                   </nav>

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from "@nuxt/ui";
 
+const open = defineModel<boolean>("open", { default: false });
+
 const props = withDefaults(defineProps<{
   items: DropdownMenuItem[][];
   content?: {
@@ -10,30 +12,37 @@ const props = withDefaults(defineProps<{
   };
   widthClass?: string;
   headerToneClass?: string;
+  ui?: Record<string, string>;
 }>(), {
   content: () => ({ side: "bottom", align: "end", sideOffset: 8 }),
   widthClass: "w-80",
   headerToneClass: "bg-(--stage-ink)",
+  ui: () => ({}),
 });
+
+const resolvedUi = computed(() => ({
+  ...props.ui,
+  content: [props.widthClass, props.ui.content].filter(Boolean).join(" "),
+}));
 </script>
 
 <template>
-  <StageDropdown
+  <UDropdownMenu
+    v-model:open="open"
     :items="items"
     :content="content"
-    :width-class="widthClass"
-    :header-tone-class="headerToneClass"
+    :ui="resolvedUi"
   >
-    <template #default="{ open }">
-      <slot :open="open" />
-    </template>
+    <slot :open="open" />
 
-    <template #header>
-      <slot name="header" />
-    </template>
-
-    <template #header-actions>
-      <slot name="header-actions" />
+    <template #content-top>
+      <div
+        class="flex items-center justify-between border-b-3 border-(--stage-ink) px-3 py-2 text-(--stage-ink)"
+        :class="headerToneClass"
+      >
+        <slot name="header" />
+        <slot name="header-actions" />
+      </div>
     </template>
 
     <template #content-bottom>
@@ -51,5 +60,5 @@ const props = withDefaults(defineProps<{
     <template #item-description="slotProps">
       <slot name="item-description" v-bind="slotProps" />
     </template>
-  </StageDropdown>
+  </UDropdownMenu>
 </template>

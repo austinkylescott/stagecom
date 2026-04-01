@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from "@nuxt/ui";
 import type { TheaterDetails } from "~/queries/theaters";
-import { stageButtonToneClasses } from "~/utils/stageButtonTone";
 
 type PublicEvent = TheaterDetails["shows"]["public"][number];
 
@@ -163,7 +162,7 @@ onBeforeUnmount(() => {
         <div class="flex items-center gap-4 min-w-0 sm:gap-5">
           <UAvatar
             :text="theaterInitials"
-            class="size-18 shrink-0 border-2 border-(--stage-ink) bg-[rgba(251,247,239,0.84)] text-xl font-black text-(--stage-ink) sm:size-20 sm:text-2xl"
+            class="size-20 shrink-0 border-2 border-(--stage-ink) bg-[rgba(251,247,239,0.84)] text-xl font-black text-(--stage-ink) sm:size-24 sm:text-2xl"
           />
 
           <div class="min-w-0 flex-1 space-y-2">
@@ -195,65 +194,55 @@ onBeforeUnmount(() => {
     </div>
 
     <div class="flex w-full min-w-0 flex-wrap items-center gap-2">
-      <UButton
-        color="neutral"
+      <StageButton
         variant="ghost"
+        tone="event"
         :to="calendarPath"
         icon="i-heroicons-calendar-days"
         class="w-full sm:w-auto"
-        :class="stageButtonToneClasses('event')"
       >
         Full calendar
-      </UButton>
-      <UButton
+      </StageButton>
+      <StageButton
         v-if="isMember"
-        color="neutral"
         variant="ghost"
+        tone="event"
         :to="createEventPath"
         icon="i-heroicons-plus"
         class="hidden md:inline-flex"
-        :class="stageButtonToneClasses('event')"
       >
         Create an event
-      </UButton>
-      <UButton
+      </StageButton>
+      <StageButton
         v-if="canReview"
-        color="neutral"
         variant="ghost"
+        tone="theater"
         :to="adminPath"
         icon="i-heroicons-shield-check"
         class="hidden lg:inline-flex"
-        :class="stageButtonToneClasses('theater')"
       >
         Theater admin
-      </UButton>
-      <UDropdownMenu
+      </StageButton>
+      <StageDropdown
         v-if="theater"
         class="w-full sm:w-auto sm:ml-auto"
         :items="theaterActionsMenuItems"
         :content="{ align: 'end', sideOffset: 8 }"
-        :ui="{
-          content:
-            'w-64 rounded-none border-3 border-(--stage-ink) bg-(--stage-cream) p-0 shadow-[8px_8px_0_0_var(--stage-ink)]',
-          viewport: 'p-0',
-          group: 'p-0',
-          item: 'rounded-none border-b border-[rgba(43,41,38,0.12)] px-3 py-3 last:border-b-0 data-[highlighted]:bg-(--stage-paper-strong) data-[highlighted]:text-(--stage-ink)',
-          itemLeadingIcon: 'size-4 text-(--stage-ink)',
-          itemLabel: 'text-sm font-medium text-(--stage-ink)',
-        }"
+        width-class="w-64"
       >
-        <UButton
-          size="sm"
-          color="neutral"
-          variant="ghost"
-          icon="i-heroicons-ellipsis-horizontal"
-          class="w-full sm:w-auto"
-          :loading="relationshipLoading"
-          :class="stageButtonToneClasses('neutral')"
-        >
-          Theater actions
-        </UButton>
-      </UDropdownMenu>
+        <template #default>
+          <StageButton
+            size="sm"
+            variant="ghost"
+            tone="neutral"
+            icon="i-heroicons-ellipsis-horizontal"
+            class="w-full sm:w-auto"
+            :loading="relationshipLoading"
+          >
+            Theater actions
+          </StageButton>
+        </template>
+      </StageDropdown>
     </div>
 
     <article
@@ -267,20 +256,18 @@ onBeforeUnmount(() => {
         </div>
 
         <div class="flex shrink-0 items-center gap-2">
-          <UButton
+          <StageButton
             size="xs"
-            color="neutral"
             variant="ghost"
+            tone="neutral"
             icon="i-heroicons-arrow-left"
-            :class="stageButtonToneClasses('neutral')"
             @click="scrollTheaterAlerts('prev')"
           />
-          <UButton
+          <StageButton
             size="xs"
-            color="neutral"
             variant="ghost"
+            tone="neutral"
             icon="i-heroicons-arrow-right"
-            :class="stageButtonToneClasses('neutral')"
             @click="scrollTheaterAlerts('next')"
           />
         </div>
@@ -326,7 +313,7 @@ onBeforeUnmount(() => {
                 v-for="(alert, index) in theaterAlerts"
                 :key="alert.id"
                 type="button"
-                class="h-2.5 w-2.5 border border-(--stage-ink) transition-colors"
+                class="size-2.5 border border-(--stage-ink) transition-colors"
                 :class="
                   index === activeTheaterAlertIndex
                     ? 'bg-(--stage-ink)'
@@ -395,14 +382,14 @@ onBeforeUnmount(() => {
             </div>
 
             <div class="border-t-2 border-[rgba(43,41,38,0.14)] pt-3">
-              <UButton
+              <StageButton
                 size="xs"
-                color="neutral"
                 variant="ghost"
+                tone="neutral"
                 :to="`/theaters/${slug}/shows/${nextEvent.id}`"
               >
                 Open event
-              </UButton>
+              </StageButton>
             </div>
           </template>
 
@@ -421,15 +408,15 @@ onBeforeUnmount(() => {
             </div>
 
             <div class="border-t-2 border-[rgba(43,41,38,0.14)] pt-3">
-              <UButton
+              <StageButton
                 size="xs"
-                color="neutral"
                 variant="ghost"
+                tone="neutral"
                 :to="eventEmptyCta.to"
                 :icon="eventEmptyCta.icon"
               >
                 {{ eventEmptyCta.label }}
-              </UButton>
+              </StageButton>
             </div>
           </template>
         </div>
@@ -502,14 +489,14 @@ onBeforeUnmount(() => {
               </div>
 
               <div class="border-t-2 border-[rgba(43,41,38,0.14)] pt-3">
-                <UButton
+                <StageButton
                   size="xs"
-                  color="neutral"
                   variant="ghost"
+                  tone="neutral"
                   :to="`/theaters/${slug}/shows/${nextShow.id}`"
                 >
                   Open show
-                </UButton>
+                </StageButton>
               </div>
             </template>
 
@@ -527,15 +514,15 @@ onBeforeUnmount(() => {
               </div>
 
               <div class="border-t-2 border-[rgba(43,41,38,0.14)] pt-3">
-                <UButton
+                <StageButton
                   size="xs"
-                  color="neutral"
                   variant="ghost"
+                  tone="neutral"
                   :to="showEmptyCta.to"
                   :icon="showEmptyCta.icon"
                 >
                   {{ showEmptyCta.label }}
-                </UButton>
+                </StageButton>
               </div>
             </template>
           </div>

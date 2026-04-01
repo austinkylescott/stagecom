@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useRequestHeaders } from "#app";
 import type { DropdownMenuItem } from "@nuxt/ui";
+import TheaterEventDateGroup from "~/components/theater/detail/TheaterEventDateGroup.vue";
+import TheaterShowCard from "~/components/theater/detail/TheaterShowCard.vue";
 import { useHomeTheaterState } from "~/composables/useHomeTheaterState";
 import { useHomeTheaterMutation } from "~/composables/useHomeTheaterMutation";
 import { useMembershipToggle } from "~/composables/useMembershipToggle";
@@ -356,112 +358,39 @@ const formatTime = (value: string | null) =>
       inner-class="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-7 lg:px-8"
     >
       <div class="space-y-5">
-        <div class="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <p class="stage-overline text-[rgba(43,41,38,0.62)]">
-              What's on stage?
-            </p>
-            <h2 class="mt-2 font-display text-4xl uppercase tracking-[0.08em]">
-              Upcoming Shows
-            </h2>
-            <p class="mt-2 max-w-2xl text-sm leading-7 stage-muted">
-              Keep the spotlight on the theater overall while still making the
-              next shows easy to scan.
-            </p>
-          </div>
-          <UButton
-            size="xs"
-            color="warning"
-            variant="ghost"
-            :to="`/theaters/${slug}/calendar`"
-            icon="i-heroicons-arrow-right"
-          >
-            Full calendar
-          </UButton>
-        </div>
+        <StageSectionHeader
+          overline="What's on stage?"
+          title="Upcoming Shows"
+          description="Keep the spotlight on the theater overall while still making the next shows easy to scan."
+          description-class="max-w-2xl"
+          overline-class="text-[rgba(43,41,38,0.62)]"
+        >
+          <template #actions>
+            <StageButton
+              size="xs"
+              variant="ghost"
+              tone="event"
+              :to="`/theaters/${slug}/calendar`"
+              icon="i-heroicons-arrow-right"
+            >
+              Full calendar
+            </StageButton>
+          </template>
+        </StageSectionHeader>
 
         <div v-if="upcomingShows.length" class="grid gap-4 xl:grid-cols-3">
-          <article
+          <TheaterShowCard
             v-for="(show, index) in upcomingShows"
             :key="show.id"
-            class="stage-list-card h-full p-4 transition-transform hover:translate-x-px hover:translate-y-px sm:p-5"
-          >
-            <div class="flex h-full items-stretch gap-3 sm:gap-4">
-              <div class="shrink-0 self-stretch">
-                <div
-                  class="relative h-full min-w-19 max-w-29 overflow-hidden border-2 border-(--stage-ink) text-(--stage-cream) aspect-1080/1350"
-                  :class="artworkToneClass(index)"
-                >
-                  <div
-                    class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(251,247,239,0.24),transparent_38%),linear-gradient(180deg,transparent,rgba(43,41,38,0.34))]"
-                  />
-                  <div
-                    class="relative flex h-full flex-col justify-between p-2"
-                  >
-                    <span
-                      class="text-[8px] font-black uppercase tracking-[0.18em] text-[rgba(251,247,239,0.82)]"
-                    >
-                      Show
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="flex min-w-0 flex-1 flex-col">
-                <div class="flex flex-wrap items-center gap-2">
-                  <span class="stage-chip bg-(--stage-event)">
-                    {{ formatDate(show.startsAt) }}
-                  </span>
-                  <span class="stage-chip bg-[rgba(251,247,239,0.84)]">
-                    {{ formatTime(show.startsAt) }}
-                  </span>
-                </div>
-
-                <NuxtLink
-                  :to="`/theaters/${slug}/shows/${show.id}`"
-                  class="mt-3 block"
-                >
-                  <h3
-                    class="font-display text-3xl uppercase leading-[0.94] tracking-[0.06em]"
-                  >
-                    {{ show.title }}
-                  </h3>
-                </NuxtLink>
-                <p class="mt-3 text-sm leading-7 stage-muted">
-                  {{
-                    show.description ||
-                    `Upcoming show at ${theater?.name || "this theater"}.`
-                  }}
-                </p>
-
-                <div
-                  class="mt-4 space-y-3 text-sm leading-6 text-[rgba(43,41,38,0.78)]"
-                >
-                  <p>
-                    <span class="font-semibold text-(--stage-ink)"
-                      >Producer:</span
-                    >
-                    {{ producerLabel(show) }}
-                  </p>
-                  <div>
-                    <span class="font-semibold text-(--stage-ink)">Cast:</span>
-                    <span class="ml-1">{{ castPreviewLabel(show) }}</span>
-                  </div>
-                </div>
-
-                <div class="mt-auto pt-5">
-                  <UButton
-                    size="xs"
-                    color="neutral"
-                    variant="ghost"
-                    :to="`/theaters/${slug}/shows/${show.id}`"
-                  >
-                    Open show
-                  </UButton>
-                </div>
-              </div>
-            </div>
-          </article>
+            :slug="slug"
+            :show="show"
+            :theater-name="theater?.name"
+            :artwork-tone-class="artworkToneClass(index)"
+            :format-date="formatDate"
+            :format-time="formatTime"
+            :producer-label="producerLabel"
+            :cast-label="castPreviewLabel"
+          />
         </div>
 
         <div
@@ -485,118 +414,37 @@ const formatTime = (value: string | null) =>
       inner-class="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-7 lg:px-8"
     >
       <div class="space-y-5">
-        <div class="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <p class="stage-overline">All upcoming events</p>
-            <h2 class="mt-2 font-display text-4xl uppercase tracking-[0.08em]">
-              Everything on the board
-            </h2>
-            <p class="mt-2 max-w-3xl text-sm leading-7 stage-muted">
-              This list includes every approved, visible upcoming event for this
-              theater, including shows and non-show programming.
-            </p>
-          </div>
-          <UButton
-            size="xs"
-            color="neutral"
-            variant="ghost"
-            :to="`/theaters/${slug}/calendar`"
-            icon="i-heroicons-calendar-days"
-          >
-            Open full calendar
-          </UButton>
-        </div>
+        <StageSectionHeader
+          overline="All upcoming events"
+          title="Everything on the board"
+          description="This list includes every approved, visible upcoming event for this theater, including shows and non-show programming."
+        >
+          <template #actions>
+            <StageButton
+              size="xs"
+              variant="ghost"
+              tone="neutral"
+              :to="`/theaters/${slug}/calendar`"
+              icon="i-heroicons-calendar-days"
+            >
+              Open full calendar
+            </StageButton>
+          </template>
+        </StageSectionHeader>
 
         <div v-if="groupedPublicEvents.length" class="space-y-4">
-          <article
+          <TheaterEventDateGroup
             v-for="group in groupedPublicEvents"
             :key="group.dateKey"
-            class="stage-list-card p-4 sm:p-5"
-          >
-            <div
-              class="grid gap-4 sm:grid-cols-[7rem_minmax(0,1fr)] sm:items-start"
-            >
-              <div
-                class="border-2 border-(--stage-ink) bg-[rgba(251,247,239,0.78)] px-3 py-3 text-center"
-              >
-                <p class="stage-overline">Date</p>
-                <p
-                  class="mt-2 font-display text-3xl uppercase tracking-[0.08em]"
-                >
-                  {{ group.dateLabel }}
-                </p>
-              </div>
-
-              <div class="min-w-0 divide-y-2 divide-[rgba(43,41,38,0.12)]">
-                <article
-                  v-for="(event, index) in group.items"
-                  :key="event.id"
-                  class="transition-transform hover:translate-x-px hover:translate-y-px"
-                  :class="index === 0 ? 'pb-1' : 'pt-4 pb-1'"
-                >
-                  <div
-                    class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start"
-                  >
-                    <div class="min-w-0">
-                      <div class="flex flex-wrap items-center gap-2">
-                        <span class="stage-chip" :class="eventToneClass(event)">
-                          {{ eventTypeLabel(event.eventType) }}
-                        </span>
-                        <span class="stage-chip bg-[rgba(251,247,239,0.84)]">
-                          {{ formatDateTime(event.startsAt) }}
-                        </span>
-                      </div>
-
-                      <NuxtLink
-                        :to="`/theaters/${slug}/shows/${event.id}`"
-                        class="mt-3 block"
-                      >
-                        <h3
-                          class="font-display text-3xl uppercase leading-[0.94] tracking-[0.06em]"
-                        >
-                          {{ event.title }}
-                        </h3>
-                      </NuxtLink>
-                      <p class="mt-3 text-sm leading-7 stage-muted">
-                        {{
-                          event.description ||
-                          `Upcoming ${eventTypeLabel(event.eventType).toLowerCase()} at ${theater?.name || "this theater"}.`
-                        }}
-                      </p>
-
-                      <div
-                        class="mt-4 flex flex-wrap gap-x-5 gap-y-3 text-sm leading-6 text-[rgba(43,41,38,0.78)]"
-                      >
-                        <span>
-                          <span class="font-semibold text-(--stage-ink)"
-                            >Producer:</span
-                          >
-                          {{ producerLabel(event) }}
-                        </span>
-                        <span v-if="event.eventType === 'show'">
-                          <span class="font-semibold text-(--stage-ink)"
-                            >Cast:</span
-                          >
-                          {{ castPreviewLabel(event) }}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div class="flex items-start lg:justify-end">
-                      <UButton
-                        size="xs"
-                        color="neutral"
-                        variant="ghost"
-                        :to="`/theaters/${slug}/shows/${event.id}`"
-                      >
-                        Open event
-                      </UButton>
-                    </div>
-                  </div>
-                </article>
-              </div>
-            </div>
-          </article>
+            :slug="slug"
+            :theater-name="theater?.name"
+            :group="group"
+            :format-date-time="formatDateTime"
+            :event-type-label="eventTypeLabel"
+            :event-tone-class="eventToneClass"
+            :producer-label="producerLabel"
+            :cast-label="castPreviewLabel"
+          />
         </div>
 
         <div
@@ -612,23 +460,23 @@ const formatTime = (value: string | null) =>
             the full public scan of what is coming up at this theater.
           </p>
           <div class="mt-5 flex flex-wrap gap-2">
-            <UButton
+            <StageButton
               variant="ghost"
-              color="neutral"
+              tone="neutral"
               :to="`/theaters/${slug}/calendar`"
               icon="i-heroicons-calendar-days"
             >
               Open calendar
-            </UButton>
-            <UButton
+            </StageButton>
+            <StageButton
               v-if="isMember"
-              color="primary"
               variant="ghost"
+              tone="event"
               :to="`/theaters/${slug}/shows/new`"
               icon="i-heroicons-plus"
             >
               Create an event
-            </UButton>
+            </StageButton>
           </div>
         </div>
       </div>

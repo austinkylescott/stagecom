@@ -26,6 +26,7 @@ Read these before making behavior changes:
 - `docs/development/server-api-conventions.md`: required server auth, permission, and validation patterns.
 - `docs/development/coding-rules.md`: repo-specific guardrails.
 - `docs/development/ai-interaction.md`: workflow, branch, commit, and collaboration rules for AI-assisted work.
+- `docs/design/app-design-bible.md`: authenticated app design system and locked UI references.
 - `docs/product/events-and-notifications.md` and feature specs when touching those areas.
 
 ## Documentation Sources

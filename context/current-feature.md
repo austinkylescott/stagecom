@@ -1,16 +1,23 @@
 # Current Feature
 
+Design System Standardization v1
+
 ## Status
 
-Not Started
+Complete
 
 ## Goals
 
-- No feature loaded.
+- Extract reusable theater/dashboard presentation components from the theater detail page.
+- Standardize shell button and dropdown primitives around the locked nav and account patterns.
+- Expand Nuxt UI theming only where the pattern is truly shared.
+- Publish a design-system bible and update AI workflow docs to prevent visual drift.
 
 ## Notes
 
-- No active notes.
+- Locked anchors are the theater dashboard, navbar, account button, and shell dropdown behavior.
+- Prefer Nuxt UI primitives, then app-level theme config, then component-level `:ui`, then inline Tailwind utilities.
+- The homepage may inform palette and tone, but it is not the structural source of truth for authenticated surfaces.
 
 ## History
 
@@ -31,3 +38,4 @@ Not Started
 - Completed Shows Dashboard Refresh + Semantic Color Pass v1 with an occurrence-aware shows schedule API, compact month/day/agenda dashboard views, URL-synced filters, cache invalidation updates, and semantic theater/event/performer accent styling across the active UI surfaces
 - Completed Authenticated Work Experience Refinement v1 with theater browse/home/admin/calendar surface separation, theater-board redesign, shared flat button-tone behavior, hydration fixes, and theater-local timezone handling
 - Completed Theater Dashboard Section Refinement v1 with a dedicated theater dashboard component, mobile-first overflow fixes, relocated action controls, alert-row refinement, and new Up Next event/show summary cards
+- Completed Design System Standardization v1 with shared Stage button/dropdown/header primitives, theater-page component extraction, expanded Nuxt UI theme configuration, and a new design-system bible plus subagent brief

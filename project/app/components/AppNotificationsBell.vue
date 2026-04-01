@@ -5,7 +5,6 @@ import {
   useMarkRead,
 } from "~/composables/useNotifications";
 import {
-  stageButtonToneClasses,
   type StageButtonTone,
 } from "~/utils/stageButtonTone";
 import { formatNotification } from "~/utils/notifications";
@@ -71,19 +70,20 @@ const notificationItems = computed<NotificationDropdownItem[][]>(() => [
     :header-tone-class="latestNotificationToneClass"
   >
     <template #default="{ open }">
-    <UButton
-      color="neutral"
-      variant="ghost"
-      :class="['relative', stageButtonToneClasses(notificationButtonTone, open)]"
-    >
-      <UIcon name="i-heroicons-bell" class="size-5" />
-      <span
-        v-if="unreadCount > 0"
-        class="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center border border-(--stage-ink) bg-(--stage-performer) px-0.5 text-[10px] font-medium text-(--stage-cream)"
+      <StageButton
+        variant="ghost"
+        :tone="notificationButtonTone"
+        :active="open"
+        class="relative"
       >
-        {{ unreadCount > 9 ? "9+" : unreadCount }}
-      </span>
-    </UButton>
+        <UIcon name="i-heroicons-bell" class="size-5" />
+        <span
+          v-if="unreadCount > 0"
+          class="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center border border-(--stage-ink) bg-(--stage-performer) px-0.5 text-[10px] font-medium text-(--stage-cream)"
+        >
+          {{ unreadCount > 9 ? "9+" : unreadCount }}
+        </span>
+      </StageButton>
     </template>
 
     <template #header>
