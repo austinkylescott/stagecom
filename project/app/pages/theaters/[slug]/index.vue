@@ -4,7 +4,6 @@ import type { DropdownMenuItem } from "@nuxt/ui";
 import { useHomeTheaterState } from "~/composables/useHomeTheaterState";
 import { useHomeTheaterMutation } from "~/composables/useHomeTheaterMutation";
 import { useMembershipToggle } from "~/composables/useMembershipToggle";
-import { stageButtonToneClasses } from "~/utils/stageButtonTone";
 import {
   getTimeZoneDateKey,
   normalizeTimeZone,
@@ -50,16 +49,7 @@ const upcomingNonShowEvents = computed(() =>
   publicEvents.value.filter((event) => event.eventType !== "show"),
 );
 const nextShow = computed(() => upcomingShows.value[0] || null);
-const nextEvent = computed(() => publicEvents.value[0] || null);
-const boardAlertDescription = computed(() => {
-  if (!publicEvents.value.length) {
-    return "This page is the theater's public board. Once approved events are scheduled, it should tell people where the theater is, what is coming up, and how to open the full calendar.";
-  }
-
-  return "This is the theater's public board: see where the theater is, scan upcoming shows, catch other events on the calendar, and jump into the full schedule.";
-});
-const theaterAlertsCarousel = useTemplateRef<any>("theaterAlertsCarousel");
-const activeTheaterAlertIndex = ref(0);
+const nextEvent = computed(() => upcomingNonShowEvents.value[0] || null);
 const theaterTimeZone = computed(() => normalizeTimeZone(theater.value?.timezone));
 const fullAddress = computed(() => {
   const parts = [
@@ -78,6 +68,7 @@ const theaterAlerts = computed(() => [
     title: "Auditions this weekend",
     description:
       "Theater Admin alerts will appear here for the whole community. This slot can call out weekend auditions, lineup deadlines, or high-visibility reminders.",
+    posted: "Posted Tue, Apr 1",
     expires: "Expires Sun, Apr 6",
   },
   {
@@ -85,6 +76,7 @@ const theaterAlerts = computed(() => [
     title: "Class registration ends soon",
     description:
       "Use this card for deadline-driven updates like registration windows, workshop sign-ups, or schedule changes that matter to the entire theater community.",
+    posted: "Posted Mon, Mar 31",
     expires: "Expires Fri, Apr 4",
   },
   {
@@ -92,6 +84,7 @@ const theaterAlerts = computed(() => [
     title: "Community night lineup posted",
     description:
       "This can also carry positive board-wide announcements like community showcases, festival notes, or new public programming updates.",
+    posted: "Posted Sat, Mar 29",
     expires: "Expires Wed, Apr 9",
   },
 ]);
@@ -236,8 +229,32 @@ const handleHomeToggle = async () => {
   }
 };
 
-const relationshipMenuItems = computed<DropdownMenuItem[][]>(() => [
-  [
+const theaterActionsMenuItems = computed<DropdownMenuItem[][]>(() => {
+  const items: DropdownMenuItem[][] = [[
+    {
+      label: "Full calendar",
+      icon: "i-heroicons-calendar-days",
+      to: `/theaters/${slug.value}/calendar`,
+    },
+  ]];
+
+  if (isMember.value) {
+    items[0]?.push({
+      label: "Create an event",
+      icon: "i-heroicons-plus",
+      to: `/theaters/${slug.value}/shows/new`,
+    });
+  }
+
+  if (canReview.value) {
+    items[0]?.push({
+      label: "Theater admin",
+      icon: "i-heroicons-shield-check",
+      to: `/theaters/${slug.value}/admin`,
+    });
+  }
+
+  items.push([
     {
       label: isMember.value ? "Unfollow theater" : "Follow theater",
       icon: isMember.value
@@ -252,8 +269,10 @@ const relationshipMenuItems = computed<DropdownMenuItem[][]>(() => [
       disabled: relationshipLoading.value || !theater.value,
       onSelect: handleHomeToggle,
     },
-  ],
-]);
+  ]);
+
+  return items;
+});
 
 const passiveRelationshipLabel = computed(() => {
   if (isHome.value && isMember.value) {
@@ -304,28 +323,6 @@ const formatTime = (value: string | null) =>
     minute: "2-digit",
   });
 
-const scrollTheaterAlerts = (direction: "prev" | "next") => {
-  const api = theaterAlertsCarousel.value?.emblaApi;
-  if (!api) return;
-
-  if (direction === "prev") {
-    api.scrollPrev();
-    return;
-  }
-
-  api.scrollNext();
-};
-
-const scrollToTheaterAlert = (index: number) => {
-  const api = theaterAlertsCarousel.value?.emblaApi;
-  if (!api) return;
-
-  api.scrollTo(index);
-};
-
-const handleTheaterAlertSelect = (index: number) => {
-  activeTheaterAlertIndex.value = index;
-};
 </script>
 
 <template>
@@ -334,245 +331,23 @@ const handleTheaterAlertSelect = (index: number) => {
       outer-class="border-b-3 border-[var(--stage-ink)] bg-[var(--stage-theater)] overflow-hidden"
       inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8"
     >
-      <section class="grid gap-6">
-        <div class="grid gap-6">
-          <div class="space-y-4">
-            <div
-              class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-semibold uppercase tracking-[0.14em] text-[rgba(43,41,38,0.62)]"
-            >
-              <span>{{ isHome ? "Home theater" : "Theater page" }}</span>
-              <span v-if="canReview">Oversight access</span>
-            </div>
-
-            <div class="max-w-5xl">
-              <h1
-                class="font-display text-[clamp(4rem,9vw,7.5rem)] uppercase leading-[0.88] tracking-[0.03em] text-[var(--stage-ink)]"
-              >
-                {{ theater?.name || slug }}
-              </h1>
-            </div>
-
-            <div class="max-w-4xl space-y-3">
-              <p
-                v-if="theater?.tagline"
-                class="text-lg leading-8 text-[rgba(43,41,38,0.82)]"
-              >
-                {{ theater.tagline }}
-              </p>
-              <p class="text-sm leading-7 text-[rgba(43,41,38,0.72)]">
-                {{ fullAddress }}
-              </p>
-            </div>
-
-            <div class="flex flex-wrap items-center gap-2">
-              <UButton
-                color="neutral"
-                variant="ghost"
-                :to="`/theaters/${slug}/calendar`"
-                icon="i-heroicons-calendar-days"
-                :class="stageButtonToneClasses('event')"
-              >
-                Full calendar
-              </UButton>
-              <UButton
-                v-if="isMember"
-                color="neutral"
-                variant="ghost"
-                :to="`/theaters/${slug}/shows/new`"
-                icon="i-heroicons-plus"
-                :class="stageButtonToneClasses('event')"
-              >
-                Create an event
-              </UButton>
-              <UButton
-                v-if="canReview"
-                color="neutral"
-                variant="ghost"
-                :to="`/theaters/${slug}/admin`"
-                icon="i-heroicons-shield-check"
-                :class="stageButtonToneClasses('theater')"
-              >
-                Theater admin
-              </UButton>
-              <UDropdownMenu
-                v-if="theater"
-                :items="relationshipMenuItems"
-                :content="{ align: 'end', sideOffset: 8 }"
-                :class="stageButtonToneClasses('theater')"
-                :ui="{
-                  content:
-                    'w-64 rounded-none border-3 border-[var(--stage-ink)] bg-[var(--stage-cream)] p-0 shadow-[8px_8px_0_0_var(--stage-ink)]',
-                  viewport: 'p-0',
-                  group: 'p-0',
-                  item: 'rounded-none border-b border-[rgba(43,41,38,0.12)] px-3 py-3 last:border-b-0 data-[highlighted]:bg-[var(--stage-paper-strong)] data-[highlighted]:text-[var(--stage-ink)]',
-                  itemLeadingIcon: 'size-4 text-[var(--stage-ink)]',
-                  itemLabel: 'text-sm font-medium text-[var(--stage-ink)]',
-                }"
-              >
-                <UButton
-                  size="sm"
-                  color="neutral"
-                  variant="ghost"
-                  icon="i-heroicons-ellipsis-horizontal"
-                  :loading="relationshipLoading"
-                  :class="stageButtonToneClasses('neutral')"
-                >
-                  Theater actions
-                </UButton>
-              </UDropdownMenu>
-            </div>
-          </div>
-
-          <div
-            class="grid gap-3 xl:grid-cols-[minmax(0,1.2fr)_minmax(22rem,0.9fr)] xl:items-stretch"
-          >
-            <div>
-              <UCarousel
-                ref="theaterAlertsCarousel"
-                loop
-                fade
-                :autoplay="{ delay: 10000 }"
-                :items="theaterAlerts"
-                align="start"
-                @select="handleTheaterAlertSelect"
-                :ui="{
-                  item: 'basis-full',
-                }"
-              >
-                <template #default="{ item }">
-                  <article
-                    class="min-h-[14rem] border-2 border-[var(--stage-ink)] bg-[rgba(241,250,248,0.7)] px-4 py-4"
-                  >
-                    <div class="flex items-start justify-between gap-3">
-                      <div>
-                        <p class="stage-overline text-[rgba(43,41,38,0.62)]">
-                          Theater alerts
-                        </p>
-                        <p
-                          class="mt-2 text-sm font-semibold text-[var(--stage-ink)]"
-                        >
-                          Theater Admin can rotate 2-4 community-wide messages
-                          here.
-                        </p>
-                      </div>
-                      <div class="flex items-center gap-2">
-                        <UButton
-                          size="xs"
-                          color="neutral"
-                          variant="ghost"
-                          icon="i-heroicons-arrow-left"
-                          :class="stageButtonToneClasses('neutral')"
-                          @click="scrollTheaterAlerts('prev')"
-                        />
-                        <UButton
-                          size="xs"
-                          color="neutral"
-                          variant="ghost"
-                          icon="i-heroicons-arrow-right"
-                          :class="stageButtonToneClasses('neutral')"
-                          @click="scrollTheaterAlerts('next')"
-                        />
-                      </div>
-                    </div>
-
-                    <div class="mt-5">
-                      <div class="flex items-start gap-3">
-                        <UIcon
-                          name="i-heroicons-megaphone"
-                          class="mt-1 size-5 shrink-0 text-[var(--stage-ink)]"
-                        />
-                        <div class="min-w-0">
-                          <h3
-                            class="font-display text-2xl uppercase tracking-[0.08em] text-[var(--stage-ink)]"
-                          >
-                            {{ item.title }}
-                          </h3>
-                          <p
-                            class="mt-2 text-sm leading-7 text-[rgba(43,41,38,0.78)]"
-                          >
-                            {{ item.description }}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div
-                      class="mt-5 flex flex-wrap items-center justify-between gap-3 border-t-2 border-[rgba(43,41,38,0.14)] pt-3"
-                    >
-                      <div class="flex items-center gap-2">
-                        <button
-                          v-for="(alert, index) in theaterAlerts"
-                          :key="alert.id"
-                          type="button"
-                          class="h-2.5 w-2.5 border border-[var(--stage-ink)] transition-colors"
-                          :class="
-                            index === activeTheaterAlertIndex
-                              ? 'bg-[var(--stage-ink)]'
-                              : 'bg-transparent hover:bg-[var(--stage-paper)]'
-                          "
-                          :aria-label="`Open alert ${index + 1}`"
-                          @click="scrollToTheaterAlert(index)"
-                        />
-                      </div>
-                      <div class="flex flex-wrap items-center gap-3">
-                        <span
-                          class="text-xs font-semibold uppercase tracking-[0.14em] text-[rgba(43,41,38,0.62)]"
-                        >
-                          {{ item.expires }}
-                        </span>
-                        <span
-                          class="text-xs font-semibold uppercase tracking-[0.14em] text-[rgba(43,41,38,0.62)]"
-                        >
-                          Theater Admin message
-                        </span>
-                      </div>
-                    </div>
-                  </article>
-                </template>
-              </UCarousel>
-            </div>
-
-            <div
-              class="grid gap-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3"
-            >
-              <div
-                class="border-2 border-[var(--stage-ink)] bg-[rgba(241,250,248,0.7)] px-4 py-3"
-              >
-                <p class="stage-overline text-[rgba(43,41,38,0.62)]">Shows</p>
-                <p
-                  class="mt-1 font-display text-2xl uppercase tracking-[0.08em]"
-                >
-                  {{ upcomingShows.length }}
-                </p>
-              </div>
-              <div
-                class="border-2 border-[var(--stage-ink)] bg-[rgba(241,250,248,0.7)] px-4 py-3"
-              >
-                <p class="stage-overline text-[rgba(43,41,38,0.62)]">
-                  Other events
-                </p>
-                <p
-                  class="mt-1 font-display text-2xl uppercase tracking-[0.08em]"
-                >
-                  {{ upcomingNonShowEvents.length }}
-                </p>
-              </div>
-              <div
-                class="border-2 border-[var(--stage-ink)] bg-[rgba(241,250,248,0.7)] px-4 py-3"
-              >
-                <p class="stage-overline text-[rgba(43,41,38,0.62)]">
-                  Next date
-                </p>
-                <p
-                  class="mt-1 font-display text-2xl uppercase tracking-[0.08em]"
-                >
-                  {{ nextEvent ? formatDate(nextEvent.startsAt) : "TBD" }}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <TheaterDashboardSection
+        :slug="slug"
+        :theater="theater"
+        :can-review="canReview"
+        :is-member="isMember"
+        :passive-relationship-label="passiveRelationshipLabel"
+        :full-address="fullAddress"
+        :relationship-loading="relationshipLoading"
+        :theater-actions-menu-items="theaterActionsMenuItems"
+        :theater-alerts="theaterAlerts"
+        :next-event="nextEvent"
+        :next-show="nextShow"
+        :format-date="formatDate"
+        :format-time="formatTime"
+        :event-type-label="eventTypeLabel"
+        :producer-label="producerLabel"
+      />
     </StageSection>
 
     <StageSection
