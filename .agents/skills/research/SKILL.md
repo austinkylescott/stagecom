@@ -23,6 +23,7 @@ Execute research task: $ARGUMENTS
 5. Execute the research using appropriate tools:
   - Read files (Supabase schema, constants, components, composables, etc.)
   - Query the database via Supabase MCP if needed
+  - Check docs and use other MCPs as needed
   - Search codebase for patterns
 6. Write findings to the specified output location
 7. Summarize what was discovered
