@@ -1,16 +1,24 @@
 # Current Feature
 
+## Theater Dashboard Section Refinement v1
+
 ## Status
 
 Not Started
 
 ## Goals
 
-- No feature loaded.
+- Refine the top section of the theater page into a dedicated theater dashboard component.
+- Preserve theater identity, metadata, and actions across all breakpoints.
+- Replace stat boxes with `Up Next Event` and `Up Next Show` cards.
+- Eliminate horizontal overflow on small screens.
 
 ## Notes
 
-- No active notes.
+- Spec: `docs/specs/2026-04-01/feature-spec-theater-dashboard-section-refinement-v1.md`
+- Scope is limited to the first `StageSection` on `project/app/pages/theaters/[slug]/index.vue`.
+- Keep Theater Alerts on a separate row from theater metadata.
+- Use Nuxt UI primitives and canonical Tailwind utilities.
 
 ## History
 

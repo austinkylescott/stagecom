@@ -337,8 +337,8 @@ This document was derived from the current implementation and supporting docs, p
 
 - `docs/product/PRD.md`
 - `docs/data/data-model.md`
-- `docs/specs/feature-spec-show-lifecycle-v1.md`
-- `docs/specs/feature-spec-auth-security-hardening-v1.md`
+- `docs/specs/2026-01-09/feature-spec-show-lifecycle-v1.md`
+- `docs/specs/2026-03-27/feature-spec-auth-security-hardening-v1.md`
 - `project/server/api/theaters/[slug]/index.get.ts`
 - `project/server/api/theaters/[slug]/review.get.ts`
 - `project/server/api/review/index.get.ts`

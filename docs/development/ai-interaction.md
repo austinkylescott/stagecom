@@ -12,7 +12,7 @@
 
 This is the common workflow that we will use for every single feature/fix:
 
-1. **Draft Spec** - Write or update the feature spec in `docs/specs/` when the work is spec-driven.
+1. **Draft Spec** - Write or update the feature spec in `docs/specs/YYYY-MM-DD/` when the work is spec-driven.
 2. **Document** - Load that spec into `context/current-feature.md`.
 3. **Branch** - Start from `main`, then create a new branch for the feature or fix
 4. **Implement** - Switch to that new branch and do all implementation work there, not on `main`
@@ -24,7 +24,7 @@ This is the common workflow that we will use for every single feature/fix:
 10. **Review** - Review AI-generated code periodically and on demand.
 11. Mark as completed in `context/current-feature.md` and add to history
 
-Use the feature skill to load written specs from `docs/specs/` into `context/current-feature.md` before starting implementation.
+Use the feature skill to load written specs from `docs/specs/YYYY-MM-DD/` into `context/current-feature.md` before starting implementation.
 
 Do NOT commit without permission and until the build passes. If build fails, fix the issues first.
 

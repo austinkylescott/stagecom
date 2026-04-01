@@ -13,7 +13,7 @@ These rules exist to keep Stagecom aligned with the current product docs, data m
   - `docs/data/data-model.md` for schema or relationship changes
   - `docs/product/events-and-notifications.md` for event or recipient changes
   - `docs/data/mock-data-workflow.md` and the mock-data configs/scripts when database-backed test expectations change
-  - feature specs in `docs/specs/` when behavior is spec-driven
+  - feature specs in dated folders under `docs/specs/YYYY-MM-DD/` when behavior is spec-driven
 
 ## 2. Stack requirements
 

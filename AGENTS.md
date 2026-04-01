@@ -7,7 +7,7 @@ Repository guide for coding agents working in Stagecom.
 - This file applies to the entire repository.
 - Main application code lives in `project/`.
 - Product and architecture docs live in `docs/`.
-- Feature specs live in `docs/specs/`.
+- Feature specs live in dated folders under `docs/specs/YYYY-MM-DD/`.
 
 ## Project Shape
 
@@ -31,7 +31,7 @@ Read these before making behavior changes:
 ## Documentation Sources
 
 - Use repository docs in `docs/` as the source of truth for product behavior, architecture, and repo-specific constraints.
-- Draft new feature specs in `docs/specs/`, then load them into `context/current-feature.md` with the feature skill before implementation.
+- Draft new feature specs in a dated folder under `docs/specs/YYYY-MM-DD/`, then load them into `context/current-feature.md` with the feature skill before implementation.
 - Use Context7 for current framework and library documentation when working with Nuxt, Nuxt UI, Vue, Supabase, and Vitest.
 - Prefer official or high-reputation Context7 libraries when multiple matches exist.
 - Use Supabase MCP for live database and project inspection rather than documentation lookups.

@@ -1,11 +1,11 @@
 # Load Action
 
 1. Check $ARGUMENTS (after "load"):
-   - If it looks like a filename (single word, no spaces): Look for `docs/specs/{name}.md`
+   - If it looks like a filename (single word, no spaces): Look for a matching file anywhere under `docs/specs/**/{name}.md`
    - If it's multiple words: Use as inline feature description, generate goals
    - If empty: Error - "load" requires a spec filename or feature description
 
-2. When working from a written spec, treat `docs/specs/` as the canonical feature-spec directory.
+2. When working from a written spec, treat `docs/specs/` as the canonical feature-spec root and store specs in dated folders under `docs/specs/YYYY-MM-DD/`.
 
 3. Update `context/current-feature.md`:
    - Update H1 heading to include feature name (e.g., `# Current Feature: Add Navbar`)
