@@ -9,32 +9,32 @@ export const stageButtonToneClasses = (
   if (tone === "theater") {
     return [
       active
-        ? "bg-[var(--stage-theater)] hover:bg-[var(--stage-theater)] active:bg-[var(--stage-theater)]"
-        : `${baseRestClass} hover:bg-[var(--stage-theater-soft)] active:bg-[var(--stage-theater)]`,
-      "text-[var(--stage-ink)]",
+        ? "bg-(--stage-theater) hover:bg-(--stage-theater) active:bg-(--stage-theater)"
+        : `${baseRestClass} hover:bg-(--stage-theater-soft) active:bg-(--stage-theater)`,
+      "text-(--stage-ink)",
     ];
   }
 
   if (tone === "event") {
     return [
       active
-        ? "bg-[var(--stage-event)] hover:bg-[var(--stage-event)] active:bg-[var(--stage-event)]"
-        : `${baseRestClass} hover:bg-[var(--stage-event-soft)] active:bg-[var(--stage-event)]`,
-      "text-[var(--stage-ink)]",
+        ? "bg-(--stage-event) hover:bg-(--stage-event) active:bg-(--stage-event)"
+        : `${baseRestClass} hover:bg-(--stage-event-soft) active:bg-(--stage-event)`,
+      "text-(--stage-ink)",
     ];
   }
 
   if (tone === "performer") {
     return [
       active
-        ? "bg-[var(--stage-performer)] text-[var(--stage-cream)] hover:bg-[var(--stage-performer)] hover:text-[var(--stage-cream)] active:bg-[var(--stage-performer)] active:text-[var(--stage-cream)]"
-        : `${baseRestClass} text-[var(--stage-ink)] hover:bg-[var(--stage-performer-soft)] active:bg-[var(--stage-performer)] active:text-[var(--stage-cream)]`,
+        ? "bg-(--stage-performer) text-(--stage-cream) hover:bg-(--stage-performer) hover:text-(--stage-cream) active:bg-(--stage-performer) active:text-(--stage-cream)"
+        : `${baseRestClass} text-(--stage-ink) hover:bg-(--stage-performer-soft) active:bg-(--stage-performer) active:text-(--stage-cream)`,
     ];
   }
 
   return [
     active
-      ? "bg-[var(--stage-paper-strong)] text-[var(--stage-ink)]"
-      : `${baseRestClass} text-[var(--stage-ink)] hover:bg-[var(--stage-paper)] active:bg-[var(--stage-paper-strong)]`,
+      ? "bg-(--stage-paper-strong) text-(--stage-ink)"
+      : `${baseRestClass} text-(--stage-ink) hover:bg-(--stage-paper) active:bg-(--stage-paper-strong)`,
   ];
 };

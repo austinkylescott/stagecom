@@ -24,13 +24,13 @@ const markAllRead = () => markRead({ all: true });
 const latestNotificationToneClass = computed(() => {
   const latestType = notifications.value[0]?.type;
 
-  if (!latestType) return "bg-[var(--stage-paper-strong)]";
-  if (latestType.startsWith("cast.")) return "bg-[var(--stage-performer-soft)]";
+  if (!latestType) return "bg-(--stage-paper-strong)";
+  if (latestType.startsWith("cast.")) return "bg-(--stage-performer-soft)";
   if (["show.submitted_for_review", "show.approved"].includes(latestType)) {
-    return "bg-[var(--stage-theater-soft)]";
+    return "bg-(--stage-theater-soft)";
   }
 
-  return "bg-[var(--stage-paper-strong)]";
+  return "bg-(--stage-paper-strong)";
 });
 
 const notificationButtonTone = computed<StageButtonTone>(() => {
@@ -79,7 +79,7 @@ const notificationItems = computed<NotificationDropdownItem[][]>(() => [
       <UIcon name="i-heroicons-bell" class="size-5" />
       <span
         v-if="unreadCount > 0"
-        class="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center border border-[var(--stage-ink)] bg-[var(--stage-performer)] px-0.5 text-[10px] font-medium text-[var(--stage-cream)]"
+        class="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center border border-(--stage-ink) bg-(--stage-performer) px-0.5 text-[10px] font-medium text-(--stage-cream)"
       >
         {{ unreadCount > 9 ? "9+" : unreadCount }}
       </span>
@@ -87,21 +87,21 @@ const notificationItems = computed<NotificationDropdownItem[][]>(() => [
     </template>
 
     <template #header>
-      <p class="text-sm font-medium text-[var(--stage-ink)]">Notifications</p>
+      <p class="text-sm font-medium text-(--stage-ink)">Notifications</p>
     </template>
 
     <template #header-actions>
       <div class="flex gap-3">
         <button
           v-if="unreadCount > 0"
-          class="text-xs font-semibold text-[var(--stage-ink)] underline underline-offset-2"
+          class="text-xs font-semibold text-(--stage-ink) underline underline-offset-2"
           @click="markAllRead"
         >
           Mark all read
         </button>
         <NuxtLink
           to="/notifications"
-          class="text-xs font-semibold text-[var(--stage-ink)] underline underline-offset-2"
+          class="text-xs font-semibold text-(--stage-ink) underline underline-offset-2"
         >
           See all
         </NuxtLink>
@@ -119,13 +119,13 @@ const notificationItems = computed<NotificationDropdownItem[][]>(() => [
 
     <template #item-leading="{ item }">
       <span
-        class="mt-1.5 size-2 shrink-0 border border-[var(--stage-ink)]"
-        :class="item.unread ? 'bg-[var(--stage-performer)]' : 'bg-transparent'"
+        class="mt-1.5 size-2 shrink-0 border border-(--stage-ink)"
+        :class="item.unread ? 'bg-(--stage-performer)' : 'bg-transparent'"
       />
     </template>
 
     <template #item-label="{ item }">
-      <span :class="item.unread ? 'font-medium text-[var(--stage-ink)]' : 'stage-muted'">
+      <span :class="item.unread ? 'font-medium text-(--stage-ink)' : 'stage-muted'">
         {{ item.label }}
       </span>
     </template>

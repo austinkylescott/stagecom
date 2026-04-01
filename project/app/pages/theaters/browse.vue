@@ -196,7 +196,7 @@ const cancelLeaveHome = () => {
 
 <template>
   <div class="space-y-0">
-    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[var(--stage-cream)]" inner-class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
+    <StageSection outer-class="border-b-3 border-(--stage-ink) bg-(--stage-cream)" inner-class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
       <div class="grid gap-6 lg:grid-cols-[1.1fr_auto] lg:items-end">
         <div class="space-y-4">
           <span class="stage-kicker">Theater discovery</span>
@@ -218,7 +218,7 @@ const cancelLeaveHome = () => {
       </div>
     </StageSection>
 
-    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.5)]" inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+    <StageSection outer-class="border-b-3 border-(--stage-ink) bg-[rgba(251,247,239,0.5)]" inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
       <div class="mb-6 grid gap-3 sm:grid-cols-3">
         <div class="stage-stat">
           <span class="stage-overline">Home theater</span>

@@ -64,7 +64,7 @@ const guestItems = [[
 <template>
   <AppHeaderDropdown
     :items="isAuthed ? authedItems : guestItems"
-    header-tone-class="bg-[var(--stage-performer-soft)]"
+    header-tone-class="bg-(--stage-performer-soft)"
   >
     <template #default="{ open }">
     <UButton
@@ -77,7 +77,7 @@ const guestItems = [[
         :src="avatarUrl"
         :text="initials"
         size="xs"
-        class="border border-[var(--stage-ink)] bg-[var(--stage-paper-strong)] text-[var(--stage-ink)]"
+        class="border border-(--stage-ink) bg-(--stage-paper-strong) text-(--stage-ink)"
       />
       <span class="text-sm">{{ isAuthed ? displayName : "Account" }}</span>
       <UIcon name="i-heroicons-chevron-down" class="size-4" />
@@ -90,13 +90,13 @@ const guestItems = [[
           :src="avatarUrl"
           :text="initials"
           size="sm"
-          class="border border-[var(--stage-ink)] bg-[var(--stage-paper)] text-[var(--stage-ink)]"
+          class="border border-(--stage-ink) bg-(--stage-paper) text-(--stage-ink)"
         />
         <div class="min-w-0">
-          <p class="truncate text-sm font-medium text-[var(--stage-ink)]">
+          <p class="truncate text-sm font-medium text-(--stage-ink)">
             {{ isAuthed ? displayName : "Account" }}
           </p>
-          <p class="text-xs text-[var(--stage-ink)]/75">
+          <p class="text-xs text-(--stage-ink)/75">
             {{ isAuthed ? "Signed in" : "Guest options" }}
           </p>
         </div>

@@ -112,7 +112,7 @@ const updateStatus = async (
 
 <template>
   <div class="space-y-0">
-    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[var(--stage-cream)] stage-texture overflow-hidden" inner-class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
+    <StageSection outer-class="border-b-3 border-(--stage-ink) bg-(--stage-cream) stage-texture overflow-hidden" inner-class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
       <div class="stage-page-grid stage-page-grid-rail items-start">
         <div class="space-y-5">
           <span class="stage-kicker">Theater review</span>
@@ -149,11 +149,11 @@ const updateStatus = async (
         </div>
 
         <aside class="stage-panel-dark stage-grid-board p-5 sm:p-6">
-          <p class="stage-overline text-[var(--stage-paper-muted)]">Queue guidance</p>
-          <h2 class="mt-2 font-display text-4xl uppercase tracking-[0.08em] text-[var(--stage-cream)]">
+          <p class="stage-overline text-(--stage-paper-muted)">Queue guidance</p>
+          <h2 class="mt-2 font-display text-4xl uppercase tracking-[0.08em] text-(--stage-cream)">
             Review flow
           </h2>
-          <div class="mt-4 space-y-3 text-sm leading-7 text-[var(--stage-paper-muted)]">
+          <div class="mt-4 space-y-3 text-sm leading-7 text-(--stage-paper-muted)">
             <p>Approve when the public information is clear and the theater is ready to stand behind the listing.</p>
             <p>Request changes when lineup, schedule, or policy details still need correction.</p>
             <p>Reject only when the proposal should not move forward in its current form.</p>
@@ -162,7 +162,7 @@ const updateStatus = async (
       </div>
     </StageSection>
 
-    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.52)]" inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+    <StageSection outer-class="border-b-3 border-(--stage-ink) bg-[rgba(251,247,239,0.52)]" inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
       <div class="mb-6 space-y-2">
         <p v-if="message" class="text-sm text-emerald-600">{{ message }}</p>
         <p v-if="error" class="text-sm text-red-600">
@@ -190,9 +190,9 @@ const updateStatus = async (
           :key="show.id"
           title="Review Queue"
           subtitle="Theater approval workflow"
-          tone="bg-[var(--stage-theater)]"
+          tone="bg-(--stage-theater)"
         >
-          <div class="space-y-3 text-[var(--stage-ink)]">
+          <div class="space-y-3 text-(--stage-ink)">
             <div class="flex items-center justify-between gap-3 border-2 border-[rgba(43,41,38,0.1)] p-3">
               <div>
                 <div class="text-sm font-medium">{{ show.title }}</div>
@@ -249,7 +249,7 @@ const updateStatus = async (
             </div>
             <div class="border-t-2 border-[rgba(43,41,38,0.1)] pt-3 text-center">
               <span class="text-sm stage-muted">
-                <span class="font-bold text-[var(--stage-coral)]">{{ show.status === 'pending_review' ? 1 : 0 }}</span>
+                <span class="font-bold text-(--stage-coral)">{{ show.status === 'pending_review' ? 1 : 0 }}</span>
                 {{ show.status === 'pending_review' ? ' item needs review' : ' item already processed' }}
               </span>
             </div>

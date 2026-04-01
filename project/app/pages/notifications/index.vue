@@ -65,16 +65,16 @@ const notificationLabel = (type: string) => {
 };
 
 const notificationTone = (type: string, readAt: string | null) => {
-  if (readAt) return "bg-[var(--stage-paper-strong)]";
-  if (["cast.invited", "cast.requested"].includes(type)) return "bg-[var(--stage-performer-soft)]";
-  if (["show.submitted_for_review", "show.approved"].includes(type)) return "bg-[var(--stage-theater-soft)]";
+  if (readAt) return "bg-(--stage-paper-strong)";
+  if (["cast.invited", "cast.requested"].includes(type)) return "bg-(--stage-performer-soft)";
+  if (["show.submitted_for_review", "show.approved"].includes(type)) return "bg-(--stage-theater-soft)";
   return "bg-[rgba(231,180,55,0.22)]";
 };
 </script>
 
 <template>
   <div class="space-y-0">
-    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[var(--stage-cream)] stage-texture overflow-hidden" inner-class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
+    <StageSection outer-class="border-b-3 border-(--stage-ink) bg-(--stage-cream) stage-texture overflow-hidden" inner-class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
       <div class="flex items-end justify-between flex-wrap gap-4">
         <div>
           <span class="stage-kicker">Notifications</span>
@@ -94,7 +94,7 @@ const notificationTone = (type: string, readAt: string | null) => {
       </div>
     </StageSection>
 
-    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.52)]" inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+    <StageSection outer-class="border-b-3 border-(--stage-ink) bg-[rgba(251,247,239,0.52)]" inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
       <div class="mb-6 grid gap-3 sm:grid-cols-3">
         <div class="stage-stat">
           <span class="stage-overline">Unread</span>
@@ -147,8 +147,8 @@ const notificationTone = (type: string, readAt: string | null) => {
           <div class="flex items-start justify-between gap-4">
             <div class="flex min-w-0 flex-1 items-start gap-3">
               <span
-                class="mt-1.5 size-2 shrink-0 border border-[var(--stage-ink)]"
-                :class="n.read_at ? 'bg-[var(--stage-paper-strong)]' : 'bg-[var(--stage-performer)]'"
+                class="mt-1.5 size-2 shrink-0 border border-(--stage-ink)"
+                :class="n.read_at ? 'bg-(--stage-paper-strong)' : 'bg-(--stage-performer)'"
               />
               <div class="min-w-0 flex-1">
                 <div class="mb-2 flex flex-wrap items-center gap-2">
@@ -162,7 +162,7 @@ const notificationTone = (type: string, readAt: string | null) => {
                     {{ notificationLabel(n.type) }}
                   </span>
                 </div>
-                <p class="text-sm" :class="n.read_at ? 'stage-muted' : 'font-medium text-[var(--stage-ink)]'">
+                <p class="text-sm" :class="n.read_at ? 'stage-muted' : 'font-medium text-(--stage-ink)'">
                   {{ formatNotification(n.type, n.payload).text }}
                 </p>
                 <p

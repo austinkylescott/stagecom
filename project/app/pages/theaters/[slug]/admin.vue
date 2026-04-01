@@ -54,7 +54,7 @@ const formatDateTime = (value: string | null) =>
 <template>
   <div class="space-y-0">
     <StageSection
-      outer-class="border-b-3 border-[var(--stage-ink)] bg-[var(--stage-cream)]"
+      outer-class="border-b-3 border-(--stage-ink) bg-(--stage-cream)"
       inner-class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8"
     >
       <div v-if="!canReview" class="stage-panel p-6 sm:p-8">
@@ -82,7 +82,7 @@ const formatDateTime = (value: string | null) =>
           <div class="space-y-5">
             <div class="flex flex-wrap items-center gap-2">
               <span class="stage-kicker">Theater admin</span>
-              <span class="stage-chip bg-[var(--stage-gold)] text-[var(--stage-ink)]">
+              <span class="stage-chip bg-(--stage-gold) text-(--stage-ink)">
                 Oversight
               </span>
             </div>
@@ -171,7 +171,7 @@ const formatDateTime = (value: string | null) =>
 
     <StageSection
       v-if="canReview"
-      outer-class="border-b-3 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.52)]"
+      outer-class="border-b-3 border-(--stage-ink) bg-[rgba(251,247,239,0.52)]"
       inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8"
     >
       <div v-if="error" class="mb-6 stage-panel px-5 py-4 text-sm text-red-700">
@@ -202,14 +202,14 @@ const formatDateTime = (value: string | null) =>
               <article class="stage-list-card p-4">
                 <div class="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <p class="text-sm font-semibold text-[var(--stage-ink)]">
+                    <p class="text-sm font-semibold text-(--stage-ink)">
                       {{ show.title }}
                     </p>
                     <p class="mt-1 text-xs stage-muted">
                       {{ formatDateTime(show.startsAt) }}
                     </p>
                   </div>
-                  <span class="stage-chip bg-[var(--stage-gold)]">
+                  <span class="stage-chip bg-(--stage-gold)">
                     {{ show.status.replace(/_/g, " ") }}
                   </span>
                 </div>
@@ -219,7 +219,7 @@ const formatDateTime = (value: string | null) =>
 
           <div
             v-else-if="!reviewLoading"
-            class="mt-5 border-2 border-dashed border-[var(--stage-ink)] px-4 py-6 text-sm stage-muted"
+            class="mt-5 border-2 border-dashed border-(--stage-ink) px-4 py-6 text-sm stage-muted"
           >
             Nothing is waiting for theater review right now.
           </div>

@@ -11,13 +11,13 @@ defineProps<{
 
 <template>
   <div v-if="members.length" class="space-y-2">
-    <p class="text-sm font-semibold text-[var(--stage-ink)]">
+    <p class="text-sm font-semibold text-(--stage-ink)">
       {{ title }} ({{ members.length }})
     </p>
     <div
       v-for="member in members"
       :key="member.userId"
-      class="flex items-center justify-between border-2 border-[var(--stage-ink)] bg-[var(--stage-cream)] px-3 py-2"
+      class="flex items-center justify-between border-2 border-(--stage-ink) bg-(--stage-cream) px-3 py-2"
     >
       <div class="flex items-center gap-2">
         <UAvatar :text="member.displayName?.[0] ?? '?'" size="xs" />

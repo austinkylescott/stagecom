@@ -98,7 +98,8 @@ const desktopNavItems = computed<NavigationMenuItem[]>(() => {
       ...(items[0].children || []),
       {
         label: "Theater Admin",
-        description: "Open theater-wide oversight, queue, and community signals.",
+        description:
+          "Open theater-wide oversight, queue, and community signals.",
         icon: "i-heroicons-shield-check",
         to: `/theaters/${homeTheater.value.slug}/admin`,
       },
@@ -153,22 +154,26 @@ watch(
 
 <template>
   <header
-    class="sticky top-0 z-50 border-b-3 border-[var(--stage-ink)] bg-[rgba(247,241,229,0.94)] supports-[backdrop-filter]:bg-[rgba(247,241,229,0.86)] backdrop-blur-sm"
+    class="sticky top-0 z-50 border-b-3 border-(--stage-ink) bg-[rgba(247,241,229,0.94)] supports-backdrop-filter:bg-[rgba(247,241,229,0.86)] backdrop-blur-sm"
   >
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div class="flex flex-col gap-3 py-3 lg:py-3.5">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <NuxtLink to="/" class="group flex items-center gap-2">
-            <span class="font-display text-[1.7rem] leading-none uppercase tracking-[0.12em]">
+            <span
+              class="font-display text-[1.7rem] leading-none uppercase tracking-[0.12em]"
+            >
               Stagecom
             </span>
-            <span class="stage-chip bg-[var(--stage-theater)] text-[var(--stage-ink)]">
+            <span class="stage-chip bg-(--stage-theater) text-(--stage-ink)">
               Beta
             </span>
           </NuxtLink>
         </div>
 
-        <div class="flex items-center justify-between gap-2 lg:grid lg:grid-cols-[1fr_auto] lg:items-center">
+        <div
+          class="flex items-center justify-between gap-2 lg:grid lg:grid-cols-[1fr_auto] lg:items-center"
+        >
           <nav class="hidden lg:block">
             <UNavigationMenu
               :items="desktopNavItems"
@@ -176,15 +181,18 @@ watch(
                 root: 'w-full',
                 list: 'flex flex-wrap items-center gap-2',
                 item: 'relative',
-                link: 'w-full border-2 border-[var(--stage-ink)] rounded-none px-3 py-2 text-sm font-medium text-[var(--stage-ink)] transition-colors',
+                link: 'w-full border-2 border-(--stage-ink) rounded-none px-3 py-2 text-sm font-medium text-(--stage-ink) transition-colors',
                 linkLeadingIcon: 'size-4',
-                content: 'min-w-80 rounded-none border-3 border-[var(--stage-ink)] bg-[var(--stage-cream)] p-0 shadow-[8px_8px_0_0_var(--stage-ink)]',
+                content:
+                  'min-w-80 rounded-none border-3 border-(--stage-ink) bg-(--stage-cream) p-0 shadow-[8px_8px_0_0_var(--stage-ink)]',
                 childList: 'grid gap-0',
-                childItem: 'rounded-none border-b border-[rgba(43,41,38,0.12)] transition-colors last:border-b-0 hover:bg-[var(--stage-theater-soft)] focus-within:bg-[var(--stage-theater-soft)]',
-                childLink: 'flex w-full items-start gap-3 rounded-none border-0 px-3 py-3 shadow-none',
+                childItem:
+                  'rounded-none border-b border-[rgba(43,41,38,0.12)] transition-colors last:border-b-0 hover:bg-(--stage-theater-soft) focus-within:bg-(--stage-theater-soft)',
+                childLink:
+                  'flex w-full items-start gap-3 rounded-none border-0 px-3 py-3 shadow-none',
                 childLinkWrapper: 'min-w-0 flex-1',
-                childLabel: 'text-sm font-medium text-[var(--stage-ink)]',
-                childDescription: 'mt-1 text-xs stage-muted'
+                childLabel: 'text-sm font-medium text-(--stage-ink)',
+                childDescription: 'mt-1 text-xs stage-muted',
               }"
               class="justify-start"
             />
@@ -198,9 +206,10 @@ watch(
               description="Primary navigation for moving between Stagecom sections."
               :handle="true"
               :ui="{
-                content: 'rounded-none border-t-3 border-x-3 border-[var(--stage-ink)] bg-[var(--stage-cream)] shadow-[0_-8px_0_0_var(--stage-ink)]',
-                handle: 'bg-[var(--stage-ink)]',
-                overlay: 'bg-[rgba(43,41,38,0.45)]'
+                content:
+                  'rounded-none border-t-3 border-x-3 border-(--stage-ink) bg-(--stage-cream) shadow-[0_-8px_0_0_var(--stage-ink)]',
+                handle: 'bg-(--stage-ink)',
+                overlay: 'bg-[rgba(43,41,38,0.45)]',
               }"
             >
               <UButton
@@ -212,26 +221,43 @@ watch(
               </UButton>
 
               <template #content>
-                <div class="mx-auto flex w-full max-w-7xl flex-col gap-5 px-4 py-5 sm:px-6">
-                  <div class="flex items-end justify-between gap-3 border-b-3 border-[var(--stage-ink)] pb-4">
+                <div
+                  class="mx-auto flex w-full max-w-7xl flex-col gap-5 px-4 py-5 sm:px-6"
+                >
+                  <div
+                    class="flex items-end justify-between gap-3 border-b-3 border-(--stage-ink) pb-4"
+                  >
                     <div>
                       <p class="stage-overline">Navigate Stagecom</p>
-                      <h2 class="mt-2 font-display text-4xl uppercase tracking-[0.08em] text-[var(--stage-ink)]">
+                      <h2
+                        class="mt-2 font-display text-4xl uppercase tracking-[0.08em] text-(--stage-ink)"
+                      >
                         Menu
                       </h2>
                     </div>
-                    <UButton variant="ghost" icon="i-heroicons-x-mark" @click="mobileNavOpen = false" />
+                    <UButton
+                      variant="ghost"
+                      icon="i-heroicons-x-mark"
+                      @click="mobileNavOpen = false"
+                    />
                   </div>
 
                   <nav>
                     <ul class="grid gap-3 sm:grid-cols-2">
                       <li v-if="isAuthed" class="sm:col-span-2">
-                        <div class="rounded-none border-3 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.72)] p-3">
-                          <div class="flex items-center justify-between gap-3 border-b-2 border-[var(--stage-ink)] pb-3">
+                        <div
+                          class="rounded-none border-3 border-(--stage-ink) bg-[rgba(251,247,239,0.72)] p-3"
+                        >
+                          <div
+                            class="flex items-center justify-between gap-3 border-b-2 border-(--stage-ink) pb-3"
+                          >
                             <div>
                               <p class="stage-overline">My theater</p>
                               <p class="mt-1 text-sm stage-muted">
-                                {{ homeTheater?.name || "Home theater not set yet" }}
+                                {{
+                                  homeTheater?.name ||
+                                  "Home theater not set yet"
+                                }}
                               </p>
                             </div>
                           </div>
@@ -240,7 +266,9 @@ watch(
                               block
                               :to="homeTheaterPrimaryTo"
                               :variant="isTheaterNavActive ? 'soft' : 'ghost'"
-                              :class="navToneClasses('/theaters', isTheaterNavActive)"
+                              :class="
+                                navToneClasses('/theaters', isTheaterNavActive)
+                              "
                             >
                               Open My Theater
                             </UButton>
@@ -248,16 +276,22 @@ watch(
                               block
                               to="/shows"
                               variant="ghost"
-                              :class="navToneClasses('/shows', isActive('/shows'))"
+                              :class="
+                                navToneClasses('/shows', isActive('/shows'))
+                              "
                             >
                               Browse Shows
                             </UButton>
                             <UButton
-                              v-if="homeTheater && homePermissions.canCreateShow"
+                              v-if="
+                                homeTheater && homePermissions.canCreateShow
+                              "
                               block
                               :to="`/theaters/${homeTheater.slug}/shows/new`"
                               variant="ghost"
-                              :class="navToneClasses('/theaters', isTheaterNavActive)"
+                              :class="
+                                navToneClasses('/theaters', isTheaterNavActive)
+                              "
                             >
                               New Show
                             </UButton>
@@ -266,7 +300,9 @@ watch(
                               block
                               :to="`/theaters/${homeTheater.slug}/admin`"
                               variant="ghost"
-                              :class="navToneClasses('/theaters', isTheaterNavActive)"
+                              :class="
+                                navToneClasses('/theaters', isTheaterNavActive)
+                              "
                             >
                               Theater Admin
                             </UButton>
@@ -274,7 +310,12 @@ watch(
                               block
                               to="/theaters/browse"
                               variant="ghost"
-                              :class="navToneClasses('/theaters', isActive('/theaters'))"
+                              :class="
+                                navToneClasses(
+                                  '/theaters',
+                                  isActive('/theaters'),
+                                )
+                              "
                             >
                               Browse Theaters
                             </UButton>

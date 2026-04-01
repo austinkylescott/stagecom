@@ -70,7 +70,7 @@ const submit = async (submitForReview: boolean) => {
 
 <template>
   <div class="space-y-0">
-    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[var(--stage-cream)] stage-texture overflow-hidden" inner-class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
+    <StageSection outer-class="border-b-3 border-(--stage-ink) bg-(--stage-cream) stage-texture overflow-hidden" inner-class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
       <div class="flex items-center justify-between flex-wrap gap-3">
         <div>
           <span class="stage-kicker">Show setup</span>
@@ -85,13 +85,13 @@ const submit = async (submitForReview: boolean) => {
       </div>
     </StageSection>
 
-    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.5)]" inner-class="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+    <StageSection outer-class="border-b-3 border-(--stage-ink) bg-[rgba(251,247,239,0.5)]" inner-class="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
       <StageFeatureCard
         title="Show Setup"
         subtitle="Clear ownership and casting controls"
-        tone="bg-[var(--stage-gold)]"
+        tone="bg-(--stage-gold)"
       >
-        <div class="space-y-6 text-[var(--stage-ink)]">
+        <div class="space-y-6 text-(--stage-ink)">
           <div class="grid gap-4 md:grid-cols-2">
             <UFormField label="Title" required>
               <UInput v-model="form.title" placeholder="Harold Night" />

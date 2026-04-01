@@ -23,8 +23,8 @@ const { filteredResults, scopeAll, search, searchInput, searchLoading } =
 </script>
 
 <template>
-  <div class="space-y-3 border-t-2 border-[var(--stage-ink)] pt-4">
-    <p class="text-sm font-semibold text-[var(--stage-ink)]">Invite a performer</p>
+  <div class="space-y-3 border-t-2 border-(--stage-ink) pt-4">
+    <p class="text-sm font-semibold text-(--stage-ink)">Invite a performer</p>
     <div class="flex flex-wrap items-center gap-2">
       <UInput
         v-model="searchInput"
@@ -57,7 +57,7 @@ const { filteredResults, scopeAll, search, searchInput, searchLoading } =
       <div
         v-for="profile in filteredResults"
         :key="profile.id"
-        class="flex items-center justify-between border-2 border-[var(--stage-ink)] bg-[var(--stage-cream)] px-3 py-2"
+        class="flex items-center justify-between border-2 border-(--stage-ink) bg-(--stage-cream) px-3 py-2"
       >
         <div class="flex items-center gap-2">
           <UAvatar :text="profile.display_name?.[0] ?? '?'" size="xs" />

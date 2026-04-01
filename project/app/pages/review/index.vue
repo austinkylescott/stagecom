@@ -79,10 +79,10 @@ const createdPendingCount = computed(
 );
 
 const statusTone = (status: string) => {
-  if (status === "pending_review") return "bg-[var(--stage-event)]";
-  if (status === "approved") return "bg-[var(--stage-theater)]";
-  if (status === "rejected") return "bg-[var(--stage-paper-muted)]";
-  return "bg-[var(--stage-event)]";
+  if (status === "pending_review") return "bg-(--stage-event)";
+  if (status === "approved") return "bg-(--stage-theater)";
+  if (status === "rejected") return "bg-(--stage-paper-muted)";
+  return "bg-(--stage-event)";
 };
 
 const formatDateTime = (value: string | null) =>
@@ -90,9 +90,9 @@ const formatDateTime = (value: string | null) =>
 
 const reviewTableUi = {
   root: "stage-data-table",
-  thead: "bg-[var(--stage-paper-strong)]",
-  th: "px-4 py-3 text-[11px] font-extrabold uppercase tracking-[0.16em] text-[var(--stage-ink)]",
-  td: "px-4 py-4 align-top text-sm text-[var(--stage-ink)]",
+  thead: "bg-(--stage-paper-strong)",
+  th: "px-4 py-3 text-[11px] font-extrabold uppercase tracking-[0.16em] text-(--stage-ink)",
+  td: "px-4 py-4 align-top text-sm text-(--stage-ink)",
   tr: "border-b border-[rgba(43,41,38,0.12)] last:border-b-0",
 };
 
@@ -199,7 +199,7 @@ const updateStatus = async (
 
 <template>
   <div class="space-y-0">
-    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[var(--stage-cream)] stage-texture overflow-hidden" inner-class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
+    <StageSection outer-class="border-b-3 border-(--stage-ink) bg-(--stage-cream) stage-texture overflow-hidden" inner-class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
       <div class="stage-page-grid stage-page-grid-rail items-start">
         <div class="space-y-5">
           <span class="stage-kicker">Review board</span>
@@ -231,21 +231,21 @@ const updateStatus = async (
           <div class="flex flex-wrap gap-2">
             <UButton
               :variant="activeFilter === 'needs_action' ? 'soft' : 'ghost'"
-              :class="activeFilter === 'needs_action' ? 'bg-[var(--stage-theater)]' : ''"
+              :class="activeFilter === 'needs_action' ? 'bg-(--stage-theater)' : ''"
               @click="activeFilter = 'needs_action'"
             >
               Needs action
             </UButton>
             <UButton
               :variant="activeFilter === 'created' ? 'soft' : 'ghost'"
-              :class="activeFilter === 'created' ? 'bg-[var(--stage-event)]' : ''"
+              :class="activeFilter === 'created' ? 'bg-(--stage-event)' : ''"
               @click="activeFilter = 'created'"
             >
               Created by you
             </UButton>
             <UButton
               :variant="activeFilter === 'all' ? 'soft' : 'ghost'"
-              :class="activeFilter === 'all' ? 'bg-[var(--stage-paper-strong)]' : ''"
+              :class="activeFilter === 'all' ? 'bg-(--stage-paper-strong)' : ''"
               @click="activeFilter = 'all'"
             >
               Full queue
@@ -256,12 +256,12 @@ const updateStatus = async (
         <aside class="stage-panel-dark stage-grid-board p-5 sm:p-6">
           <div class="flex items-center justify-between gap-3 border-b-2 border-[rgba(251,247,239,0.2)] pb-4">
             <div>
-              <p class="stage-overline text-[var(--stage-paper-muted)]">Tonight's shows</p>
-              <h2 class="mt-2 font-display text-4xl uppercase tracking-[0.08em] text-[var(--stage-cream)]">
+              <p class="stage-overline text-(--stage-paper-muted)">Tonight's shows</p>
+              <h2 class="mt-2 font-display text-4xl uppercase tracking-[0.08em] text-(--stage-cream)">
                 Live board
               </h2>
             </div>
-            <span class="stage-chip bg-[var(--stage-theater)] text-[var(--stage-ink)]">
+            <span class="stage-chip bg-(--stage-theater) text-(--stage-ink)">
               {{ upcomingShows.length }} upcoming
             </span>
           </div>
@@ -274,25 +274,25 @@ const updateStatus = async (
             >
               <div class="flex items-start justify-between gap-3">
                 <div>
-                  <p class="font-display text-3xl uppercase tracking-[0.08em] text-[var(--stage-cream)]">
+                  <p class="font-display text-3xl uppercase tracking-[0.08em] text-(--stage-cream)">
                     {{ show.title }}
                   </p>
-                  <p class="mt-2 text-xs uppercase tracking-[0.16em] text-[var(--stage-paper-muted)]">
+                  <p class="mt-2 text-xs uppercase tracking-[0.16em] text-(--stage-paper-muted)">
                     {{ show.theaterName }}
                   </p>
                 </div>
-                <span class="stage-chip text-[var(--stage-ink)]" :class="statusTone(show.status)">
+                <span class="stage-chip text-(--stage-ink)" :class="statusTone(show.status)">
                   {{ show.status.replaceAll('_', ' ') }}
                 </span>
               </div>
-              <p class="mt-3 text-sm leading-7 text-[var(--stage-paper-muted)]">
+              <p class="mt-3 text-sm leading-7 text-(--stage-paper-muted)">
                 {{ formatDateTime(show.nextStartsAt) }}
               </p>
             </div>
 
             <div
               v-if="!upcomingShows.length && !isLoading"
-              class="border-3 border-dashed border-[rgba(251,247,239,0.3)] px-4 py-6 text-sm text-[var(--stage-paper-muted)]"
+              class="border-3 border-dashed border-[rgba(251,247,239,0.3)] px-4 py-6 text-sm text-(--stage-paper-muted)"
             >
               No upcoming shows in this queue yet.
             </div>
@@ -301,7 +301,7 @@ const updateStatus = async (
       </div>
     </StageSection>
 
-    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.52)]" inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+    <StageSection outer-class="border-b-3 border-(--stage-ink) bg-[rgba(251,247,239,0.52)]" inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
       <div class="mb-6 space-y-2">
         <p v-if="notice" class="text-sm text-emerald-600">{{ notice }}</p>
         <p v-if="mutationError" class="text-sm text-red-600">{{ mutationError }}</p>
@@ -361,12 +361,12 @@ const updateStatus = async (
           <article
             v-for="show in visibleShows"
             :key="show.id"
-            class="border-4 border-[rgba(43,41,38,0.16)] bg-[var(--stage-cream)]"
+            class="border-4 border-[rgba(43,41,38,0.16)] bg-(--stage-cream)"
           >
-            <div class="border-b-4 border-[var(--stage-ink)] bg-[var(--stage-theater)] px-4 py-3">
+            <div class="border-b-4 border-(--stage-ink) bg-(--stage-theater) px-4 py-3">
               <div class="flex items-center justify-between gap-3">
                 <div>
-                  <h3 class="font-bold text-[var(--stage-ink)]">{{ show.title }}</h3>
+                  <h3 class="font-bold text-(--stage-ink)">{{ show.title }}</h3>
                   <p class="text-sm text-[rgba(43,41,38,0.7)]">
                     {{ show.theaterName }} · {{ show.eventType || "show" }}
                   </p>
@@ -375,7 +375,7 @@ const updateStatus = async (
               </div>
             </div>
 
-            <div class="space-y-3 p-4 text-[var(--stage-ink)]">
+            <div class="space-y-3 p-4 text-(--stage-ink)">
               <div class="flex flex-wrap items-center gap-2">
                 <UBadge
                   :color="statusColors[show.status] || 'neutral'"
@@ -454,7 +454,7 @@ const updateStatus = async (
               </div>
               <div class="text-center">
                 <span class="text-sm stage-muted">
-                  <span class="font-bold" :class="show.canReview && show.status === 'pending_review' ? 'text-[var(--stage-coral)]' : 'text-[var(--stage-ink)]'">1</span>
+                  <span class="font-bold" :class="show.canReview && show.status === 'pending_review' ? 'text-(--stage-coral)' : 'text-(--stage-ink)'">1</span>
                   {{ show.canReview && show.status === 'pending_review' ? ' item needs review' : ' item tracked' }}
                 </span>
               </div>

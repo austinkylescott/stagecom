@@ -202,18 +202,18 @@ const statusTone = (status: string) => {
 
 const occurrenceToneClass = (status: string) => {
   if (status === "cancelled") {
-    return "bg-[var(--stage-paper-muted)] opacity-60";
+    return "bg-(--stage-paper-muted) opacity-60";
   }
 
   if (status === "changed") {
-    return "bg-[var(--stage-coral)]";
+    return "bg-(--stage-coral)";
   }
 
-  return "bg-[var(--stage-gold)]";
+  return "bg-(--stage-gold)";
 };
 
 const calendarMarkerClass = () =>
-  "bg-[var(--stage-gold)] border border-[var(--stage-ink)]";
+  "bg-(--stage-gold) border border-(--stage-ink)";
 
 const calendarDaySummary = (dateKey: string) => {
   const items = itemsByDate.value.get(dateKey) ?? [];
@@ -309,7 +309,7 @@ watch(
 <template>
   <div class="space-y-0">
     <StageSection
-      outer-class="border-b-3 border-[var(--stage-ink)] bg-[var(--stage-cream)] stage-texture overflow-hidden"
+      outer-class="border-b-3 border-(--stage-ink) bg-(--stage-cream) stage-texture overflow-hidden"
       inner-class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8"
     >
       <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
@@ -361,7 +361,7 @@ watch(
             </div>
           </template>
 
-          <div v-if="nextUpItem" class="space-y-3 text-sm text-[var(--stage-ink)]">
+          <div v-if="nextUpItem" class="space-y-3 text-sm text-(--stage-ink)">
             <div class="flex flex-wrap items-center gap-2">
               <UBadge color="warning" variant="soft">
                 {{ nextUpItem.show.eventType || "show" }}
@@ -395,7 +395,7 @@ watch(
     </StageSection>
 
     <StageSection
-      outer-class="border-b-3 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.58)]"
+      outer-class="border-b-3 border-(--stage-ink) bg-[rgba(251,247,239,0.58)]"
       inner-class="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8"
     >
       <section class="stage-panel stage-dot-board p-4 sm:p-5">
@@ -442,7 +442,7 @@ watch(
     </StageSection>
 
     <StageSection
-      outer-class="border-b-3 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.42)]"
+      outer-class="border-b-3 border-(--stage-ink) bg-[rgba(251,247,239,0.42)]"
       inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8"
     >
       <div class="grid gap-6 xl:grid-cols-[minmax(0,0.88fr)_minmax(0,0.9fr)_minmax(0,1.12fr)]">
@@ -486,11 +486,11 @@ watch(
             v-model="selectedCalendarDate"
             :month-controls="false"
             :year-controls="false"
-            class="rounded-none border-2 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.78)] p-3"
+            class="rounded-none border-2 border-(--stage-ink) bg-[rgba(251,247,239,0.78)] p-3"
           >
             <template #day="{ day }">
               <div class="relative flex min-h-14 w-full items-center justify-center px-1 py-1 text-center">
-                <span class="relative z-10 text-sm font-semibold text-[var(--stage-ink)]">
+                <span class="relative z-10 text-sm font-semibold text-(--stage-ink)">
                   {{ day.day }}
                 </span>
 
@@ -527,7 +527,7 @@ watch(
 
           <div
             v-else-if="!selectedDayItems.length"
-            class="border-2 border-dashed border-[var(--stage-ink)] bg-[rgba(251,247,239,0.78)] px-4 py-6 text-sm stage-muted"
+            class="border-2 border-dashed border-(--stage-ink) bg-[rgba(251,247,239,0.78)] px-4 py-6 text-sm stage-muted"
           >
             No matching events land on {{ formattedSelectedDate }}.
           </div>
@@ -542,7 +542,7 @@ watch(
               <div class="flex items-start justify-between gap-3">
                 <div>
                   <div class="flex flex-wrap items-center gap-2">
-                    <span class="stage-chip bg-[var(--stage-paper-strong)]">
+                    <span class="stage-chip bg-(--stage-paper-strong)">
                       {{ item.show.eventType || "show" }}
                     </span>
                     <span class="stage-chip" :class="occurrenceToneClass(item.occurrenceStatus)">
@@ -578,7 +578,7 @@ watch(
                   The complete theater-scoped chronology for this view.
                 </p>
               </div>
-              <span class="stage-chip bg-[var(--stage-paper-strong)]">
+              <span class="stage-chip bg-(--stage-paper-strong)">
                 {{ agendaItems.length }} items
               </span>
             </div>
@@ -588,7 +588,7 @@ watch(
 
           <div
             v-else-if="!agendaItems.length"
-            class="border-2 border-dashed border-[var(--stage-ink)] bg-[rgba(251,247,239,0.78)] px-4 py-6 text-sm stage-muted"
+            class="border-2 border-dashed border-(--stage-ink) bg-[rgba(251,247,239,0.78)] px-4 py-6 text-sm stage-muted"
           >
             No schedule items match the current filter combination.
           </div>
@@ -598,24 +598,24 @@ watch(
               v-for="item in agendaItems"
               :key="item.occurrenceId"
               :to="`/theaters/${slug}/shows/${item.show.id}`"
-              class="block border-3 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.92)] p-4 shadow-[5px_5px_0_0_var(--stage-ink)] transition-transform hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[4px_4px_0_0_var(--stage-ink)]"
+              class="block border-3 border-(--stage-ink) bg-[rgba(251,247,239,0.92)] p-4 shadow-[5px_5px_0_0_var(--stage-ink)] transition-transform hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[4px_4px_0_0_var(--stage-ink)]"
             >
               <div class="grid gap-4 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:items-center">
-                <div class="border-2 border-[var(--stage-ink)] bg-[var(--stage-ink)] px-3 py-2 text-[var(--stage-cream)]">
-                  <p class="stage-overline text-[var(--stage-paper-muted)]">
+                <div class="border-2 border-(--stage-ink) bg-(--stage-ink) px-3 py-2 text-(--stage-cream)">
+                  <p class="stage-overline text-(--stage-paper-muted)">
                     {{ item.startsAt.slice(0, 10) === selectedDate ? "Selected" : "Date" }}
                   </p>
                   <p class="mt-1 text-sm font-semibold">
                     {{ formatDateLabel(item.startsAt.slice(0, 10)) }}
                   </p>
-                  <p class="mt-1 text-xs text-[var(--stage-paper-muted)]">
+                  <p class="mt-1 text-xs text-(--stage-paper-muted)">
                     {{ formatTimeLabel(item.startsAt) }}
                   </p>
                 </div>
 
                 <div class="min-w-0">
                   <div class="flex flex-wrap items-center gap-2">
-                    <span class="stage-chip bg-[var(--stage-paper-strong)]">
+                    <span class="stage-chip bg-(--stage-paper-strong)">
                       {{ item.show.eventType || "show" }}
                     </span>
                     <span class="stage-chip" :class="occurrenceToneClass(item.occurrenceStatus)">
@@ -647,7 +647,7 @@ watch(
     </StageSection>
 
     <StageSection
-      outer-class="border-b-3 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.52)]"
+      outer-class="border-b-3 border-(--stage-ink) bg-[rgba(251,247,239,0.52)]"
       inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8"
     >
       <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">

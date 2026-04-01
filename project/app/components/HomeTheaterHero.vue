@@ -84,7 +84,7 @@ const roleLabel = computed(() => {
           <h3 class="mt-2 font-display text-4xl uppercase tracking-[0.08em]">
             {{ stats?.pendingReviewCount ? `${stats.pendingReviewCount} shows need review` : "Review queue is clear" }}
           </h3>
-          <p class="mt-3 max-w-3xl text-sm leading-7 text-[var(--stage-ink-soft)]">
+          <p class="mt-3 max-w-3xl text-sm leading-7 text-(--stage-ink-soft)">
             Oversight users should be able to tell immediately whether the theater needs action. This panel stays focused on operational review work instead of mixing it into discovery UI.
           </p>
         </div>
@@ -218,7 +218,7 @@ const roleLabel = computed(() => {
             <NuxtLink
               v-if="theater"
               :to="`/theaters/${theater.slug}`"
-              class="stage-link text-sm text-[var(--stage-ink)]"
+              class="stage-link text-sm text-(--stage-ink)"
             >
               Open theater
             </NuxtLink>
@@ -229,16 +229,16 @@ const roleLabel = computed(() => {
               v-for="show in shows"
               :key="show.id"
               :to="theater ? `/theaters/${theater.slug}/shows/${show.id}` : undefined"
-              class="block border-2 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.72)] p-4 transition-colors hover:bg-[var(--stage-paper-strong)]"
+              class="block border-2 border-(--stage-ink) bg-[rgba(251,247,239,0.72)] p-4 transition-colors hover:bg-(--stage-paper-strong)"
             >
               <div class="flex items-start justify-between gap-3">
                 <div>
-                  <p class="font-semibold text-[var(--stage-ink)]">{{ show.title }}</p>
+                  <p class="font-semibold text-(--stage-ink)">{{ show.title }}</p>
                   <p class="mt-1 text-xs uppercase tracking-[0.14em] stage-muted">
                     {{ show.startsAt ? new Date(show.startsAt).toLocaleString() : "TBD" }}
                   </p>
                 </div>
-                <span class="stage-chip bg-[var(--stage-event)] text-[var(--stage-ink)]">
+                <span class="stage-chip bg-(--stage-event) text-(--stage-ink)">
                   Show
                 </span>
               </div>
@@ -252,7 +252,7 @@ const roleLabel = computed(() => {
 
             <div
               v-if="!shows?.length"
-              class="border-2 border-dashed border-[var(--stage-ink)] bg-[rgba(251,247,239,0.7)] px-4 py-6 text-sm stage-muted"
+              class="border-2 border-dashed border-(--stage-ink) bg-[rgba(251,247,239,0.7)] px-4 py-6 text-sm stage-muted"
             >
               {{
                 theater

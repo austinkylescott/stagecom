@@ -126,7 +126,7 @@ const save = async () => {
 
 <template>
   <div class="space-y-0">
-    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[var(--stage-cream)] stage-texture overflow-hidden" inner-class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
+    <StageSection outer-class="border-b-3 border-(--stage-ink) bg-(--stage-cream) stage-texture overflow-hidden" inner-class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
       <div>
         <span class="stage-kicker">Profile</span>
         <h1 class="mt-4 stage-section-title">How you appear across the scene.</h1>
@@ -136,7 +136,7 @@ const save = async () => {
       </div>
     </StageSection>
 
-    <StageSection outer-class="border-b-3 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.52)]" inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+    <StageSection outer-class="border-b-3 border-(--stage-ink) bg-[rgba(251,247,239,0.52)]" inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
       <UAlert v-if="!user" color="yellow" variant="soft">
         <template #title>Sign in required</template>
         <template #description>Log in to edit your profile.</template>
@@ -208,8 +208,8 @@ const save = async () => {
         </div>
 
         <aside class="stage-panel-dark stage-grid-board p-5 sm:p-6">
-          <span class="stage-overline text-[var(--stage-cream)]">What this controls</span>
-          <h2 class="mt-3 text-2xl font-black tracking-[-0.03em] text-[var(--stage-cream)]">
+          <span class="stage-overline text-(--stage-cream)">What this controls</span>
+          <h2 class="mt-3 text-2xl font-black tracking-[-0.03em] text-(--stage-cream)">
             Make it easy to recognize you.
           </h2>
           <div class="mt-4 space-y-4 text-sm leading-6 text-[rgba(251,247,239,0.82)]">

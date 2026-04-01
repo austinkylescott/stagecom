@@ -75,11 +75,11 @@ const nextOccurrence = computed(() => data.value?.occurrences?.[0] ?? null);
       v-if="show"
       title="Lineup Order"
       subtitle="Program everyone can trust"
-      tone="bg-[var(--stage-coral)]"
+      tone="bg-(--stage-coral)"
     >
       <div class="flex items-center justify-between gap-3 p-4">
         <div>
-          <p class="text-sm font-medium text-[var(--stage-ink)]">
+          <p class="text-sm font-medium text-(--stage-ink)">
             {{ acceptedCast.length }} performer{{ acceptedCast.length === 1 ? "" : "s" }}
           </p>
           <p v-if="nextOccurrence" class="text-sm stage-muted">
@@ -99,14 +99,14 @@ const nextOccurrence = computed(() => data.value?.occurrences?.[0] ?? null);
       <div
         v-for="(member, index) in acceptedCast"
         :key="member.userId"
-        class="border-2 border-[rgba(43,41,38,0.12)] bg-[var(--stage-cream)] px-4 py-4"
+        class="border-2 border-[rgba(43,41,38,0.12)] bg-(--stage-cream) px-4 py-4"
       >
         <div class="flex items-center gap-3">
-          <div class="flex size-10 items-center justify-center border-2 border-[var(--stage-ink)] bg-[var(--stage-ink)] text-sm font-semibold text-[var(--stage-cream)]">
+          <div class="flex size-10 items-center justify-center border-2 border-(--stage-ink) bg-(--stage-ink) text-sm font-semibold text-(--stage-cream)">
             {{ member.programOrder ?? index + 1 }}
           </div>
           <div class="min-w-0">
-            <p class="truncate text-base font-semibold text-[var(--stage-ink)]">
+            <p class="truncate text-base font-semibold text-(--stage-ink)">
               {{ member.displayName ?? member.userId }}
             </p>
             <p class="text-xs uppercase tracking-wide stage-muted">

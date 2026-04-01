@@ -4,10 +4,7 @@ import type { DropdownMenuItem } from "@nuxt/ui";
 import { useHomeTheaterState } from "~/composables/useHomeTheaterState";
 import { useHomeTheaterMutation } from "~/composables/useHomeTheaterMutation";
 import { useMembershipToggle } from "~/composables/useMembershipToggle";
-import {
-  getTimeZoneDateKey,
-  normalizeTimeZone,
-} from "~/utils/timezone";
+import { getTimeZoneDateKey, normalizeTimeZone } from "~/utils/timezone";
 import {
   type TheaterDetails,
   useTheaterDetails,
@@ -50,7 +47,9 @@ const upcomingNonShowEvents = computed(() =>
 );
 const nextShow = computed(() => upcomingShows.value[0] || null);
 const nextEvent = computed(() => upcomingNonShowEvents.value[0] || null);
-const theaterTimeZone = computed(() => normalizeTimeZone(theater.value?.timezone));
+const theaterTimeZone = computed(() =>
+  normalizeTimeZone(theater.value?.timezone),
+);
 const fullAddress = computed(() => {
   const parts = [
     theater.value?.street,
@@ -134,8 +133,8 @@ const eventTypeLabel = (value: PublicEvent["eventType"]) => {
 
 const eventToneClass = (event: PublicEvent) =>
   event.eventType === "show"
-    ? "bg-[var(--stage-event)] text-[var(--stage-ink)]"
-    : "bg-[var(--stage-theater)] text-[var(--stage-ink)]";
+    ? "bg-(--stage-event) text-(--stage-ink)"
+    : "bg-(--stage-theater) text-(--stage-ink)";
 
 const castPreviewLabel = (event: PublicEvent) => {
   if (!event.cast.length) {
@@ -230,13 +229,15 @@ const handleHomeToggle = async () => {
 };
 
 const theaterActionsMenuItems = computed<DropdownMenuItem[][]>(() => {
-  const items: DropdownMenuItem[][] = [[
-    {
-      label: "Full calendar",
-      icon: "i-heroicons-calendar-days",
-      to: `/theaters/${slug.value}/calendar`,
-    },
-  ]];
+  const items: DropdownMenuItem[][] = [
+    [
+      {
+        label: "Full calendar",
+        icon: "i-heroicons-calendar-days",
+        to: `/theaters/${slug.value}/calendar`,
+      },
+    ],
+  ];
 
   if (isMember.value) {
     items[0]?.push({
@@ -322,13 +323,12 @@ const formatTime = (value: string | null) =>
     hour: "numeric",
     minute: "2-digit",
   });
-
 </script>
 
 <template>
   <div class="space-y-0">
     <StageSection
-      outer-class="border-b-3 border-[var(--stage-ink)] bg-[var(--stage-theater)] overflow-hidden"
+      outer-class="border-b-3 border-(--stage-ink) bg-(--stage-theater) overflow-hidden"
       inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8"
     >
       <TheaterDashboardSection
@@ -347,11 +347,12 @@ const formatTime = (value: string | null) =>
         :format-time="formatTime"
         :event-type-label="eventTypeLabel"
         :producer-label="producerLabel"
+        :cast-label="castPreviewLabel"
       />
     </StageSection>
 
     <StageSection
-      outer-class="border-b-3 border-[var(--stage-ink)] bg-[var(--stage-cream)]"
+      outer-class="border-b-3 border-(--stage-ink) bg-(--stage-cream)"
       inner-class="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-7 lg:px-8"
     >
       <div class="space-y-5">
@@ -383,12 +384,12 @@ const formatTime = (value: string | null) =>
           <article
             v-for="(show, index) in upcomingShows"
             :key="show.id"
-            class="stage-list-card h-full p-4 transition-transform hover:translate-x-[1px] hover:translate-y-[1px] sm:p-5"
+            class="stage-list-card h-full p-4 transition-transform hover:translate-x-px hover:translate-y-px sm:p-5"
           >
             <div class="flex h-full items-stretch gap-3 sm:gap-4">
               <div class="shrink-0 self-stretch">
                 <div
-                  class="relative h-full min-w-[4.75rem] max-w-[7.25rem] overflow-hidden border-2 border-[var(--stage-ink)] text-[var(--stage-cream)] aspect-[1080/1350]"
+                  class="relative h-full min-w-19 max-w-29 overflow-hidden border-2 border-(--stage-ink) text-(--stage-cream) aspect-1080/1350"
                   :class="artworkToneClass(index)"
                 >
                   <div
@@ -408,7 +409,7 @@ const formatTime = (value: string | null) =>
 
               <div class="flex min-w-0 flex-1 flex-col">
                 <div class="flex flex-wrap items-center gap-2">
-                  <span class="stage-chip bg-[var(--stage-event)]">
+                  <span class="stage-chip bg-(--stage-event)">
                     {{ formatDate(show.startsAt) }}
                   </span>
                   <span class="stage-chip bg-[rgba(251,247,239,0.84)]">
@@ -437,15 +438,13 @@ const formatTime = (value: string | null) =>
                   class="mt-4 space-y-3 text-sm leading-6 text-[rgba(43,41,38,0.78)]"
                 >
                   <p>
-                    <span class="font-semibold text-[var(--stage-ink)]"
+                    <span class="font-semibold text-(--stage-ink)"
                       >Producer:</span
                     >
                     {{ producerLabel(show) }}
                   </p>
                   <div>
-                    <span class="font-semibold text-[var(--stage-ink)]"
-                      >Cast:</span
-                    >
+                    <span class="font-semibold text-(--stage-ink)">Cast:</span>
                     <span class="ml-1">{{ castPreviewLabel(show) }}</span>
                   </div>
                 </div>
@@ -467,7 +466,7 @@ const formatTime = (value: string | null) =>
 
         <div
           v-else-if="!isLoading"
-          class="border-3 border-dashed border-[var(--stage-ink)] bg-[rgba(251,247,239,0.78)] px-5 py-6"
+          class="border-3 border-dashed border-(--stage-ink) bg-[rgba(251,247,239,0.78)] px-5 py-6"
         >
           <p class="stage-overline">Upcoming shows</p>
           <h2 class="mt-2 font-display text-3xl uppercase tracking-[0.08em]">
@@ -482,7 +481,7 @@ const formatTime = (value: string | null) =>
     </StageSection>
 
     <StageSection
-      outer-class="border-b-3 border-[var(--stage-ink)] bg-[var(--stage-cream)] stage-texture overflow-hidden"
+      outer-class="border-b-3 border-(--stage-ink) bg-(--stage-cream) stage-texture overflow-hidden"
       inner-class="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-7 lg:px-8"
     >
       <div class="space-y-5">
@@ -518,7 +517,7 @@ const formatTime = (value: string | null) =>
               class="grid gap-4 sm:grid-cols-[7rem_minmax(0,1fr)] sm:items-start"
             >
               <div
-                class="border-2 border-[var(--stage-ink)] bg-[rgba(251,247,239,0.78)] px-3 py-3 text-center"
+                class="border-2 border-(--stage-ink) bg-[rgba(251,247,239,0.78)] px-3 py-3 text-center"
               >
                 <p class="stage-overline">Date</p>
                 <p
@@ -532,7 +531,7 @@ const formatTime = (value: string | null) =>
                 <article
                   v-for="(event, index) in group.items"
                   :key="event.id"
-                  class="transition-transform hover:translate-x-[1px] hover:translate-y-[1px]"
+                  class="transition-transform hover:translate-x-px hover:translate-y-px"
                   :class="index === 0 ? 'pb-1' : 'pt-4 pb-1'"
                 >
                   <div
@@ -569,13 +568,13 @@ const formatTime = (value: string | null) =>
                         class="mt-4 flex flex-wrap gap-x-5 gap-y-3 text-sm leading-6 text-[rgba(43,41,38,0.78)]"
                       >
                         <span>
-                          <span class="font-semibold text-[var(--stage-ink)]"
+                          <span class="font-semibold text-(--stage-ink)"
                             >Producer:</span
                           >
                           {{ producerLabel(event) }}
                         </span>
                         <span v-if="event.eventType === 'show'">
-                          <span class="font-semibold text-[var(--stage-ink)]"
+                          <span class="font-semibold text-(--stage-ink)"
                             >Cast:</span
                           >
                           {{ castPreviewLabel(event) }}
@@ -602,7 +601,7 @@ const formatTime = (value: string | null) =>
 
         <div
           v-else-if="!isLoading"
-          class="border-3 border-dashed border-[var(--stage-ink)] bg-[rgba(251,247,239,0.78)] px-5 py-6"
+          class="border-3 border-dashed border-(--stage-ink) bg-[rgba(251,247,239,0.78)] px-5 py-6"
         >
           <p class="stage-overline">Programming signal</p>
           <h2 class="mt-2 font-display text-3xl uppercase tracking-[0.08em]">
