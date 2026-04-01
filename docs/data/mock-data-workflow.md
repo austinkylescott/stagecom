@@ -96,6 +96,7 @@ npm run supabase:stop
 The example config intentionally covers:
 
 - Theater manager, staff, producer, and performer roles
+- Theater-local timezone display scenarios via `theaters[].timezone`
 - Explicit cast membership separate from producer roles
 - Approved, pending review, and draft show states
 - Show and practice event types

@@ -228,6 +228,7 @@ function pushTheaterUpserts(lines, theaters) {
     asSqlString(requireString(theater.name, `theaters[${theater.key}].name`)),
     asSqlString(requireString(theater.slug, `theaters[${theater.key}].slug`)),
     asSqlNullableString(optionalString(theater.tagline)),
+    asSqlString(optionalString(theater.timezone) ?? "UTC"),
     asSqlNullableString(optionalString(theater.street)),
     asSqlNullableString(optionalString(theater.city)),
     asSqlNullableString(optionalString(theater.stateRegion)),
@@ -237,7 +238,7 @@ function pushTheaterUpserts(lines, theaters) {
 
   lines.push("-- Theaters");
   lines.push(
-    "insert into theaters (id, name, slug, tagline, street, city, state_region, postal_code, country)",
+    "insert into theaters (id, name, slug, tagline, timezone, street, city, state_region, postal_code, country)",
   );
   lines.push(`values\n${rows.join(",\n")}`);
   lines.push(
@@ -245,6 +246,7 @@ function pushTheaterUpserts(lines, theaters) {
     "  name = excluded.name,",
     "  slug = excluded.slug,",
     "  tagline = excluded.tagline,",
+    "  timezone = excluded.timezone,",
     "  street = excluded.street,",
     "  city = excluded.city,",
     "  state_region = excluded.state_region,",

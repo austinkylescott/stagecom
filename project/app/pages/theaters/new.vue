@@ -8,6 +8,7 @@ const router = useRouter();
 const form = reactive({
   name: "",
   tagline: "",
+  timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
   street: "",
   city: "",
   state_region: "",
@@ -92,6 +93,18 @@ const handleSubmit = async () => {
             <UInput
               v-model="form.tagline"
               placeholder="Late-night improv hub"
+            />
+          </UFormField>
+
+          <UFormField
+            label="Timezone"
+            description="Use an IANA timezone like America/New_York"
+          >
+            <UInput
+              v-model="form.timezone"
+              placeholder="America/New_York"
+              autocapitalize="off"
+              spellcheck="false"
             />
           </UFormField>
 

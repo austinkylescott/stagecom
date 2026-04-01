@@ -11,10 +11,12 @@ In Progress
 - Align page structure with real concern levels: general authenticated user, theater member, relationship-based participant, oversight user, and self-only surfaces.
 - Use the visibility policy as a first-class UX organizing principle for modules, fields, and actions.
 - Establish a unified dashboard language that is readable, durable, and reusable across authenticated surfaces.
+- Redesign the theater detail page so it reads as the theater's home board first, with compact upcoming shows and a complete all-events section.
 
 ## Notes
 
 - Spec: `docs/specs/feature-spec-authenticated-work-experience-refinement-v1.md`
+- Active sub-spec: `docs/specs/feature-spec-theater-page-design-pass-v1.md`
 - Primary route direction:
   - `/theaters/[slug]` as the main home theater page for steady-state use
   - `/theaters/browse` as secondary discovery and context switching
@@ -23,6 +25,7 @@ In Progress
   - `/review` as cross-theater approvals queue
   - `/notifications` as self-only personal updates
 - The theater detail page should be member-facing first, with readable operational modules instead of a dark identity hero.
+- Current focus: make the theater header theater-led, reduce show-module dominance, and add a chronological all-upcoming-events board without changing visibility rules.
 - Oversight users should get a dedicated theater admin surface instead of forcing theater-wide controls into the default member page.
 - Dashboard direction should favor readable cream/ink operational modules over dark hero-style wrappers for dense dashboard content.
 - Preserve existing role, permission, cast, notification, and visibility-policy invariants while making the UI easier to organize by concern level.

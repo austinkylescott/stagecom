@@ -4,6 +4,10 @@ import {
   useNotificationsBell,
   useMarkRead,
 } from "~/composables/useNotifications";
+import {
+  stageButtonToneClasses,
+  type StageButtonTone,
+} from "~/utils/stageButtonTone";
 import { formatNotification } from "~/utils/notifications";
 
 type NotificationDropdownItem = DropdownMenuItem & {
@@ -27,6 +31,18 @@ const latestNotificationToneClass = computed(() => {
   }
 
   return "bg-[var(--stage-paper-strong)]";
+});
+
+const notificationButtonTone = computed<StageButtonTone>(() => {
+  const latestType = notifications.value[0]?.type;
+
+  if (!latestType) return "neutral";
+  if (latestType.startsWith("cast.")) return "performer";
+  if (["show.submitted_for_review", "show.approved"].includes(latestType)) {
+    return "theater";
+  }
+
+  return "neutral";
 });
 
 const notificationItems = computed<NotificationDropdownItem[][]>(() => [
@@ -54,7 +70,12 @@ const notificationItems = computed<NotificationDropdownItem[][]>(() => [
     :items="notificationItems"
     :header-tone-class="latestNotificationToneClass"
   >
-    <UButton color="neutral" variant="ghost" class="relative">
+    <template #default="{ open }">
+    <UButton
+      color="neutral"
+      variant="ghost"
+      :class="['relative', stageButtonToneClasses(notificationButtonTone, open)]"
+    >
       <UIcon name="i-heroicons-bell" class="size-5" />
       <span
         v-if="unreadCount > 0"
@@ -63,6 +84,7 @@ const notificationItems = computed<NotificationDropdownItem[][]>(() => [
         {{ unreadCount > 9 ? "9+" : unreadCount }}
       </span>
     </UButton>
+    </template>
 
     <template #header>
       <p class="text-sm font-medium text-[var(--stage-ink)]">Notifications</p>

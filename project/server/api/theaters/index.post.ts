@@ -1,5 +1,6 @@
 import { serverSupabaseClient } from "#supabase/server";
 import { z } from "zod";
+import { isValidTimeZone } from "../../utils/timezone";
 
 /**
  * POST /api/theaters
@@ -18,6 +19,11 @@ const createTheaterSchema = z.object({
   name: z.string().trim().min(1, "name required"),
   slug: z.string().trim().min(1).max(60).optional(),
   tagline: z.string().trim().min(1).nullable().optional(),
+  timezone: z
+    .string()
+    .trim()
+    .min(1, "timezone required")
+    .refine((value) => isValidTimeZone(value), "valid IANA timezone required"),
   street: z.string().trim().min(1).nullable().optional(),
   city: z.string().trim().min(1).nullable().optional(),
   state_region: z.string().trim().min(1).nullable().optional(),
@@ -33,7 +39,7 @@ export default defineEventHandler(async (event) => {
   const metadata = (user.user_metadata || {}) as Record<string, unknown>;
 
   // Ensure profile exists (FK requirement)
-  await supabase.from("profiles").upsert(
+  const { error: profileUpsertError } = await supabase.from("profiles").upsert(
     {
       id: userId,
       display_name:
@@ -45,10 +51,18 @@ export default defineEventHandler(async (event) => {
     { onConflict: "id" },
   );
 
+  if (profileUpsertError) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: profileUpsertError.message,
+    });
+  }
+
   const {
     name,
     slug: incomingSlug,
     tagline = null,
+    timezone,
     street = null,
     city = null,
     state_region = null,
@@ -86,13 +100,14 @@ export default defineEventHandler(async (event) => {
       name,
       slug,
       tagline,
+      timezone,
       street,
       city,
       state_region,
       postal_code,
       country,
     })
-    .select("id,slug,name,tagline,city,state_region,country")
+    .select("id,slug,name,tagline,timezone,city,state_region,country")
     .single();
 
   if (insertError) {

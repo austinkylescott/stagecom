@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from "@nuxt/ui";
 
+const open = ref(false);
+
 const props = withDefaults(defineProps<{
   items: DropdownMenuItem[][];
   content?: {
@@ -19,6 +21,7 @@ const props = withDefaults(defineProps<{
 
 <template>
   <UDropdownMenu
+    v-model:open="open"
     :items="items"
     :content="content"
     :ui="{
@@ -32,7 +35,7 @@ const props = withDefaults(defineProps<{
       itemWrapper: 'gap-0'
     }"
   >
-    <slot />
+    <slot :open="open" />
 
     <template #content-top>
       <div

@@ -55,6 +55,7 @@ export type TheaterDetails = {
     name: string;
     slug: string;
     tagline: string | null;
+    timezone: string;
     street: string | null;
     city: string | null;
     state_region: string | null;

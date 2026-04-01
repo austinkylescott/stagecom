@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from "@nuxt/ui";
 import AppNotificationsBell from "~/components/AppNotificationsBell.vue";
+import {
+  stageButtonToneClasses,
+  type StageButtonTone,
+} from "~/utils/stageButtonTone";
 
 const route = useRoute();
 const { isAuthed } = useUserIdentity();
@@ -27,29 +31,16 @@ const homeTheaterPrimaryTo = computed(() =>
   homeTheater.value ? `/theaters/${homeTheater.value.slug}` : "/theaters",
 );
 
-const desktopNavToneClass = (to: string, active: boolean) => {
-  if (to.startsWith("/theaters") || to.startsWith("/review")) {
-    return active
-      ? "bg-[var(--stage-theater)] hover:bg-[var(--stage-theater)]"
-      : "bg-[rgba(251,247,239,0.78)] hover:bg-[var(--stage-theater-soft)]";
-  }
+const navTone = (to: string): StageButtonTone => {
+  if (to.startsWith("/theaters") || to.startsWith("/review")) return "theater";
+  if (to.startsWith("/shows")) return "event";
+  if (to.startsWith("/performers")) return "performer";
 
-  if (to.startsWith("/shows")) {
-    return active
-      ? "bg-[var(--stage-event)] hover:bg-[var(--stage-event)]"
-      : "bg-[rgba(251,247,239,0.78)] hover:bg-[var(--stage-event-soft)]";
-  }
-
-  if (to.startsWith("/performers")) {
-    return active
-      ? "bg-[var(--stage-performer)] hover:bg-[var(--stage-performer)]"
-      : "bg-[rgba(251,247,239,0.78)] hover:bg-[var(--stage-performer-soft)]";
-  }
-
-  return active
-    ? "bg-[var(--stage-paper-strong)] hover:bg-[var(--stage-paper-strong)]"
-    : "bg-[rgba(251,247,239,0.78)] hover:bg-[var(--stage-paper)]";
+  return "neutral";
 };
+
+const desktopNavToneClass = (to: string, active: boolean) =>
+  stageButtonToneClasses(navTone(to), active).join(" ");
 
 const desktopNavItems = computed<NavigationMenuItem[]>(() => {
   if (!isAuthed.value) {
@@ -139,41 +130,8 @@ const desktopNavItems = computed<NavigationMenuItem[]>(() => {
   return items;
 });
 
-const navToneClasses = (to: string, active: boolean) => {
-  const shared = "!text-[var(--stage-ink)]";
-
-  if (to.startsWith("/theaters") || to.startsWith("/review")) {
-    return [
-      active
-        ? "bg-[var(--stage-theater)] hover:bg-[var(--stage-theater-soft)] active:bg-[var(--stage-theater-soft)]"
-        : "bg-[rgba(251,247,239,0.78)] hover:bg-[var(--stage-theater-soft)] active:bg-[var(--stage-theater-soft)]",
-      shared,
-    ];
-  }
-
-  if (to.startsWith("/shows")) {
-    return [
-      active
-        ? "bg-[var(--stage-event)] hover:bg-[var(--stage-event-soft)] active:bg-[var(--stage-event-soft)]"
-        : "bg-[rgba(251,247,239,0.78)] hover:bg-[var(--stage-event-soft)] active:bg-[var(--stage-event-soft)]",
-      shared,
-    ];
-  }
-
-  if (to.startsWith("/performers")) {
-    return [
-      active
-        ? "bg-[var(--stage-performer)] hover:bg-[var(--stage-performer-soft)] active:bg-[var(--stage-performer-soft)]"
-        : "bg-[rgba(251,247,239,0.78)] hover:bg-[var(--stage-performer-soft)] active:bg-[var(--stage-performer-soft)]",
-      shared,
-    ];
-  }
-
-  return [
-    active ? "bg-[var(--stage-paper-strong)]" : "bg-[rgba(251,247,239,0.78)] hover:bg-[var(--stage-paper)]",
-    shared,
-  ];
-};
+const navToneClasses = (to: string, active: boolean) =>
+  stageButtonToneClasses(navTone(to), active);
 
 const isActive = (to: string) => {
   if (to === "/") {
