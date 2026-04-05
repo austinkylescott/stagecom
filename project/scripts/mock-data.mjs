@@ -158,12 +158,13 @@ function pushProfileUpserts(lines, users, theaterByKey) {
 
   const rows = users.map((user) => {
     const userId = requireUuid(user.id, `users[${user.key}].id`);
-    const homeTheaterId = user.homeTheater
+    const homeTheaterKeys = getHomeTheaterKeys(user);
+    const primaryHomeTheaterId = homeTheaterKeys[0]
       ? asSqlUuid(
           resolveTheaterId(
             requireTheater(
               theaterByKey,
-              requireRef(user.homeTheater, user.key, "homeTheater"),
+              requireRef(homeTheaterKeys[0], user.key, "homeTheaters[0]"),
               user.key,
             ),
           ),
@@ -179,7 +180,7 @@ function pushProfileUpserts(lines, users, theaterByKey) {
       asSqlNullableString(optionalString(user.bio)),
       asSqlNullableString(optionalString(user.city)),
       asSqlNullableString(optionalString(user.handle)),
-      homeTheaterId,
+      primaryHomeTheaterId,
       asSqlJson(user.contactLinks ?? {}),
       asSqlJson(user.notificationPreferences ?? {}),
       user.availability === undefined ? "null" : asSqlJson(user.availability),
@@ -229,6 +230,8 @@ function pushTheaterUpserts(lines, theaters) {
     asSqlString(requireString(theater.slug, `theaters[${theater.key}].slug`)),
     asSqlNullableString(optionalString(theater.tagline)),
     asSqlString(optionalString(theater.timezone) ?? "UTC"),
+    String(optionalInteger(theater.upcomingShowsLimit) ?? 5),
+    String(optionalInteger(theater.upcomingOtherEventsLimit) ?? 5),
     asSqlNullableString(optionalString(theater.street)),
     asSqlNullableString(optionalString(theater.city)),
     asSqlNullableString(optionalString(theater.stateRegion)),
@@ -238,7 +241,7 @@ function pushTheaterUpserts(lines, theaters) {
 
   lines.push("-- Theaters");
   lines.push(
-    "insert into theaters (id, name, slug, tagline, timezone, street, city, state_region, postal_code, country)",
+    "insert into theaters (id, name, slug, tagline, timezone, upcoming_shows_limit, upcoming_other_events_limit, street, city, state_region, postal_code, country)",
   );
   lines.push(`values\n${rows.join(",\n")}`);
   lines.push(
@@ -247,6 +250,8 @@ function pushTheaterUpserts(lines, theaters) {
     "  slug = excluded.slug,",
     "  tagline = excluded.tagline,",
     "  timezone = excluded.timezone,",
+    "  upcoming_shows_limit = excluded.upcoming_shows_limit,",
+    "  upcoming_other_events_limit = excluded.upcoming_other_events_limit,",
     "  street = excluded.street,",
     "  city = excluded.city,",
     "  state_region = excluded.state_region,",
@@ -276,11 +281,16 @@ function pushMembershipUpserts(lines, theaters, userByKey) {
         throw new Error(`Membership for user "${userKey}" in theater "${theater.key}" needs at least one role.`);
       }
 
+      const homeTheaterKeys = getHomeTheaterKeys(user);
+      const homeRankIndex = homeTheaterKeys.indexOf(theater.key);
+
       rows.push(`  (${[
         asSqlUuid(theaterId),
         asSqlUuid(user.id),
         asSqlEnumArray(roles, "theater_role"),
         asSqlEnum(optionalString(membership.status) ?? "active", "membership_status"),
+        asSqlBoolean(homeRankIndex >= 0),
+        homeRankIndex >= 0 ? String(homeRankIndex + 1) : "null",
       ].join(", ")})`);
     }
   }
@@ -290,14 +300,36 @@ function pushMembershipUpserts(lines, theaters, userByKey) {
   }
 
   lines.push("-- Theater memberships");
-  lines.push("insert into theater_memberships (theater_id, user_id, roles, status)");
+  lines.push(
+    "insert into theater_memberships (theater_id, user_id, roles, status, is_home, home_rank)",
+  );
   lines.push(`values\n${rows.join(",\n")}`);
   lines.push(
     "on conflict (theater_id, user_id) do update set",
     "  roles = excluded.roles,",
-    "  status = excluded.status;",
+    "  status = excluded.status,",
+    "  is_home = excluded.is_home,",
+    "  home_rank = excluded.home_rank;",
     "",
   );
+}
+
+function getHomeTheaterKeys(user) {
+  const many = Array.isArray(user.homeTheaters)
+    ? user.homeTheaters.map((value, index) =>
+        requireRef(value, user.key, `homeTheaters[${index}]`),
+      )
+    : [];
+
+  if (many.length > 0) {
+    return many;
+  }
+
+  if (user.homeTheater) {
+    return [requireRef(user.homeTheater, user.key, "homeTheater")];
+  }
+
+  return [];
 }
 
 function pushShowData(lines, shows, userByKey, theaterByKey) {

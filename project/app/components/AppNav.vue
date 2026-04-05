@@ -8,7 +8,7 @@ import {
 
 const route = useRoute();
 const { isAuthed } = useUserIdentity();
-const { homeTheater, homePermissions } = useHomeTheaterState();
+const { homeTheater, homePermissions, homeTheaters } = useHomeTheaterState();
 const mobileNavOpen = ref(false);
 
 const navItems = computed(() => {
@@ -27,9 +27,7 @@ const navItems = computed(() => {
   ];
 });
 
-const homeTheaterPrimaryTo = computed(() =>
-  homeTheater.value ? `/theaters/${homeTheater.value.slug}` : "/theaters",
-);
+const homeTheaterPrimaryTo = computed(() => "/theaters");
 
 const navTone = (to: string): StageButtonTone => {
   if (to.startsWith("/theaters") || to.startsWith("/review")) return "theater";
@@ -54,14 +52,14 @@ const desktopNavItems = computed<NavigationMenuItem[]>(() => {
 
   const items: NavigationMenuItem[] = [
     {
-      label: "My Theater",
+      label: "Theaters",
       to: homeTheaterPrimaryTo.value,
       active: isTheaterNavActive.value,
       class: desktopNavToneClass("/theaters", isTheaterNavActive.value),
       children: [
         {
-          label: homeTheater.value?.name || "Open My Theater",
-          description: "Go to your home theater page.",
+          label: "Open Theater Hub",
+          description: "Open your personalized multi-home theater hub.",
           icon: "i-heroicons-building-library",
           to: homeTheaterPrimaryTo.value,
         },
@@ -119,6 +117,16 @@ const desktopNavItems = computed<NavigationMenuItem[]>(() => {
   }
 
   items[0].children = [
+    ...(homeTheaters.value.length
+      ? [
+          {
+            label: homeTheater.value?.name || "Primary Home Theater",
+            description: "Jump into the first home theater card directly.",
+            icon: "i-heroicons-home",
+            to: `/theaters/${homeTheater.value?.slug}`,
+          },
+        ]
+      : []),
     ...(items[0].children || []),
     {
       label: "Browse Theaters",
@@ -234,7 +242,7 @@ watch(
                               <p class="mt-1 text-sm stage-muted">
                                 {{
                                   homeTheater?.name ||
-                                  "Home theater not set yet"
+                                  "No home theaters set yet"
                                 }}
                               </p>
                             </div>
@@ -247,7 +255,17 @@ watch(
                               tone="theater"
                               :active="isTheaterNavActive"
                             >
-                              Open My Theater
+                              Open Theater Hub
+                            </StageButton>
+                            <StageButton
+                              v-if="homeTheater"
+                              block
+                              :to="`/theaters/${homeTheater.slug}`"
+                              variant="ghost"
+                              tone="theater"
+                              :active="isTheaterNavActive"
+                            >
+                              Open Primary Theater
                             </StageButton>
                             <StageButton
                               block

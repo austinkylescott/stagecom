@@ -409,6 +409,8 @@ export type Database = {
       theater_memberships: {
         Row: {
           created_at: string;
+          home_rank: number | null;
+          is_home: boolean;
           roles: Database["public"]["Enums"]["theater_role"][];
           status: Database["public"]["Enums"]["membership_status"];
           theater_id: string;
@@ -416,6 +418,8 @@ export type Database = {
         };
         Insert: {
           created_at?: string;
+          home_rank?: number | null;
+          is_home?: boolean;
           roles?: Database["public"]["Enums"]["theater_role"][];
           status?: Database["public"]["Enums"]["membership_status"];
           theater_id: string;
@@ -423,6 +427,8 @@ export type Database = {
         };
         Update: {
           created_at?: string;
+          home_rank?: number | null;
+          is_home?: boolean;
           roles?: Database["public"]["Enums"]["theater_role"][];
           status?: Database["public"]["Enums"]["membership_status"];
           theater_id?: string;
@@ -452,6 +458,8 @@ export type Database = {
           created_at: string;
           id: string;
           name: string;
+          upcoming_other_events_limit: number;
+          upcoming_shows_limit: number;
           postal_code: string | null;
           slug: string;
           state_region: string | null;
@@ -466,6 +474,8 @@ export type Database = {
           created_at?: string;
           id?: string;
           name: string;
+          upcoming_other_events_limit?: number;
+          upcoming_shows_limit?: number;
           postal_code?: string | null;
           slug: string;
           state_region?: string | null;
@@ -480,6 +490,8 @@ export type Database = {
           created_at?: string;
           id?: string;
           name?: string;
+          upcoming_other_events_limit?: number;
+          upcoming_shows_limit?: number;
           postal_code?: string | null;
           slug?: string;
           state_region?: string | null;

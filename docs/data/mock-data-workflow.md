@@ -55,6 +55,28 @@ Typical workflow:
 4. Run the auth seed script to create or sync users and produce `project/mock-data.resolved.json`.
 5. Seed app data from the resolved config.
 
+## Home Theater Config Shape
+
+The mock-data generator now supports multi-home theater state on memberships.
+
+- Preferred shape: `users[].homeTheaters` as an ordered array of theater keys
+- Legacy fallback: `users[].homeTheater` as a single theater key
+
+Behavior:
+
+- The first home theater in the array is also mirrored into `profiles.home_theater_id` as a compatibility pointer
+- Membership rows now receive `is_home` and `home_rank` values based on the ordered home-theater list
+- Home theater entries must still correspond to active theater memberships in the config; the seed does not invent membership implicitly
+
+## Theater Board Settings Shape
+
+The mock-data generator supports theater-level board display limits through optional theater fields:
+
+- `theaters[].upcomingShowsLimit`
+- `theaters[].upcomingOtherEventsLimit`
+
+These values seed the total number of upcoming public shows and non-show public events the theater board will display, including the dashboard slot for each type.
+
 ## Commands
 
 Run commands from `project/`.
@@ -96,7 +118,9 @@ npm run supabase:stop
 The example config intentionally covers:
 
 - Theater manager, staff, producer, and performer roles
+- Multi-home membership-compatible theater pinning via membership-backed home state
 - Theater-local timezone display scenarios via `theaters[].timezone`
+- Theater board display-limit scenarios via `theaters[].upcomingShowsLimit` and `theaters[].upcomingOtherEventsLimit`
 - Explicit cast membership separate from producer roles
 - Approved, pending review, and draft show states
 - Show and practice event types

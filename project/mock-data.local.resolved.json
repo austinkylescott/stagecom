@@ -1,0 +1,2218 @@
+{
+  "users": [
+    {
+      "key": "focus_manager",
+      "id": "570f4775-9de8-4b5f-bf86-cc98cfc968e0",
+      "auth": {
+        "email": "focus.manager@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Maya Manager",
+      "timezone": "America/Chicago",
+      "pronouns": "she/her",
+      "city": "Oklahoma City, OK",
+      "handle": "maya-manager",
+      "bio": "Keeps The Focus Theater review queue moving.",
+      "visibility": "theater_only",
+      "homeTheater": "focus_theater",
+      "notificationPreferences": {
+        "email": true,
+        "inApp": true
+      }
+    },
+    {
+      "key": "focus_staff_1",
+      "id": "4b74d027-c964-497c-9060-16805a5253c6",
+      "auth": {
+        "email": "focus.staff.one@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Sam Staff",
+      "timezone": "America/Chicago",
+      "pronouns": "he/they",
+      "city": "Oklahoma City, OK",
+      "handle": "sam-staff",
+      "bio": "Handles staff approvals and logistics.",
+      "visibility": "theater_only",
+      "homeTheater": "focus_theater"
+    },
+    {
+      "key": "focus_staff_2",
+      "id": "2a939144-5516-43e9-8be8-5e745122c3f1",
+      "auth": {
+        "email": "focus.staff.two@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Jordan Staff",
+      "timezone": "America/Chicago",
+      "pronouns": "they/them",
+      "city": "Norman, OK",
+      "handle": "jordan-staff",
+      "bio": "Covers theater operations and box office coordination.",
+      "visibility": "theater_only",
+      "homeTheater": "focus_theater"
+    },
+    {
+      "key": "focus_producer_1",
+      "id": "cb1a7033-8bcb-45a1-af7e-3392c2ebd705",
+      "auth": {
+        "email": "focus.producer.one@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Peter Producer",
+      "timezone": "America/Chicago",
+      "pronouns": "he/him",
+      "city": "Oklahoma City, OK",
+      "handle": "peter-producer",
+      "bio": "Produces flagship Focus Theater shows.",
+      "visibility": "public",
+      "homeTheater": "focus_theater"
+    },
+    {
+      "key": "focus_producer_2",
+      "id": "edd0bc6f-7224-4cce-8114-494223524f03",
+      "auth": {
+        "email": "focus.producer.two@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Casey Producer",
+      "timezone": "America/Chicago",
+      "pronouns": "she/her",
+      "city": "Edmond, OK",
+      "handle": "casey-producer",
+      "bio": "Produces late-night and experimental formats.",
+      "visibility": "public",
+      "homeTheater": "focus_theater"
+    },
+    {
+      "key": "focus_producer_3",
+      "id": "f2eba7d5-2151-4856-bbb5-c93fc9d04555",
+      "auth": {
+        "email": "focus.producer.three@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Riley Producer",
+      "timezone": "America/Chicago",
+      "pronouns": "she/they",
+      "city": "Moore, OK",
+      "handle": "riley-producer",
+      "bio": "Runs workshops, jams, and community casting calls.",
+      "visibility": "public",
+      "homeTheater": "focus_theater"
+    },
+    {
+      "key": "performer_1",
+      "id": "fa57a8ef-f0fc-455b-84fe-49139d0a2710",
+      "auth": {
+        "email": "performer.01@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Avery Harper",
+      "timezone": "America/Chicago",
+      "pronouns": "they/them",
+      "city": "Oklahoma City, OK",
+      "handle": "avery-harper",
+      "bio": "Musical improv regular.",
+      "visibility": "public",
+      "homeTheater": "focus_theater"
+    },
+    {
+      "key": "performer_2",
+      "id": "6c95f0d7-cf1a-4f3a-95e8-43f9c7605c37",
+      "auth": {
+        "email": "performer.02@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Blake Moreno",
+      "timezone": "America/Chicago",
+      "pronouns": "he/him",
+      "city": "Norman, OK",
+      "handle": "blake-moreno",
+      "bio": "House team performer and workshop sub.",
+      "visibility": "public",
+      "homeTheater": "focus_theater"
+    },
+    {
+      "key": "performer_3",
+      "id": "0113791e-8bf5-44f0-85f4-150a0851c4cb",
+      "auth": {
+        "email": "performer.03@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Cameron Lee",
+      "timezone": "America/Chicago",
+      "pronouns": "she/her",
+      "city": "Edmond, OK",
+      "handle": "cameron-lee",
+      "bio": "Character-heavy longform player.",
+      "visibility": "public",
+      "homeTheater": "focus_theater"
+    },
+    {
+      "key": "performer_4",
+      "id": "c5c5842f-145a-4bf0-8612-767728038189",
+      "auth": {
+        "email": "performer.04@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Dakota Kim",
+      "timezone": "America/Chicago",
+      "pronouns": "they/she",
+      "city": "Oklahoma City, OK",
+      "handle": "dakota-kim",
+      "bio": "Performer with high availability.",
+      "visibility": "public",
+      "homeTheater": "focus_theater"
+    },
+    {
+      "key": "performer_5",
+      "id": "605b9aac-0119-4c6e-a6bd-34cebe5a773a",
+      "auth": {
+        "email": "performer.05@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Elliot Price",
+      "timezone": "America/Chicago",
+      "pronouns": "he/they",
+      "city": "Yukon, OK",
+      "handle": "elliot-price",
+      "bio": "Available for direct invites and jams.",
+      "visibility": "public",
+      "homeTheater": "focus_theater"
+    },
+    {
+      "key": "performer_6",
+      "id": "bc69e8e4-6c95-4638-8c28-928abc99538c",
+      "auth": {
+        "email": "performer.06@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Finley Ross",
+      "timezone": "America/Chicago",
+      "pronouns": "she/they",
+      "city": "Oklahoma City, OK",
+      "handle": "finley-ross",
+      "bio": "Fast-paced shortform specialist.",
+      "visibility": "public",
+      "homeTheater": "focus_theater"
+    },
+    {
+      "key": "performer_7",
+      "id": "76c59e76-b60f-4f5e-939f-277e6c3b834b",
+      "auth": {
+        "email": "performer.07@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Gray Bennett",
+      "timezone": "America/Chicago",
+      "pronouns": "they/them",
+      "city": "Norman, OK",
+      "handle": "gray-bennett",
+      "bio": "Often requests into public casting calls.",
+      "visibility": "public",
+      "homeTheater": "focus_theater"
+    },
+    {
+      "key": "performer_8",
+      "id": "b25a6a6c-bdd7-460d-bd9a-cf63219f12b1",
+      "auth": {
+        "email": "performer.08@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Harper Stone",
+      "timezone": "America/Chicago",
+      "pronouns": "she/her",
+      "city": "Moore, OK",
+      "handle": "harper-stone",
+      "bio": "Known for genre formats and grounded scene work.",
+      "visibility": "public",
+      "homeTheater": "focus_theater"
+    },
+    {
+      "key": "performer_9",
+      "id": "94c59d0f-ca18-42e8-b389-6c368dcc5c12",
+      "auth": {
+        "email": "performer.09@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Indigo Wells",
+      "timezone": "America/Chicago",
+      "pronouns": "they/he",
+      "city": "Oklahoma City, OK",
+      "handle": "indigo-wells",
+      "bio": "Can fill both show and practice lineups.",
+      "visibility": "public",
+      "homeTheater": "focus_theater"
+    },
+    {
+      "key": "performer_10",
+      "id": "0693a09f-781a-4317-9e53-c123bccb0174",
+      "auth": {
+        "email": "performer.10@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Jules Navarro",
+      "timezone": "America/Chicago",
+      "pronouns": "she/her",
+      "city": "Edmond, OK",
+      "handle": "jules-navarro",
+      "bio": "Late-night ensemble regular.",
+      "visibility": "public",
+      "homeTheater": "focus_theater"
+    },
+    {
+      "key": "performer_11",
+      "id": "3bed3e8d-8ca1-4b50-bfdf-988d4c36ff78",
+      "auth": {
+        "email": "performer.11@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Kai Foster",
+      "timezone": "America/Chicago",
+      "pronouns": "he/him",
+      "city": "Norman, OK",
+      "handle": "kai-foster",
+      "bio": "Strong availability for weekends.",
+      "visibility": "public",
+      "homeTheater": "focus_theater"
+    },
+    {
+      "key": "performer_12",
+      "id": "7f65feb3-7503-407e-bece-cd341cbebdfb",
+      "auth": {
+        "email": "performer.12@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Logan Cruz",
+      "timezone": "America/Chicago",
+      "pronouns": "they/them",
+      "city": "Oklahoma City, OK",
+      "handle": "logan-cruz",
+      "bio": "Performer who often requests into open calls.",
+      "visibility": "public",
+      "homeTheater": "focus_theater"
+    },
+    {
+      "key": "performer_13",
+      "id": "82327ba6-68e3-4217-b127-18f0395301de",
+      "auth": {
+        "email": "performer.13@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Morgan Hale",
+      "timezone": "America/Chicago",
+      "pronouns": "she/they",
+      "city": "Yukon, OK",
+      "handle": "morgan-hale",
+      "bio": "Works both teaching and performance slots.",
+      "visibility": "public",
+      "homeTheater": "focus_theater"
+    },
+    {
+      "key": "performer_14",
+      "id": "1c3f2866-7fe5-4de9-888a-48162155a737",
+      "auth": {
+        "email": "performer.14@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Nico Alvarez",
+      "timezone": "America/Chicago",
+      "pronouns": "he/they",
+      "city": "Moore, OK",
+      "handle": "nico-alvarez",
+      "bio": "Good candidate for invite and public casting modes.",
+      "visibility": "public",
+      "homeTheater": "focus_theater"
+    },
+    {
+      "key": "performer_15",
+      "id": "8a5f55fb-48aa-473d-a93e-a553bd5cf3d8",
+      "auth": {
+        "email": "performer.15@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Oakley Reed",
+      "timezone": "America/Chicago",
+      "pronouns": "they/she",
+      "city": "Oklahoma City, OK",
+      "handle": "oakley-reed",
+      "bio": "Available for classes, jams, and lineups.",
+      "visibility": "public",
+      "homeTheater": "focus_theater"
+    },
+    {
+      "key": "performer_16",
+      "id": "0376ca59-8b12-4bb7-ae2f-ee9140fe13da",
+      "auth": {
+        "email": "performer.16@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Parker Shaw",
+      "timezone": "America/Chicago",
+      "pronouns": "he/him",
+      "city": "Edmond, OK",
+      "handle": "parker-shaw",
+      "bio": "Reliable accepted-cast state for regression checks.",
+      "visibility": "public",
+      "homeTheater": "focus_theater"
+    },
+    {
+      "key": "performer_17",
+      "id": "67fd1e60-9494-4aa1-afec-94625f1ebf6f",
+      "auth": {
+        "email": "performer.17@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Quinn Soto",
+      "timezone": "America/Chicago",
+      "pronouns": "they/them",
+      "city": "Norman, OK",
+      "handle": "quinn-soto",
+      "bio": "Often pending on invites until late in the week.",
+      "visibility": "public",
+      "homeTheater": "focus_theater"
+    },
+    {
+      "key": "performer_18",
+      "id": "73cd7ea0-e450-459b-ad88-c2ff42c7961d",
+      "auth": {
+        "email": "performer.18@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Rowan Tate",
+      "timezone": "America/Chicago",
+      "pronouns": "she/her",
+      "city": "Oklahoma City, OK",
+      "handle": "rowan-tate",
+      "bio": "Good coverage for performer search and cast lists.",
+      "visibility": "public",
+      "homeTheater": "focus_theater"
+    },
+    {
+      "key": "performer_19",
+      "id": "5b9991ed-198e-4b9d-af16-cf812a4d0e1d",
+      "auth": {
+        "email": "performer.19@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Sage Turner",
+      "timezone": "America/Chicago",
+      "pronouns": "they/he",
+      "city": "Yukon, OK",
+      "handle": "sage-turner",
+      "bio": "Public-facing profile for search result testing.",
+      "visibility": "public",
+      "homeTheater": "focus_theater"
+    },
+    {
+      "key": "performer_20",
+      "id": "4dfb2afb-e95c-47d5-bfa4-1f8c187e27b9",
+      "auth": {
+        "email": "performer.20@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Tatum Brooks",
+      "timezone": "America/Chicago",
+      "pronouns": "she/they",
+      "city": "Moore, OK",
+      "handle": "tatum-brooks",
+      "bio": "Rounds out the Focus Theater test roster.",
+      "visibility": "public",
+      "homeTheater": "focus_theater"
+    },
+    {
+      "key": "spotlight_manager",
+      "id": "63b255ba-31ab-4b75-8dfb-501218cdfa15",
+      "auth": {
+        "email": "spotlight.manager@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Uma Spotlight",
+      "timezone": "America/Chicago",
+      "pronouns": "she/her",
+      "city": "Tulsa, OK",
+      "handle": "uma-spotlight",
+      "bio": "Keeps Spotlight Theater curated and reviewable.",
+      "visibility": "theater_only",
+      "homeTheater": "spotlight_theater"
+    },
+    {
+      "key": "spotlight_performer_1",
+      "id": "c368f1a2-2286-4447-9a9a-f5b161e0e0ba",
+      "auth": {
+        "email": "spotlight.performer.01@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Val Mercer",
+      "timezone": "America/Chicago",
+      "pronouns": "they/she",
+      "city": "Tulsa, OK",
+      "handle": "val-mercer",
+      "bio": "Shortform specialist at Spotlight Theater.",
+      "visibility": "public",
+      "homeTheater": "spotlight_theater"
+    },
+    {
+      "key": "spotlight_performer_2",
+      "id": "9d3bef0d-2450-4d75-b9d9-18ab47d322c2",
+      "auth": {
+        "email": "spotlight.performer.02@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Wren Calloway",
+      "timezone": "America/Chicago",
+      "pronouns": "he/they",
+      "city": "Broken Arrow, OK",
+      "handle": "wren-calloway",
+      "bio": "Performer available for indie and theater casting.",
+      "visibility": "public",
+      "homeTheater": "spotlight_theater"
+    },
+    {
+      "key": "spotlight_performer_3",
+      "id": "84d5e2d3-0166-47a6-8698-1544b3e0f437",
+      "auth": {
+        "email": "spotlight.performer.03@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Xan Porter",
+      "timezone": "America/Chicago",
+      "pronouns": "they/them",
+      "city": "Tulsa, OK",
+      "handle": "xan-porter",
+      "bio": "Useful cross-theater browse result from Tulsa.",
+      "visibility": "public",
+      "homeTheater": "spotlight_theater"
+    },
+    {
+      "key": "brickhouse_manager",
+      "id": "f558d93b-394e-4fb2-9c39-1a420aeb8e81",
+      "auth": {
+        "email": "brickhouse.manager@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Yara Brickhouse",
+      "timezone": "America/Chicago",
+      "pronouns": "she/they",
+      "city": "Norman, OK",
+      "handle": "yara-brickhouse",
+      "bio": "Runs the Brickhouse roster and approvals.",
+      "visibility": "theater_only",
+      "homeTheater": "brickhouse_theater"
+    },
+    {
+      "key": "brickhouse_performer_1",
+      "id": "b73b3859-48d9-4d10-9056-5e04dd184145",
+      "auth": {
+        "email": "brickhouse.performer.01@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Zoe Griffin",
+      "timezone": "America/Chicago",
+      "pronouns": "she/her",
+      "city": "Norman, OK",
+      "handle": "zoe-griffin",
+      "bio": "Norman-based performer for small-theater coverage.",
+      "visibility": "public",
+      "homeTheater": "brickhouse_theater"
+    },
+    {
+      "key": "brickhouse_performer_2",
+      "id": "2717fbe7-9186-40c3-b82e-e985504c9d0b",
+      "auth": {
+        "email": "brickhouse.performer.02@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Adrian Cole",
+      "timezone": "America/Chicago",
+      "pronouns": "he/him",
+      "city": "Norman, OK",
+      "handle": "adrian-cole",
+      "bio": "Useful for cross-theater cast search results.",
+      "visibility": "public",
+      "homeTheater": "brickhouse_theater"
+    },
+    {
+      "key": "brickhouse_performer_3",
+      "id": "7ab1caed-01cd-4387-8c51-474aa9c611bd",
+      "auth": {
+        "email": "brickhouse.performer.03@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Briar Sutton",
+      "timezone": "America/Chicago",
+      "pronouns": "they/she",
+      "city": "Oklahoma City, OK",
+      "handle": "briar-sutton",
+      "bio": "Performer who should appear outside the Focus roster.",
+      "visibility": "public",
+      "homeTheater": "brickhouse_theater"
+    },
+    {
+      "key": "riverfront_manager",
+      "id": "76929069-6622-4fe2-963b-48fad752c1e0",
+      "auth": {
+        "email": "riverfront.manager@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Celine Rivers",
+      "timezone": "America/Chicago",
+      "pronouns": "she/her",
+      "city": "Edmond, OK",
+      "handle": "celine-rivers",
+      "bio": "Coordinates the Riverfront lineup and practice nights.",
+      "visibility": "theater_only",
+      "homeTheater": "riverfront_theater"
+    },
+    {
+      "key": "riverfront_performer_1",
+      "id": "e7e801d0-db13-47d2-bf97-8f2aef113295",
+      "auth": {
+        "email": "riverfront.performer.01@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Drew Lane",
+      "timezone": "America/Chicago",
+      "pronouns": "he/they",
+      "city": "Edmond, OK",
+      "handle": "drew-lane",
+      "bio": "Riverfront ensemble member for browse variety.",
+      "visibility": "public",
+      "homeTheater": "riverfront_theater"
+    },
+    {
+      "key": "riverfront_performer_2",
+      "id": "71e3efd3-ab15-4cfb-82df-69fb9d3f07c4",
+      "auth": {
+        "email": "riverfront.performer.02@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Emery Pike",
+      "timezone": "America/Chicago",
+      "pronouns": "they/them",
+      "city": "Edmond, OK",
+      "handle": "emery-pike",
+      "bio": "Strong secondary-theater performer profile.",
+      "visibility": "public",
+      "homeTheater": "riverfront_theater"
+    },
+    {
+      "key": "riverfront_performer_3",
+      "id": "10106aad-2cdd-4539-9fc9-86b36108f544",
+      "auth": {
+        "email": "riverfront.performer.03@example.com",
+        "password": "StagecomMock123!",
+        "emailConfirm": true
+      },
+      "displayName": "Flynn Avery",
+      "timezone": "America/Chicago",
+      "pronouns": "she/they",
+      "city": "Arcadia, OK",
+      "handle": "flynn-avery",
+      "bio": "Adds another visible performer outside Focus Theater.",
+      "visibility": "public",
+      "homeTheater": "riverfront_theater"
+    }
+  ],
+  "theaters": [
+    {
+      "key": "focus_theater",
+      "id": "fc1fd299-9e12-4934-840b-bd3227b2eb67",
+      "name": "The Focus Theater",
+      "slug": "focus-theater",
+      "tagline": "Dense roster for testing lineups, permissions, and requests.",
+      "timezone": "America/Chicago",
+      "upcomingShowsLimit": 5,
+      "upcomingOtherEventsLimit": 5,
+      "street": "4900 N Western Ave",
+      "city": "Oklahoma City",
+      "stateRegion": "OK",
+      "postalCode": "73118",
+      "country": "USA",
+      "memberships": [
+        {
+          "user": "focus_manager",
+          "roles": [
+            "manager"
+          ]
+        },
+        {
+          "user": "focus_staff_1",
+          "roles": [
+            "staff"
+          ]
+        },
+        {
+          "user": "focus_staff_2",
+          "roles": [
+            "staff"
+          ]
+        },
+        {
+          "user": "focus_producer_1",
+          "roles": [
+            "member"
+          ]
+        },
+        {
+          "user": "focus_producer_2",
+          "roles": [
+            "member"
+          ]
+        },
+        {
+          "user": "focus_producer_3",
+          "roles": [
+            "member"
+          ]
+        },
+        {
+          "user": "performer_1",
+          "roles": [
+            "member"
+          ]
+        },
+        {
+          "user": "performer_2",
+          "roles": [
+            "member"
+          ]
+        },
+        {
+          "user": "performer_3",
+          "roles": [
+            "member"
+          ]
+        },
+        {
+          "user": "performer_4",
+          "roles": [
+            "member"
+          ]
+        },
+        {
+          "user": "performer_5",
+          "roles": [
+            "member"
+          ]
+        },
+        {
+          "user": "performer_6",
+          "roles": [
+            "member"
+          ]
+        },
+        {
+          "user": "performer_7",
+          "roles": [
+            "member"
+          ]
+        },
+        {
+          "user": "performer_8",
+          "roles": [
+            "member"
+          ]
+        },
+        {
+          "user": "performer_9",
+          "roles": [
+            "member"
+          ]
+        },
+        {
+          "user": "performer_10",
+          "roles": [
+            "member"
+          ]
+        },
+        {
+          "user": "performer_11",
+          "roles": [
+            "member"
+          ]
+        },
+        {
+          "user": "performer_12",
+          "roles": [
+            "member"
+          ]
+        },
+        {
+          "user": "performer_13",
+          "roles": [
+            "member"
+          ]
+        },
+        {
+          "user": "performer_14",
+          "roles": [
+            "member"
+          ]
+        },
+        {
+          "user": "performer_15",
+          "roles": [
+            "member"
+          ]
+        },
+        {
+          "user": "performer_16",
+          "roles": [
+            "member"
+          ]
+        },
+        {
+          "user": "performer_17",
+          "roles": [
+            "member"
+          ]
+        },
+        {
+          "user": "performer_18",
+          "roles": [
+            "member"
+          ]
+        },
+        {
+          "user": "performer_19",
+          "roles": [
+            "member"
+          ]
+        },
+        {
+          "user": "performer_20",
+          "roles": [
+            "member"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "spotlight_theater",
+      "id": "dddddddd-dddd-4ddd-8ddd-ddddddddddd1",
+      "name": "Spotlight Theater",
+      "slug": "spotlight-theater",
+      "tagline": "Compact roster for smaller-theater testing.",
+      "timezone": "America/Chicago",
+      "upcomingShowsLimit": 3,
+      "upcomingOtherEventsLimit": 2,
+      "street": "110 Main St",
+      "city": "Tulsa",
+      "stateRegion": "OK",
+      "postalCode": "74103",
+      "country": "USA",
+      "memberships": [
+        {
+          "user": "spotlight_manager",
+          "roles": [
+            "manager"
+          ]
+        },
+        {
+          "user": "spotlight_performer_1",
+          "roles": [
+            "member"
+          ]
+        },
+        {
+          "user": "spotlight_performer_2",
+          "roles": [
+            "member"
+          ]
+        },
+        {
+          "user": "spotlight_performer_3",
+          "roles": [
+            "member"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "brickhouse_theater",
+      "id": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee1",
+      "name": "Brickhouse Theater",
+      "slug": "brickhouse-theater",
+      "tagline": "Small Norman roster for alternate theater coverage.",
+      "timezone": "America/Chicago",
+      "street": "215 Gray St",
+      "city": "Norman",
+      "stateRegion": "OK",
+      "postalCode": "73069",
+      "country": "USA",
+      "memberships": [
+        {
+          "user": "brickhouse_manager",
+          "roles": [
+            "manager"
+          ]
+        },
+        {
+          "user": "brickhouse_performer_1",
+          "roles": [
+            "member"
+          ]
+        },
+        {
+          "user": "brickhouse_performer_2",
+          "roles": [
+            "member"
+          ]
+        },
+        {
+          "user": "brickhouse_performer_3",
+          "roles": [
+            "member"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "riverfront_theater",
+      "id": "ffffffff-ffff-4fff-8fff-fffffffffff1",
+      "name": "Riverfront Theater",
+      "slug": "riverfront-theater",
+      "tagline": "Edmond roster for multi-theater browse and casting tests.",
+      "timezone": "America/Chicago",
+      "street": "48 Riverfront Dr",
+      "city": "Edmond",
+      "stateRegion": "OK",
+      "postalCode": "73034",
+      "country": "USA",
+      "memberships": [
+        {
+          "user": "riverfront_manager",
+          "roles": [
+            "manager"
+          ]
+        },
+        {
+          "user": "riverfront_performer_1",
+          "roles": [
+            "member"
+          ]
+        },
+        {
+          "user": "riverfront_performer_2",
+          "roles": [
+            "member"
+          ]
+        },
+        {
+          "user": "riverfront_performer_3",
+          "roles": [
+            "member"
+          ]
+        }
+      ]
+    }
+  ],
+  "shows": [
+    {
+      "key": "focus-friday-jam",
+      "theater": "focus_theater",
+      "createdBy": "focus_producer_1",
+      "status": "approved",
+      "eventType": "show",
+      "title": "Friday Focus Jam",
+      "description": "Approved house-style jam with a dense accepted lineup.",
+      "castingMode": "direct_invite",
+      "castMin": 6,
+      "castMax": 10,
+      "isCastFinalized": true,
+      "isPublicListed": true,
+      "ticketUrl": "https://example.com/focus-friday-jam",
+      "onSaleAt": "2026-03-22T16:00:00Z",
+      "producers": [
+        "focus_producer_1"
+      ],
+      "occurrences": [
+        {
+          "key": "week-1",
+          "startsAt": "2026-03-28T01:00:00Z",
+          "endsAt": "2026-03-28T02:30:00Z"
+        }
+      ],
+      "cast": [
+        {
+          "user": "performer_1",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 1
+        },
+        {
+          "user": "performer_2",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 2
+        },
+        {
+          "user": "performer_3",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 3
+        },
+        {
+          "user": "performer_4",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 4
+        },
+        {
+          "user": "performer_5",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 5
+        },
+        {
+          "user": "performer_6",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 6
+        },
+        {
+          "user": "performer_7",
+          "source": "invited",
+          "status": "pending",
+          "programOrder": 7
+        }
+      ],
+      "reviewEvents": [
+        {
+          "key": "approved",
+          "action": "approved",
+          "actor": "focus_manager",
+          "note": "Approved flagship jam."
+        }
+      ],
+      "notifications": [
+        {
+          "key": "accepted-cast",
+          "user": "performer_1",
+          "type": "show_invite",
+          "entityType": "cast",
+          "entity": {
+            "type": "cast",
+            "key": "performer_1"
+          },
+          "payload": {
+            "message": "You are in Friday Focus Jam."
+          },
+          "dedupeKey": "focus-friday-jam:performer_1:invite"
+        }
+      ],
+      "emailOutbox": [
+        {
+          "key": "accepted-cast",
+          "user": "performer_1",
+          "template": "invite_email",
+          "payload": {
+            "subject": "Friday Focus Jam lineup confirmed"
+          },
+          "dedupeKey": "focus-friday-jam:performer_1:invite"
+        }
+      ]
+    },
+    {
+      "key": "focus-saturday-house",
+      "theater": "focus_theater",
+      "createdBy": "focus_producer_2",
+      "status": "pending_review",
+      "eventType": "show",
+      "title": "Saturday House Blend",
+      "description": "Pending review example with public casting requests.",
+      "castingMode": "public_casting",
+      "castMin": 8,
+      "castMax": 12,
+      "isCastFinalized": false,
+      "isPublicListed": false,
+      "producers": [
+        "focus_producer_2"
+      ],
+      "occurrences": [
+        {
+          "key": "week-1",
+          "startsAt": "2026-03-29T01:30:00Z",
+          "endsAt": "2026-03-29T03:00:00Z"
+        }
+      ],
+      "cast": [
+        {
+          "user": "performer_8",
+          "source": "requested",
+          "status": "pending"
+        },
+        {
+          "user": "performer_9",
+          "source": "requested",
+          "status": "pending"
+        },
+        {
+          "user": "performer_10",
+          "source": "requested",
+          "status": "pending"
+        }
+      ],
+      "reviewEvents": [
+        {
+          "key": "submitted",
+          "action": "submitted",
+          "actor": "focus_producer_2",
+          "note": "Queued for manager review."
+        }
+      ],
+      "notifications": [
+        {
+          "key": "submitted",
+          "user": "focus_producer_2",
+          "type": "show_submitted",
+          "entityType": "show",
+          "entity": {
+            "type": "show",
+            "key": "focus-saturday-house"
+          },
+          "payload": {
+            "message": "Saturday House Blend is waiting for review."
+          },
+          "dedupeKey": "focus-saturday-house:submitted"
+        }
+      ]
+    },
+    {
+      "key": "focus-sunday-late",
+      "theater": "focus_theater",
+      "createdBy": "focus_producer_3",
+      "status": "approved",
+      "eventType": "show",
+      "title": "Sunday Late Set",
+      "description": "Approved late-night format with mixed cast states.",
+      "castingMode": "theater_casting",
+      "castMin": 5,
+      "castMax": 8,
+      "isCastFinalized": false,
+      "isPublicListed": true,
+      "producers": [
+        "focus_producer_3"
+      ],
+      "occurrences": [
+        {
+          "key": "week-1",
+          "startsAt": "2026-03-31T00:00:00Z",
+          "endsAt": "2026-03-31T01:15:00Z"
+        }
+      ],
+      "cast": [
+        {
+          "user": "performer_11",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 1
+        },
+        {
+          "user": "performer_12",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 2
+        },
+        {
+          "user": "performer_13",
+          "source": "invited",
+          "status": "declined",
+          "programOrder": 3
+        },
+        {
+          "user": "performer_14",
+          "source": "invited",
+          "status": "pending",
+          "programOrder": 4
+        },
+        {
+          "user": "performer_15",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 5
+        }
+      ],
+      "reviewEvents": [
+        {
+          "key": "approved",
+          "action": "approved",
+          "actor": "focus_staff_1",
+          "note": "Approved for public listing."
+        }
+      ]
+    },
+    {
+      "key": "focus-open-practice",
+      "theater": "focus_theater",
+      "createdBy": "focus_staff_1",
+      "status": "draft",
+      "eventType": "practice",
+      "title": "Open Practice",
+      "description": "Practice event for theater-casting and RSVP states.",
+      "castingMode": "theater_casting",
+      "castMin": 6,
+      "castMax": 16,
+      "isCastFinalized": false,
+      "isPublicListed": false,
+      "producers": [
+        "focus_staff_1"
+      ],
+      "occurrences": [
+        {
+          "key": "week-1",
+          "startsAt": "2026-04-02T00:30:00Z",
+          "endsAt": "2026-04-02T02:00:00Z"
+        }
+      ],
+      "cast": [
+        {
+          "user": "performer_16",
+          "source": "invited",
+          "status": "accepted"
+        },
+        {
+          "user": "performer_17",
+          "source": "invited",
+          "status": "pending"
+        },
+        {
+          "user": "performer_18",
+          "source": "invited",
+          "status": "pending"
+        },
+        {
+          "user": "performer_19",
+          "source": "invited",
+          "status": "declined"
+        },
+        {
+          "user": "performer_20",
+          "source": "invited",
+          "status": "accepted"
+        }
+      ]
+    },
+    {
+      "key": "focus-workshop-night",
+      "theater": "focus_theater",
+      "createdBy": "focus_producer_3",
+      "status": "approved",
+      "eventType": "workshop",
+      "title": "Workshop Night",
+      "description": "Approved workshop event for non-show event type coverage.",
+      "castingMode": "direct_invite",
+      "castMin": 4,
+      "castMax": 20,
+      "isCastFinalized": false,
+      "isPublicListed": true,
+      "producers": [
+        "focus_producer_3"
+      ],
+      "occurrences": [
+        {
+          "key": "week-1",
+          "startsAt": "2026-04-04T00:00:00Z",
+          "endsAt": "2026-04-04T02:00:00Z"
+        }
+      ],
+      "cast": [
+        {
+          "user": "performer_1",
+          "source": "invited",
+          "status": "accepted"
+        },
+        {
+          "user": "performer_8",
+          "source": "invited",
+          "status": "accepted"
+        },
+        {
+          "user": "performer_12",
+          "source": "invited",
+          "status": "accepted"
+        },
+        {
+          "user": "performer_18",
+          "source": "invited",
+          "status": "pending"
+        }
+      ],
+      "reviewEvents": [
+        {
+          "key": "approved",
+          "action": "approved",
+          "actor": "focus_manager",
+          "note": "Workshop cleared for listing."
+        }
+      ]
+    },
+    {
+      "key": "focus-producer-lab",
+      "theater": "focus_theater",
+      "createdBy": "focus_producer_1",
+      "status": "approved",
+      "eventType": "show",
+      "title": "Producer Lab",
+      "description": "Public-casting show with accepted, pending, withdrawn, and declined cast states for producer testing.",
+      "castingMode": "public_casting",
+      "castMin": 5,
+      "castMax": 8,
+      "isCastFinalized": false,
+      "isPublicListed": true,
+      "ticketUrl": "https://example.com/producer-lab",
+      "onSaleAt": "2026-04-05T16:00:00Z",
+      "producers": [
+        "focus_producer_1"
+      ],
+      "occurrences": [
+        {
+          "key": "week-1",
+          "startsAt": "2026-04-10T01:00:00Z",
+          "endsAt": "2026-04-10T02:30:00Z"
+        }
+      ],
+      "cast": [
+        {
+          "user": "performer_7",
+          "source": "requested",
+          "status": "pending"
+        },
+        {
+          "user": "performer_8",
+          "source": "requested",
+          "status": "accepted",
+          "programOrder": 1
+        },
+        {
+          "user": "performer_9",
+          "source": "requested",
+          "status": "pending"
+        },
+        {
+          "user": "performer_10",
+          "source": "requested",
+          "status": "withdrawn"
+        },
+        {
+          "user": "performer_11",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 2
+        },
+        {
+          "user": "performer_12",
+          "source": "invited",
+          "status": "declined"
+        }
+      ],
+      "reviewEvents": [
+        {
+          "key": "approved",
+          "action": "approved",
+          "actor": "focus_manager",
+          "note": "Approved for producer visibility scenarios."
+        }
+      ]
+    },
+    {
+      "key": "focus-midweek-experiment",
+      "theater": "focus_theater",
+      "createdBy": "focus_producer_1",
+      "status": "draft",
+      "eventType": "show",
+      "title": "Midweek Experiment",
+      "description": "Draft invite-only show with active and inactive invite states for producer workflow checks.",
+      "castingMode": "direct_invite",
+      "castMin": 4,
+      "castMax": 7,
+      "isCastFinalized": false,
+      "isPublicListed": false,
+      "producers": [
+        "focus_producer_1"
+      ],
+      "occurrences": [
+        {
+          "key": "week-1",
+          "startsAt": "2026-04-12T00:30:00Z",
+          "endsAt": "2026-04-12T01:45:00Z"
+        }
+      ],
+      "cast": [
+        {
+          "user": "performer_13",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 1
+        },
+        {
+          "user": "performer_14",
+          "source": "invited",
+          "status": "pending",
+          "programOrder": 2
+        },
+        {
+          "user": "performer_15",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 3
+        },
+        {
+          "user": "performer_16",
+          "source": "invited",
+          "status": "removed"
+        },
+        {
+          "user": "performer_17",
+          "source": "invited",
+          "status": "declined"
+        }
+      ]
+    },
+    {
+      "key": "focus-community-clash",
+      "theater": "focus_theater",
+      "createdBy": "focus_producer_2",
+      "status": "approved",
+      "eventType": "show",
+      "title": "Community Clash",
+      "description": "Theater-casting show with accepted castmates, pending requests, and pending invites.",
+      "castingMode": "theater_casting",
+      "castMin": 6,
+      "castMax": 10,
+      "isCastFinalized": false,
+      "isPublicListed": true,
+      "ticketUrl": "https://example.com/community-clash",
+      "onSaleAt": "2026-04-06T16:00:00Z",
+      "producers": [
+        "focus_producer_2"
+      ],
+      "occurrences": [
+        {
+          "key": "week-1",
+          "startsAt": "2026-04-13T01:30:00Z",
+          "endsAt": "2026-04-13T03:00:00Z"
+        }
+      ],
+      "cast": [
+        {
+          "user": "performer_1",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 1
+        },
+        {
+          "user": "performer_2",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 2
+        },
+        {
+          "user": "performer_3",
+          "source": "invited",
+          "status": "pending",
+          "programOrder": 3
+        },
+        {
+          "user": "performer_4",
+          "source": "requested",
+          "status": "pending"
+        },
+        {
+          "user": "performer_5",
+          "source": "requested",
+          "status": "accepted",
+          "programOrder": 4
+        },
+        {
+          "user": "performer_6",
+          "source": "requested",
+          "status": "withdrawn"
+        }
+      ],
+      "reviewEvents": [
+        {
+          "key": "approved",
+          "action": "approved",
+          "actor": "focus_staff_2",
+          "note": "Approved with mixed cast visibility states."
+        }
+      ]
+    },
+    {
+      "key": "focus-coaching-lab",
+      "theater": "focus_theater",
+      "createdBy": "focus_producer_3",
+      "status": "approved",
+      "eventType": "workshop",
+      "title": "Coaching Lab",
+      "description": "Public workshop series for testing a deeper non-show programming queue.",
+      "castingMode": "direct_invite",
+      "castMin": 4,
+      "castMax": 18,
+      "isCastFinalized": false,
+      "isPublicListed": true,
+      "producers": [
+        "focus_producer_3"
+      ],
+      "occurrences": [
+        {
+          "key": "week-1",
+          "startsAt": "2026-04-11T19:00:00Z",
+          "endsAt": "2026-04-11T21:00:00Z"
+        }
+      ],
+      "cast": [
+        {
+          "user": "performer_2",
+          "source": "invited",
+          "status": "accepted"
+        },
+        {
+          "user": "performer_5",
+          "source": "invited",
+          "status": "accepted"
+        },
+        {
+          "user": "performer_9",
+          "source": "invited",
+          "status": "pending"
+        },
+        {
+          "user": "performer_16",
+          "source": "invited",
+          "status": "accepted"
+        }
+      ],
+      "reviewEvents": [
+        {
+          "key": "approved",
+          "action": "approved",
+          "actor": "focus_manager",
+          "note": "Approved workshop block for board-limit testing."
+        }
+      ]
+    },
+    {
+      "key": "focus-town-hall",
+      "theater": "focus_theater",
+      "createdBy": "focus_staff_2",
+      "status": "approved",
+      "eventType": "meeting",
+      "title": "Theater Town Hall",
+      "description": "Public meeting event for board configuration and upcoming-event density checks.",
+      "castingMode": "theater_casting",
+      "castMin": 3,
+      "castMax": 20,
+      "isCastFinalized": false,
+      "isPublicListed": true,
+      "producers": [
+        "focus_staff_2"
+      ],
+      "occurrences": [
+        {
+          "key": "week-1",
+          "startsAt": "2026-04-15T23:30:00Z",
+          "endsAt": "2026-04-16T01:00:00Z"
+        }
+      ],
+      "cast": [
+        {
+          "user": "performer_1",
+          "source": "invited",
+          "status": "accepted"
+        },
+        {
+          "user": "performer_6",
+          "source": "invited",
+          "status": "accepted"
+        },
+        {
+          "user": "performer_10",
+          "source": "invited",
+          "status": "pending"
+        }
+      ],
+      "reviewEvents": [
+        {
+          "key": "approved",
+          "action": "approved",
+          "actor": "focus_staff_1",
+          "note": "Approved public meeting for schedule density coverage."
+        }
+      ]
+    },
+    {
+      "key": "focus-monday-mixer-madness",
+      "theater": "focus_theater",
+      "createdBy": "focus_producer_1",
+      "status": "approved",
+      "eventType": "show",
+      "title": "Monday Mixer Madness",
+      "description": "Approved shortform show added to deepen the upcoming shows section.",
+      "castingMode": "theater_casting",
+      "castMin": 5,
+      "castMax": 8,
+      "isCastFinalized": false,
+      "isPublicListed": true,
+      "ticketUrl": "https://example.com/monday-mixer-madness",
+      "onSaleAt": "2026-04-08T16:00:00Z",
+      "producers": [
+        "focus_producer_1"
+      ],
+      "occurrences": [
+        {
+          "key": "week-1",
+          "startsAt": "2026-04-16T01:00:00Z",
+          "endsAt": "2026-04-16T02:20:00Z"
+        }
+      ],
+      "cast": [
+        {
+          "user": "performer_3",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 1
+        },
+        {
+          "user": "performer_4",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 2
+        },
+        {
+          "user": "performer_8",
+          "source": "requested",
+          "status": "accepted",
+          "programOrder": 3
+        },
+        {
+          "user": "performer_9",
+          "source": "requested",
+          "status": "pending"
+        },
+        {
+          "user": "performer_12",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 4
+        }
+      ],
+      "reviewEvents": [
+        {
+          "key": "approved",
+          "action": "approved",
+          "actor": "focus_manager",
+          "note": "Approved to expand the public show queue."
+        }
+      ]
+    },
+    {
+      "key": "focus-open-audition-block",
+      "theater": "focus_theater",
+      "createdBy": "focus_staff_1",
+      "status": "approved",
+      "eventType": "audition",
+      "title": "Open Audition Block",
+      "description": "Public audition event for testing non-show cards beyond the dashboard slot.",
+      "castingMode": "public_casting",
+      "castMin": 4,
+      "castMax": 24,
+      "isCastFinalized": false,
+      "isPublicListed": true,
+      "producers": [
+        "focus_staff_1"
+      ],
+      "occurrences": [
+        {
+          "key": "week-1",
+          "startsAt": "2026-04-17T22:30:00Z",
+          "endsAt": "2026-04-18T00:30:00Z"
+        }
+      ],
+      "cast": [
+        {
+          "user": "performer_7",
+          "source": "requested",
+          "status": "pending"
+        },
+        {
+          "user": "performer_11",
+          "source": "requested",
+          "status": "pending"
+        },
+        {
+          "user": "performer_14",
+          "source": "requested",
+          "status": "accepted"
+        }
+      ],
+      "reviewEvents": [
+        {
+          "key": "approved",
+          "action": "approved",
+          "actor": "focus_manager",
+          "note": "Approved audition block for public board testing."
+        }
+      ]
+    },
+    {
+      "key": "focus-harold-heatwave",
+      "theater": "focus_theater",
+      "createdBy": "focus_producer_2",
+      "status": "approved",
+      "eventType": "show",
+      "title": "Harold Heatwave",
+      "description": "Approved longform show to broaden the future programming lineup.",
+      "castingMode": "direct_invite",
+      "castMin": 6,
+      "castMax": 10,
+      "isCastFinalized": true,
+      "isPublicListed": true,
+      "ticketUrl": "https://example.com/harold-heatwave",
+      "onSaleAt": "2026-04-09T16:00:00Z",
+      "producers": [
+        "focus_producer_2"
+      ],
+      "occurrences": [
+        {
+          "key": "week-1",
+          "startsAt": "2026-04-19T01:00:00Z",
+          "endsAt": "2026-04-19T02:35:00Z"
+        }
+      ],
+      "cast": [
+        {
+          "user": "performer_1",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 1
+        },
+        {
+          "user": "performer_5",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 2
+        },
+        {
+          "user": "performer_6",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 3
+        },
+        {
+          "user": "performer_10",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 4
+        },
+        {
+          "user": "performer_15",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 5
+        },
+        {
+          "user": "performer_18",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 6
+        }
+      ],
+      "reviewEvents": [
+        {
+          "key": "approved",
+          "action": "approved",
+          "actor": "focus_staff_2",
+          "note": "Approved longform headliner for display-limit testing."
+        }
+      ]
+    },
+    {
+      "key": "focus-saturday-skills-practice",
+      "theater": "focus_theater",
+      "createdBy": "focus_producer_3",
+      "status": "approved",
+      "eventType": "practice",
+      "title": "Saturday Skills Practice",
+      "description": "Public practice slot for checking how the board handles additional non-show entries.",
+      "castingMode": "theater_casting",
+      "castMin": 5,
+      "castMax": 16,
+      "isCastFinalized": false,
+      "isPublicListed": true,
+      "producers": [
+        "focus_producer_3"
+      ],
+      "occurrences": [
+        {
+          "key": "week-1",
+          "startsAt": "2026-04-20T16:00:00Z",
+          "endsAt": "2026-04-20T18:00:00Z"
+        }
+      ],
+      "cast": [
+        {
+          "user": "performer_4",
+          "source": "invited",
+          "status": "accepted"
+        },
+        {
+          "user": "performer_8",
+          "source": "invited",
+          "status": "accepted"
+        },
+        {
+          "user": "performer_13",
+          "source": "invited",
+          "status": "pending"
+        },
+        {
+          "user": "performer_19",
+          "source": "invited",
+          "status": "accepted"
+        }
+      ],
+      "reviewEvents": [
+        {
+          "key": "approved",
+          "action": "approved",
+          "actor": "focus_staff_1",
+          "note": "Approved practice for non-show board depth."
+        }
+      ]
+    },
+    {
+      "key": "focus-sunset-shortform",
+      "theater": "focus_theater",
+      "createdBy": "focus_producer_3",
+      "status": "approved",
+      "eventType": "show",
+      "title": "Sunset Shortform",
+      "description": "Approved shortform bill for testing larger show counts in the upcoming section.",
+      "castingMode": "theater_casting",
+      "castMin": 5,
+      "castMax": 9,
+      "isCastFinalized": false,
+      "isPublicListed": true,
+      "ticketUrl": "https://example.com/sunset-shortform",
+      "onSaleAt": "2026-04-12T16:00:00Z",
+      "producers": [
+        "focus_producer_3"
+      ],
+      "occurrences": [
+        {
+          "key": "week-1",
+          "startsAt": "2026-04-23T23:00:00Z",
+          "endsAt": "2026-04-24T00:30:00Z"
+        }
+      ],
+      "cast": [
+        {
+          "user": "performer_2",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 1
+        },
+        {
+          "user": "performer_7",
+          "source": "requested",
+          "status": "accepted",
+          "programOrder": 2
+        },
+        {
+          "user": "performer_9",
+          "source": "requested",
+          "status": "pending"
+        },
+        {
+          "user": "performer_14",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 3
+        },
+        {
+          "user": "performer_17",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 4
+        }
+      ],
+      "reviewEvents": [
+        {
+          "key": "approved",
+          "action": "approved",
+          "actor": "focus_manager",
+          "note": "Approved additional shortform bill."
+        }
+      ]
+    },
+    {
+      "key": "focus-midnight-monoscene",
+      "theater": "focus_theater",
+      "createdBy": "focus_producer_1",
+      "status": "approved",
+      "eventType": "show",
+      "title": "Midnight Monoscene",
+      "description": "Approved late-night monoscene show for upcoming board stress testing.",
+      "castingMode": "direct_invite",
+      "castMin": 4,
+      "castMax": 7,
+      "isCastFinalized": false,
+      "isPublicListed": true,
+      "ticketUrl": "https://example.com/midnight-monoscene",
+      "onSaleAt": "2026-04-15T16:00:00Z",
+      "producers": [
+        "focus_producer_1"
+      ],
+      "occurrences": [
+        {
+          "key": "week-1",
+          "startsAt": "2026-04-26T03:30:00Z",
+          "endsAt": "2026-04-26T04:45:00Z"
+        }
+      ],
+      "cast": [
+        {
+          "user": "performer_3",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 1
+        },
+        {
+          "user": "performer_11",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 2
+        },
+        {
+          "user": "performer_12",
+          "source": "invited",
+          "status": "pending",
+          "programOrder": 3
+        },
+        {
+          "user": "performer_16",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 4
+        }
+      ],
+      "reviewEvents": [
+        {
+          "key": "approved",
+          "action": "approved",
+          "actor": "focus_staff_2",
+          "note": "Approved monoscene slot for deeper future scheduling."
+        }
+      ]
+    },
+    {
+      "key": "focus-community-intensive",
+      "theater": "focus_theater",
+      "createdBy": "focus_producer_2",
+      "status": "approved",
+      "eventType": "workshop",
+      "title": "Community Workshop Intensive",
+      "description": "Public workshop intensive to keep the non-show list full when the board count increases.",
+      "castingMode": "direct_invite",
+      "castMin": 6,
+      "castMax": 24,
+      "isCastFinalized": false,
+      "isPublicListed": true,
+      "producers": [
+        "focus_producer_2"
+      ],
+      "occurrences": [
+        {
+          "key": "week-1",
+          "startsAt": "2026-04-27T23:00:00Z",
+          "endsAt": "2026-04-28T01:30:00Z"
+        }
+      ],
+      "cast": [
+        {
+          "user": "performer_1",
+          "source": "invited",
+          "status": "accepted"
+        },
+        {
+          "user": "performer_6",
+          "source": "invited",
+          "status": "accepted"
+        },
+        {
+          "user": "performer_12",
+          "source": "invited",
+          "status": "accepted"
+        },
+        {
+          "user": "performer_18",
+          "source": "invited",
+          "status": "pending"
+        }
+      ],
+      "reviewEvents": [
+        {
+          "key": "approved",
+          "action": "approved",
+          "actor": "focus_manager",
+          "note": "Approved intensive for non-show queue expansion."
+        }
+      ]
+    },
+    {
+      "key": "focus-team-mashup-showcase",
+      "theater": "focus_theater",
+      "createdBy": "focus_producer_2",
+      "status": "approved",
+      "eventType": "show",
+      "title": "Team Mashup Showcase",
+      "description": "Approved showcase added so the upcoming show list can scale beyond the default board count.",
+      "castingMode": "public_casting",
+      "castMin": 6,
+      "castMax": 10,
+      "isCastFinalized": false,
+      "isPublicListed": true,
+      "ticketUrl": "https://example.com/team-mashup-showcase",
+      "onSaleAt": "2026-04-17T16:00:00Z",
+      "producers": [
+        "focus_producer_2"
+      ],
+      "occurrences": [
+        {
+          "key": "week-1",
+          "startsAt": "2026-04-30T01:30:00Z",
+          "endsAt": "2026-04-30T03:00:00Z"
+        }
+      ],
+      "cast": [
+        {
+          "user": "performer_4",
+          "source": "requested",
+          "status": "accepted",
+          "programOrder": 1
+        },
+        {
+          "user": "performer_5",
+          "source": "requested",
+          "status": "accepted",
+          "programOrder": 2
+        },
+        {
+          "user": "performer_8",
+          "source": "requested",
+          "status": "pending"
+        },
+        {
+          "user": "performer_13",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 3
+        },
+        {
+          "user": "performer_19",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 4
+        }
+      ],
+      "reviewEvents": [
+        {
+          "key": "approved",
+          "action": "approved",
+          "actor": "focus_staff_1",
+          "note": "Approved showcase for larger board display ranges."
+        }
+      ]
+    },
+    {
+      "key": "spotlight-weeknight-mixer",
+      "theater": "spotlight_theater",
+      "createdBy": "spotlight_manager",
+      "status": "approved",
+      "eventType": "show",
+      "title": "Spotlight Weeknight Mixer",
+      "description": "Small-theater approved show for browse and cast list checks.",
+      "castingMode": "theater_casting",
+      "castMin": 3,
+      "castMax": 5,
+      "isCastFinalized": true,
+      "isPublicListed": true,
+      "producers": [
+        "spotlight_manager"
+      ],
+      "occurrences": [
+        {
+          "key": "week-1",
+          "startsAt": "2026-04-05T01:00:00Z",
+          "endsAt": "2026-04-05T02:15:00Z"
+        }
+      ],
+      "cast": [
+        {
+          "user": "spotlight_performer_1",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 1
+        },
+        {
+          "user": "spotlight_performer_2",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 2
+        },
+        {
+          "user": "spotlight_performer_3",
+          "source": "invited",
+          "status": "accepted",
+          "programOrder": 3
+        }
+      ],
+      "reviewEvents": [
+        {
+          "key": "approved",
+          "action": "approved",
+          "actor": "spotlight_manager",
+          "note": "Approved for Spotlight listing."
+        }
+      ]
+    },
+    {
+      "key": "brickhouse-late-show",
+      "theater": "brickhouse_theater",
+      "createdBy": "brickhouse_manager",
+      "status": "pending_review",
+      "eventType": "show",
+      "title": "Brickhouse Late Show",
+      "description": "Pending review small-theater example outside Focus Theater.",
+      "castingMode": "public_casting",
+      "castMin": 3,
+      "castMax": 6,
+      "isCastFinalized": false,
+      "isPublicListed": false,
+      "producers": [
+        "brickhouse_manager"
+      ],
+      "occurrences": [
+        {
+          "key": "week-1",
+          "startsAt": "2026-04-06T01:30:00Z",
+          "endsAt": "2026-04-06T02:45:00Z"
+        }
+      ],
+      "cast": [
+        {
+          "user": "brickhouse_performer_1",
+          "source": "requested",
+          "status": "pending"
+        },
+        {
+          "user": "brickhouse_performer_2",
+          "source": "requested",
+          "status": "pending"
+        },
+        {
+          "user": "brickhouse_performer_3",
+          "source": "requested",
+          "status": "accepted"
+        }
+      ],
+      "reviewEvents": [
+        {
+          "key": "submitted",
+          "action": "submitted",
+          "actor": "brickhouse_manager",
+          "note": "Submitted for manager-side review coverage."
+        }
+      ]
+    },
+    {
+      "key": "riverfront-open-practice",
+      "theater": "riverfront_theater",
+      "createdBy": "riverfront_manager",
+      "status": "approved",
+      "eventType": "practice",
+      "title": "Riverfront Open Practice",
+      "description": "Secondary-theater practice event for RSVP and roster checks.",
+      "castingMode": "theater_casting",
+      "castMin": 3,
+      "castMax": 8,
+      "isCastFinalized": false,
+      "isPublicListed": true,
+      "producers": [
+        "riverfront_manager"
+      ],
+      "occurrences": [
+        {
+          "key": "week-1",
+          "startsAt": "2026-04-08T00:30:00Z",
+          "endsAt": "2026-04-08T02:00:00Z"
+        }
+      ],
+      "cast": [
+        {
+          "user": "riverfront_performer_1",
+          "source": "invited",
+          "status": "accepted"
+        },
+        {
+          "user": "riverfront_performer_2",
+          "source": "invited",
+          "status": "pending"
+        },
+        {
+          "user": "riverfront_performer_3",
+          "source": "invited",
+          "status": "accepted"
+        }
+      ],
+      "reviewEvents": [
+        {
+          "key": "approved",
+          "action": "approved",
+          "actor": "riverfront_manager",
+          "note": "Approved practice for Riverfront."
+        }
+      ]
+    }
+  ]
+}

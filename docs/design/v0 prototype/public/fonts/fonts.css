@@ -1,8 +1,0 @@
-/* Cubano Font - Bold display typeface for Stagecom branding */
-@font-face {
-  font-family: 'Cubano';
-  src: url('/fonts/Cubano.woff2') format('woff2');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}

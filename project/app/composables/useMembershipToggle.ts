@@ -54,6 +54,10 @@ export const useMembershipToggle = (
           exact: true,
         }),
         queryCache.invalidateQueries({
+          key: queryKeys.homeTheaterDashboardPrefix(),
+          exact: false,
+        }),
+        queryCache.invalidateQueries({
           key: queryKeys.memberShows(),
           exact: true,
         }),
@@ -77,6 +81,10 @@ export const useMembershipToggle = (
       queryCache.invalidateQueries({
         key: queryKeys.homeTheater(),
         exact: true,
+      });
+      queryCache.invalidateQueries({
+        key: queryKeys.homeTheaterDashboardPrefix(),
+        exact: false,
       });
       queryCache.invalidateQueries({
         key: queryKeys.memberShows(),

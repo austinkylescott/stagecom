@@ -59,10 +59,13 @@ create table theater_memberships (
     user_id uuid not null references profiles(id) on delete cascade,
     roles theater_role[] not null default array['member']::theater_role[],
     status membership_status not null default 'active',
+    is_home boolean not null default false,
+    home_rank integer,
     created_at timestamptz not null default now(),
     primary key (theater_id, user_id)
 );
 create index idx_theater_memberships_user on theater_memberships (user_id);
+create index idx_theater_memberships_user_home on theater_memberships (user_id, is_home);
 
 create table shows (
     id uuid primary key default gen_random_uuid(),

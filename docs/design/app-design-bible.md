@@ -71,12 +71,34 @@ Use these shared app primitives first:
 
 Use these theater detail components before copying page markup:
 
-- `project/app/components/theater/detail/TheaterShowCard.vue`
+- `project/app/components/theater/detail/TheaterUpcomingCard.vue`
 - `project/app/components/theater/detail/TheaterEventDateGroup.vue`
 
 If a new surface feels similar but not identical, prefer extending one of these rather than starting over.
 
 ## Visual Grammar
+
+### Semantic color mapping
+
+Stagecom uses a fixed semantic color system across the authenticated app. These meanings are not interchangeable.
+
+- `theater` uses the mint blue theater color: `#82bfb6`
+- `event` / `show` uses the yellow event color: `#eaa542`
+- `performer` / `people` / relationship-oriented surfaces use the red performer color: `#c76056`
+
+These map to the shared tokens already defined in `project/app/assets/css/main.css`:
+
+- `--stage-theater` = `#82bfb6`
+- `--stage-event` = `#eaa542`
+- `--stage-performer` = `#c76056`
+
+When choosing accents, chips, section wrappers, button tones, markers, or badges:
+
+- theater-wide context, theater dashboards, approvals, and theater destinations use mint blue
+- shows, schedules, calendars, and event-programming surfaces use yellow
+- people, cast, performer identity, and relationship-driven actions use red
+
+Do not swap these meanings for variety. Semantic consistency matters more than local novelty.
 
 ### Semantic tones
 
@@ -90,6 +112,54 @@ If a new surface feels similar but not identical, prefer extending one of these 
 - Primary dashboard modules should be readable, cream-forward, and ink-framed.
 - Dark or louder accent treatments should be selective, not the default wrapper for dense information.
 - Alerts, boards, and action groups should feel composed rather than ornamental.
+
+### Semantic surface variants
+
+Use semantic surface variants instead of passing raw color strings into components.
+
+The shared surface vocabulary is:
+
+- `theater`: mint-leaning dashboard and community summary surfaces
+- `event`: yellow-leaning programming and schedule surfaces
+- `performer`: red-leaning people or relationship surfaces
+- `paper`: neutral cream-forward supporting surfaces
+
+These variants should resolve through shared theme tokens in `project/app/assets/css/main.css`, not ad hoc `rgba(...)` values at call sites.
+
+For reusable components, prefer a semantic prop such as `surfaceTone="theater"` over a freeform class prop like `surfaceClass`.
+
+If a new surface tone is needed:
+
+1. add the token to the shared theme layer
+2. document the meaning here
+3. expose it through a semantic variant or prop
+
+Do not introduce one-off arbitrary color strings in page templates when a semantic surface already exists.
+
+### Tone workflow for new components
+
+When building a new reusable component that needs color or surface control, use this sequence:
+
+1. Decide the semantic meaning first.
+   Choose whether the component is `theater`, `event`, `performer`, or `paper`.
+
+2. Check whether the need belongs to a Nuxt UI primitive.
+   If the component is fundamentally a `UButton`, `UBadge`, `UCard`, `UInput`, or similar primitive, prefer expressing the tone in `project/app/app.config.ts`.
+
+3. If it is an app-specific composite component, expose a semantic prop.
+   Use a prop such as `surfaceTone`, `tone`, or `accentTone` rather than a freeform class string.
+
+4. Map that semantic prop to shared theme tokens.
+   Resolve the prop inside the component to shared theme-backed classes from `project/app/assets/css/main.css`.
+
+5. Only add a new semantic token when the existing set is insufficient.
+   If none of `theater`, `event`, `performer`, or `paper` is correct, add a new token in the shared theme layer first, then document its meaning here.
+
+6. Keep call sites semantic.
+   Page templates should say what the component means, for example `surface-tone="event"`, not how to paint it with ad hoc utility strings.
+
+7. Verify the result against nearby surfaces.
+   Make sure the new component still looks like it belongs with the authenticated app and does not introduce a local color dialect.
 
 ### Typography
 

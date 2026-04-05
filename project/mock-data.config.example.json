@@ -15,7 +15,7 @@
       "handle": "maya-manager",
       "bio": "Keeps The Focus Theater review queue moving.",
       "visibility": "theater_only",
-      "homeTheater": "focus_theater",
+      "homeTheaters": ["focus_theater"],
       "notificationPreferences": {
         "email": true,
         "inApp": true
@@ -36,7 +36,7 @@
       "handle": "sam-staff",
       "bio": "Handles staff approvals and logistics.",
       "visibility": "theater_only",
-      "homeTheater": "focus_theater"
+      "homeTheaters": ["focus_theater"]
     },
     {
       "key": "focus_staff_2",
@@ -53,7 +53,7 @@
       "handle": "jordan-staff",
       "bio": "Covers theater operations and box office coordination.",
       "visibility": "theater_only",
-      "homeTheater": "focus_theater"
+      "homeTheaters": ["focus_theater"]
     },
     {
       "key": "focus_producer_1",
@@ -659,6 +659,8 @@
       "slug": "focus-theater",
       "tagline": "Dense roster for testing lineups, permissions, and requests.",
       "timezone": "America/Chicago",
+      "upcomingShowsLimit": 5,
+      "upcomingOtherEventsLimit": 5,
       "street": "4900 N Western Ave",
       "city": "Oklahoma City",
       "stateRegion": "OK",
@@ -700,6 +702,8 @@
       "slug": "spotlight-theater",
       "tagline": "Compact roster for smaller-theater testing.",
       "timezone": "America/Chicago",
+      "upcomingShowsLimit": 3,
+      "upcomingOtherEventsLimit": 2,
       "street": "110 Main St",
       "city": "Tulsa",
       "stateRegion": "OK",
@@ -1006,6 +1010,289 @@
       ],
       "reviewEvents": [
         { "key": "approved", "action": "approved", "actor": "focus_staff_2", "note": "Approved with mixed cast visibility states." }
+      ]
+    },
+    {
+      "key": "focus-coaching-lab",
+      "theater": "focus_theater",
+      "createdBy": "focus_producer_3",
+      "status": "approved",
+      "eventType": "workshop",
+      "title": "Coaching Lab",
+      "description": "Public workshop series for testing a deeper non-show programming queue.",
+      "castingMode": "direct_invite",
+      "castMin": 4,
+      "castMax": 18,
+      "isCastFinalized": false,
+      "isPublicListed": true,
+      "producers": ["focus_producer_3"],
+      "occurrences": [
+        { "key": "week-1", "startsAt": "2026-04-11T19:00:00Z", "endsAt": "2026-04-11T21:00:00Z" }
+      ],
+      "cast": [
+        { "user": "performer_2", "source": "invited", "status": "accepted" },
+        { "user": "performer_5", "source": "invited", "status": "accepted" },
+        { "user": "performer_9", "source": "invited", "status": "pending" },
+        { "user": "performer_16", "source": "invited", "status": "accepted" }
+      ],
+      "reviewEvents": [
+        { "key": "approved", "action": "approved", "actor": "focus_manager", "note": "Approved workshop block for board-limit testing." }
+      ]
+    },
+    {
+      "key": "focus-town-hall",
+      "theater": "focus_theater",
+      "createdBy": "focus_staff_2",
+      "status": "approved",
+      "eventType": "meeting",
+      "title": "Theater Town Hall",
+      "description": "Public meeting event for board configuration and upcoming-event density checks.",
+      "castingMode": "theater_casting",
+      "castMin": 3,
+      "castMax": 20,
+      "isCastFinalized": false,
+      "isPublicListed": true,
+      "producers": ["focus_staff_2"],
+      "occurrences": [
+        { "key": "week-1", "startsAt": "2026-04-15T23:30:00Z", "endsAt": "2026-04-16T01:00:00Z" }
+      ],
+      "cast": [
+        { "user": "performer_1", "source": "invited", "status": "accepted" },
+        { "user": "performer_6", "source": "invited", "status": "accepted" },
+        { "user": "performer_10", "source": "invited", "status": "pending" }
+      ],
+      "reviewEvents": [
+        { "key": "approved", "action": "approved", "actor": "focus_staff_1", "note": "Approved public meeting for schedule density coverage." }
+      ]
+    },
+    {
+      "key": "focus-monday-mixer-madness",
+      "theater": "focus_theater",
+      "createdBy": "focus_producer_1",
+      "status": "approved",
+      "eventType": "show",
+      "title": "Monday Mixer Madness",
+      "description": "Approved shortform show added to deepen the upcoming shows section.",
+      "castingMode": "theater_casting",
+      "castMin": 5,
+      "castMax": 8,
+      "isCastFinalized": false,
+      "isPublicListed": true,
+      "ticketUrl": "https://example.com/monday-mixer-madness",
+      "onSaleAt": "2026-04-08T16:00:00Z",
+      "producers": ["focus_producer_1"],
+      "occurrences": [
+        { "key": "week-1", "startsAt": "2026-04-16T01:00:00Z", "endsAt": "2026-04-16T02:20:00Z" }
+      ],
+      "cast": [
+        { "user": "performer_3", "source": "invited", "status": "accepted", "programOrder": 1 },
+        { "user": "performer_4", "source": "invited", "status": "accepted", "programOrder": 2 },
+        { "user": "performer_8", "source": "requested", "status": "accepted", "programOrder": 3 },
+        { "user": "performer_9", "source": "requested", "status": "pending" },
+        { "user": "performer_12", "source": "invited", "status": "accepted", "programOrder": 4 }
+      ],
+      "reviewEvents": [
+        { "key": "approved", "action": "approved", "actor": "focus_manager", "note": "Approved to expand the public show queue." }
+      ]
+    },
+    {
+      "key": "focus-open-audition-block",
+      "theater": "focus_theater",
+      "createdBy": "focus_staff_1",
+      "status": "approved",
+      "eventType": "audition",
+      "title": "Open Audition Block",
+      "description": "Public audition event for testing non-show cards beyond the dashboard slot.",
+      "castingMode": "public_casting",
+      "castMin": 4,
+      "castMax": 24,
+      "isCastFinalized": false,
+      "isPublicListed": true,
+      "producers": ["focus_staff_1"],
+      "occurrences": [
+        { "key": "week-1", "startsAt": "2026-04-17T22:30:00Z", "endsAt": "2026-04-18T00:30:00Z" }
+      ],
+      "cast": [
+        { "user": "performer_7", "source": "requested", "status": "pending" },
+        { "user": "performer_11", "source": "requested", "status": "pending" },
+        { "user": "performer_14", "source": "requested", "status": "accepted" }
+      ],
+      "reviewEvents": [
+        { "key": "approved", "action": "approved", "actor": "focus_manager", "note": "Approved audition block for public board testing." }
+      ]
+    },
+    {
+      "key": "focus-harold-heatwave",
+      "theater": "focus_theater",
+      "createdBy": "focus_producer_2",
+      "status": "approved",
+      "eventType": "show",
+      "title": "Harold Heatwave",
+      "description": "Approved longform show to broaden the future programming lineup.",
+      "castingMode": "direct_invite",
+      "castMin": 6,
+      "castMax": 10,
+      "isCastFinalized": true,
+      "isPublicListed": true,
+      "ticketUrl": "https://example.com/harold-heatwave",
+      "onSaleAt": "2026-04-09T16:00:00Z",
+      "producers": ["focus_producer_2"],
+      "occurrences": [
+        { "key": "week-1", "startsAt": "2026-04-19T01:00:00Z", "endsAt": "2026-04-19T02:35:00Z" }
+      ],
+      "cast": [
+        { "user": "performer_1", "source": "invited", "status": "accepted", "programOrder": 1 },
+        { "user": "performer_5", "source": "invited", "status": "accepted", "programOrder": 2 },
+        { "user": "performer_6", "source": "invited", "status": "accepted", "programOrder": 3 },
+        { "user": "performer_10", "source": "invited", "status": "accepted", "programOrder": 4 },
+        { "user": "performer_15", "source": "invited", "status": "accepted", "programOrder": 5 },
+        { "user": "performer_18", "source": "invited", "status": "accepted", "programOrder": 6 }
+      ],
+      "reviewEvents": [
+        { "key": "approved", "action": "approved", "actor": "focus_staff_2", "note": "Approved longform headliner for display-limit testing." }
+      ]
+    },
+    {
+      "key": "focus-saturday-skills-practice",
+      "theater": "focus_theater",
+      "createdBy": "focus_producer_3",
+      "status": "approved",
+      "eventType": "practice",
+      "title": "Saturday Skills Practice",
+      "description": "Public practice slot for checking how the board handles additional non-show entries.",
+      "castingMode": "theater_casting",
+      "castMin": 5,
+      "castMax": 16,
+      "isCastFinalized": false,
+      "isPublicListed": true,
+      "producers": ["focus_producer_3"],
+      "occurrences": [
+        { "key": "week-1", "startsAt": "2026-04-20T16:00:00Z", "endsAt": "2026-04-20T18:00:00Z" }
+      ],
+      "cast": [
+        { "user": "performer_4", "source": "invited", "status": "accepted" },
+        { "user": "performer_8", "source": "invited", "status": "accepted" },
+        { "user": "performer_13", "source": "invited", "status": "pending" },
+        { "user": "performer_19", "source": "invited", "status": "accepted" }
+      ],
+      "reviewEvents": [
+        { "key": "approved", "action": "approved", "actor": "focus_staff_1", "note": "Approved practice for non-show board depth." }
+      ]
+    },
+    {
+      "key": "focus-sunset-shortform",
+      "theater": "focus_theater",
+      "createdBy": "focus_producer_3",
+      "status": "approved",
+      "eventType": "show",
+      "title": "Sunset Shortform",
+      "description": "Approved shortform bill for testing larger show counts in the upcoming section.",
+      "castingMode": "theater_casting",
+      "castMin": 5,
+      "castMax": 9,
+      "isCastFinalized": false,
+      "isPublicListed": true,
+      "ticketUrl": "https://example.com/sunset-shortform",
+      "onSaleAt": "2026-04-12T16:00:00Z",
+      "producers": ["focus_producer_3"],
+      "occurrences": [
+        { "key": "week-1", "startsAt": "2026-04-23T23:00:00Z", "endsAt": "2026-04-24T00:30:00Z" }
+      ],
+      "cast": [
+        { "user": "performer_2", "source": "invited", "status": "accepted", "programOrder": 1 },
+        { "user": "performer_7", "source": "requested", "status": "accepted", "programOrder": 2 },
+        { "user": "performer_9", "source": "requested", "status": "pending" },
+        { "user": "performer_14", "source": "invited", "status": "accepted", "programOrder": 3 },
+        { "user": "performer_17", "source": "invited", "status": "accepted", "programOrder": 4 }
+      ],
+      "reviewEvents": [
+        { "key": "approved", "action": "approved", "actor": "focus_manager", "note": "Approved additional shortform bill." }
+      ]
+    },
+    {
+      "key": "focus-midnight-monoscene",
+      "theater": "focus_theater",
+      "createdBy": "focus_producer_1",
+      "status": "approved",
+      "eventType": "show",
+      "title": "Midnight Monoscene",
+      "description": "Approved late-night monoscene show for upcoming board stress testing.",
+      "castingMode": "direct_invite",
+      "castMin": 4,
+      "castMax": 7,
+      "isCastFinalized": false,
+      "isPublicListed": true,
+      "ticketUrl": "https://example.com/midnight-monoscene",
+      "onSaleAt": "2026-04-15T16:00:00Z",
+      "producers": ["focus_producer_1"],
+      "occurrences": [
+        { "key": "week-1", "startsAt": "2026-04-26T03:30:00Z", "endsAt": "2026-04-26T04:45:00Z" }
+      ],
+      "cast": [
+        { "user": "performer_3", "source": "invited", "status": "accepted", "programOrder": 1 },
+        { "user": "performer_11", "source": "invited", "status": "accepted", "programOrder": 2 },
+        { "user": "performer_12", "source": "invited", "status": "pending", "programOrder": 3 },
+        { "user": "performer_16", "source": "invited", "status": "accepted", "programOrder": 4 }
+      ],
+      "reviewEvents": [
+        { "key": "approved", "action": "approved", "actor": "focus_staff_2", "note": "Approved monoscene slot for deeper future scheduling." }
+      ]
+    },
+    {
+      "key": "focus-community-intensive",
+      "theater": "focus_theater",
+      "createdBy": "focus_producer_2",
+      "status": "approved",
+      "eventType": "workshop",
+      "title": "Community Workshop Intensive",
+      "description": "Public workshop intensive to keep the non-show list full when the board count increases.",
+      "castingMode": "direct_invite",
+      "castMin": 6,
+      "castMax": 24,
+      "isCastFinalized": false,
+      "isPublicListed": true,
+      "producers": ["focus_producer_2"],
+      "occurrences": [
+        { "key": "week-1", "startsAt": "2026-04-27T23:00:00Z", "endsAt": "2026-04-28T01:30:00Z" }
+      ],
+      "cast": [
+        { "user": "performer_1", "source": "invited", "status": "accepted" },
+        { "user": "performer_6", "source": "invited", "status": "accepted" },
+        { "user": "performer_12", "source": "invited", "status": "accepted" },
+        { "user": "performer_18", "source": "invited", "status": "pending" }
+      ],
+      "reviewEvents": [
+        { "key": "approved", "action": "approved", "actor": "focus_manager", "note": "Approved intensive for non-show queue expansion." }
+      ]
+    },
+    {
+      "key": "focus-team-mashup-showcase",
+      "theater": "focus_theater",
+      "createdBy": "focus_producer_2",
+      "status": "approved",
+      "eventType": "show",
+      "title": "Team Mashup Showcase",
+      "description": "Approved showcase added so the upcoming show list can scale beyond the default board count.",
+      "castingMode": "public_casting",
+      "castMin": 6,
+      "castMax": 10,
+      "isCastFinalized": false,
+      "isPublicListed": true,
+      "ticketUrl": "https://example.com/team-mashup-showcase",
+      "onSaleAt": "2026-04-17T16:00:00Z",
+      "producers": ["focus_producer_2"],
+      "occurrences": [
+        { "key": "week-1", "startsAt": "2026-04-30T01:30:00Z", "endsAt": "2026-04-30T03:00:00Z" }
+      ],
+      "cast": [
+        { "user": "performer_4", "source": "requested", "status": "accepted", "programOrder": 1 },
+        { "user": "performer_5", "source": "requested", "status": "accepted", "programOrder": 2 },
+        { "user": "performer_8", "source": "requested", "status": "pending" },
+        { "user": "performer_13", "source": "invited", "status": "accepted", "programOrder": 3 },
+        { "user": "performer_19", "source": "invited", "status": "accepted", "programOrder": 4 }
+      ],
+      "reviewEvents": [
+        { "key": "approved", "action": "approved", "actor": "focus_staff_1", "note": "Approved showcase for larger board display ranges." }
       ]
     },
     {

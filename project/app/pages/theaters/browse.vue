@@ -17,7 +17,7 @@ type TheaterLike = {
   isMember?: boolean;
 };
 
-const { homeId, hasHome } = useHomeTheaterState();
+const { hasHome, homeIds, homeTheaters } = useHomeTheaterState();
 const { saveHome } = useHomeTheaterMutation();
 
 const { data: initialTheaters } = await useAsyncData(() =>
@@ -58,14 +58,14 @@ const myTheaters = computed<Theater[]>(() =>
   (data.value?.myTheaters || []).map((t) => ({
     ...t,
     isMember: true,
-    isHome: homeId.value === t.id,
+    isHome: homeIds.value.includes(t.id),
   })),
 );
 
 const allTheaters = computed<Theater[]>(() =>
   (data.value?.theaters || []).map((t) => ({
     ...t,
-    isHome: homeId.value === t.id,
+    isHome: homeIds.value.includes(t.id),
   })),
 );
 
@@ -93,7 +93,7 @@ const openLeaveHomePrompt = (theater: TheaterLike) => {
 
 const handleToggle = async (action: "join" | "leave", theater: TheaterLike) => {
   if (!theater?.id) return;
-  if (action === "leave" && homeId.value === theater.id) {
+  if (action === "leave" && homeIds.value.includes(theater.id)) {
     openLeaveHomePrompt(theater);
     return;
   }
@@ -120,35 +120,16 @@ const handleHome = async (action: "set" | "clear", theater: TheaterLike) => {
   homeBusy.add(theater.id);
   homeBusyIds.value = homeBusy;
 
-  const needsJoin = action === "set" && !theater.isMember;
-  if (needsJoin) {
-    const memberBusy = new Set(membershipBusyIds.value);
-    memberBusy.add(theater.id);
-    membershipBusyIds.value = memberBusy;
-  }
-
   try {
     if (action === "set") {
-      if (needsJoin) {
-        await toggleMembership(
-          theater as { slug: string; id?: string },
-          "join",
-        );
-      }
-      await saveHome(theater.id);
-    } else if (homeId.value === theater.id) {
-      await saveHome(null);
+      await saveHome(theater.id, true);
+    } else if (homeIds.value.includes(theater.id)) {
+      await saveHome(theater.id, false);
     }
   } finally {
     const afterHome = new Set(homeBusyIds.value);
     afterHome.delete(theater.id);
     homeBusyIds.value = afterHome;
-
-    if (needsJoin) {
-      const afterMember = new Set(membershipBusyIds.value);
-      afterMember.delete(theater.id);
-      membershipBusyIds.value = afterMember;
-    }
   }
 };
 
@@ -161,7 +142,7 @@ const confirmHomeChoice = async (makeHome: boolean) => {
   settingHome.value = true;
   try {
     if (makeHome) {
-      await saveHome(pendingHomeTheater.value.id || null);
+      await saveHome(pendingHomeTheater.value.id || null, true);
     }
   } finally {
     settingHome.value = false;
@@ -180,7 +161,6 @@ const confirmLeaveHome = async () => {
   try {
     const theater = pendingLeaveTheater.value;
     await toggleMembership(theater as { slug: string; id?: string }, "leave");
-    await saveHome(null);
   } finally {
     leavingHome.value = false;
     showLeaveHomeModal.value = false;
@@ -221,10 +201,10 @@ const cancelLeaveHome = () => {
     <StageSection outer-class="border-b-3 border-(--stage-ink) bg-[rgba(251,247,239,0.5)]" inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
       <div class="mb-6 grid gap-3 sm:grid-cols-3">
         <div class="stage-stat">
-          <span class="stage-overline">Home theater</span>
-          <span class="stage-stat-value">{{ hasHome ? "Set" : "Unset" }}</span>
+          <span class="stage-overline">Home theaters</span>
+          <span class="stage-stat-value">{{ homeTheaters.length }}</span>
           <p class="mt-2 text-sm stage-muted">
-            {{ hasHome ? "Discovery is secondary because you already have a home base." : "Pick a home base when you are ready to turn the theater page into a true hub." }}
+            {{ hasHome ? "Discovery is secondary because your main theater context already lives in the hub." : "Pin one or more member theaters when you are ready to turn the hub into your steady-state board." }}
           </p>
         </div>
         <div class="stage-stat">
