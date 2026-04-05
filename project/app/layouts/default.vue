@@ -1,7 +1,7 @@
 <template>
   <UApp>
     <AppNav />
-    <main class="pb-16">
+    <main>
       <slot />
     </main>
     <AppFooter />

@@ -8,6 +8,11 @@ export const queryKeys = {
 
   theater: (slug: string) => ["theater", { slug }] as const,
 
+  theaterMeta: (slug: string) => ["theater", { slug, section: "meta" }] as const,
+
+  theaterUpcoming: (slug: string) =>
+    ["theater", { slug, section: "upcoming" }] as const,
+
   theaterReview: (slug: string) => ["theater-review", { slug }] as const,
 
   theaterSchedule: (params: {
@@ -27,6 +32,9 @@ export const queryKeys = {
   reviewInbox: () => ["review-inbox"] as const,
 
   homeTheater: () => ["home-theater"] as const,
+
+  homeTheaterDashboard: (slug: string) =>
+    ["home-theater-dashboard", { slug }] as const,
 
   memberShows: () => ["member-shows"] as const,
 
@@ -56,4 +64,6 @@ export const queryKeys = {
 
   notificationsPage: (params: { filter: string; page: number }) =>
     ["notifications-page", params] as const,
+
+  homeTheaterDashboardPrefix: () => ["home-theater-dashboard"] as const,
 };

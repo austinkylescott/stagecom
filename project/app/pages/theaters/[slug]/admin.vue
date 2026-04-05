@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { useMutation, useQueryCache } from "@pinia/colada";
 import { useRequestHeaders } from "#app";
+import { queryKeys } from "~/composables/queryKeys";
 import {
   type TheaterDetails,
   useTheaterDetails,
@@ -8,9 +10,15 @@ import {
   type ReviewQueue,
   useTheaterReviewQueue,
 } from "~/composables/useTheaterReviewQueue";
+import {
+  MAX_THEATER_UPCOMING_ITEMS_LIMIT,
+  MIN_THEATER_UPCOMING_ITEMS_LIMIT,
+} from "~~/shared/theater-board-settings";
 
 const route = useRoute();
 const slug = computed(() => route.params.slug as string);
+const queryCache = useQueryCache();
+const toast = useToast();
 
 const { data: initialTheater } = await useAsyncData(
   `theater-admin-${slug.value}`,
@@ -46,6 +54,91 @@ const { data: reviewQueue, isLoading: reviewLoading } = useTheaterReviewQueue(
 );
 
 const reviewPreview = computed(() => (reviewQueue.value?.shows || []).slice(0, 5));
+const boardSettingsForm = reactive({
+  upcomingOtherEventsLimit: MIN_THEATER_UPCOMING_ITEMS_LIMIT,
+  upcomingShowsLimit: MIN_THEATER_UPCOMING_ITEMS_LIMIT,
+});
+
+watch(
+  () => data.value?.boardSettings,
+  (settings) => {
+    if (!settings) return;
+
+    boardSettingsForm.upcomingOtherEventsLimit =
+      settings.upcomingOtherEventsLimit;
+    boardSettingsForm.upcomingShowsLimit = settings.upcomingShowsLimit;
+  },
+  { immediate: true },
+);
+
+const boardSettingsMutation = useMutation<
+  { boardSettings: TheaterDetails["boardSettings"] },
+  TheaterDetails["boardSettings"]
+>({
+  mutation: (payload) =>
+    $fetch(`/api/theaters/${slug.value}/settings`, {
+      body: payload,
+      credentials: "include",
+      method: "PATCH",
+    }),
+  onSuccess: async (response) => {
+    boardSettingsForm.upcomingOtherEventsLimit =
+      response.boardSettings.upcomingOtherEventsLimit;
+    boardSettingsForm.upcomingShowsLimit =
+      response.boardSettings.upcomingShowsLimit;
+
+    await queryCache.invalidateQueries({
+      key: queryKeys.theaterPrefix(),
+      exact: false,
+    });
+
+    toast?.add({
+      title: "Theater board updated",
+      description: "Upcoming show and event counts now match the board settings.",
+      color: "success",
+    });
+  },
+  onError: (error: any) => {
+    toast?.add({
+      title: "Unable to save board settings",
+      description:
+        error?.data?.statusMessage ||
+        error?.data?.message ||
+        error?.message ||
+        "Unknown error",
+      color: "error",
+    });
+  },
+});
+
+const boardSettingsSaving = computed(() => boardSettingsMutation.isLoading.value);
+
+const saveBoardSettings = async () => {
+  const upcomingShowsLimit = Math.min(
+    MAX_THEATER_UPCOMING_ITEMS_LIMIT,
+    Math.max(
+      MIN_THEATER_UPCOMING_ITEMS_LIMIT,
+      Number(boardSettingsForm.upcomingShowsLimit) ||
+        MIN_THEATER_UPCOMING_ITEMS_LIMIT,
+    ),
+  );
+  const upcomingOtherEventsLimit = Math.min(
+    MAX_THEATER_UPCOMING_ITEMS_LIMIT,
+    Math.max(
+      MIN_THEATER_UPCOMING_ITEMS_LIMIT,
+      Number(boardSettingsForm.upcomingOtherEventsLimit) ||
+        MIN_THEATER_UPCOMING_ITEMS_LIMIT,
+    ),
+  );
+
+  boardSettingsForm.upcomingShowsLimit = upcomingShowsLimit;
+  boardSettingsForm.upcomingOtherEventsLimit = upcomingOtherEventsLimit;
+
+  await boardSettingsMutation.mutateAsync({
+    upcomingOtherEventsLimit,
+    upcomingShowsLimit,
+  });
+};
 
 const formatDateTime = (value: string | null) =>
   value ? new Date(value).toLocaleString() : "TBD";
@@ -137,9 +230,60 @@ const formatDateTime = (value: string | null) =>
             </div>
           </div>
 
-          <aside class="grid gap-4">
-            <section class="stage-panel p-5 sm:p-6">
-              <p class="stage-overline">Admin focus</p>
+        <aside class="grid gap-4">
+          <section class="stage-panel p-5 sm:p-6">
+            <p class="stage-overline">Board settings</p>
+            <h2 class="mt-2 font-display text-3xl uppercase tracking-[0.08em]">
+              Control theater board volume
+            </h2>
+            <p class="mt-3 text-sm leading-7 stage-muted">
+              These totals shape how much programming the theater page fetches and
+              displays. The first show and first non-show event land in the dashboard;
+              the remaining items appear in the sections below.
+            </p>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <UFormField
+                label="Upcoming shows"
+                :description="`Total visible on the board, including the dashboard card. ${MIN_THEATER_UPCOMING_ITEMS_LIMIT}-${MAX_THEATER_UPCOMING_ITEMS_LIMIT}.`"
+              >
+                <UInput
+                  v-model.number="boardSettingsForm.upcomingShowsLimit"
+                  type="number"
+                  :min="MIN_THEATER_UPCOMING_ITEMS_LIMIT"
+                  :max="MAX_THEATER_UPCOMING_ITEMS_LIMIT"
+                />
+              </UFormField>
+
+              <UFormField
+                label="Upcoming non-show events"
+                :description="`Total visible on the board, including the dashboard card. ${MIN_THEATER_UPCOMING_ITEMS_LIMIT}-${MAX_THEATER_UPCOMING_ITEMS_LIMIT}.`"
+              >
+                <UInput
+                  v-model.number="boardSettingsForm.upcomingOtherEventsLimit"
+                  type="number"
+                  :min="MIN_THEATER_UPCOMING_ITEMS_LIMIT"
+                  :max="MAX_THEATER_UPCOMING_ITEMS_LIMIT"
+                />
+              </UFormField>
+            </div>
+
+            <div class="mt-5 flex flex-wrap items-center gap-3">
+              <UButton
+                :loading="boardSettingsSaving"
+                icon="i-heroicons-check"
+                @click="saveBoardSettings"
+              >
+                Save board settings
+              </UButton>
+              <p class="text-xs stage-muted">
+                Smaller totals reduce the amount of upcoming theater data the page fetches.
+              </p>
+            </div>
+          </section>
+
+          <section class="stage-panel p-5 sm:p-6">
+            <p class="stage-overline">Admin focus</p>
               <h2 class="mt-2 font-display text-3xl uppercase tracking-[0.08em]">
                 What needs attention now
               </h2>

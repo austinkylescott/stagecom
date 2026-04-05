@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { useMembershipToggle } from "~/composables/useMembershipToggle";
-import { useHomeTheaterMutation } from "~/composables/useHomeTheaterMutation";
 import { useHomeTheaterState } from "~/composables/useHomeTheaterState";
+import { useTheaterRelationship } from "~/composables/useTheaterRelationship";
 
 type Theater = { id: string; slug: string; name?: string };
 
@@ -26,13 +25,10 @@ const emit = defineEmits<{
   ): void;
 }>();
 
-const { toggleMembership } = useMembershipToggle();
-const { saveHome } = useHomeTheaterMutation();
-const { homeId } = useHomeTheaterState();
+const { homeIds } = useHomeTheaterState();
 
 const localMember = ref(props.isMember);
 const localHome = ref(props.isHome);
-const loading = ref(false);
 
 watch(
   () => props.isMember,
@@ -44,13 +40,21 @@ watch(
 );
 
 const computedIsHome = computed(
-  () => localHome.value || homeId.value === props.theater.id,
+  () => localHome.value || homeIds.value.includes(props.theater.id),
 );
 
-const followLabel = computed(() => (localMember.value ? "Unfollow" : "Follow"));
-const homeLabel = computed(() =>
-  computedIsHome.value ? "Home theater" : "Set home",
-);
+const theaterTarget = computed(() => props.theater);
+
+const {
+  followLabel,
+  handleFollowToggle,
+  handleHomeToggle,
+  relationshipLoading,
+} = useTheaterRelationship({
+  theater: theaterTarget,
+  isMember: localMember,
+  isHome: computedIsHome,
+});
 
 const emitUpdate = () =>
   emit("updated", {
@@ -60,39 +64,27 @@ const emitUpdate = () =>
   });
 
 const handleFollow = async () => {
-  loading.value = true;
-  try {
-    await toggleMembership(props.theater, localMember.value ? "leave" : "join");
-    localMember.value = !localMember.value;
-    // Clear home if user unfollows the current home theater.
-    if (!localMember.value && computedIsHome.value) {
-      await saveHome(null);
-      localHome.value = false;
-    }
-    emitUpdate();
-  } finally {
-    loading.value = false;
+  const wasMember = localMember.value;
+  const wasHome = computedIsHome.value;
+  await handleFollowToggle();
+  localMember.value = !wasMember;
+  if (wasMember && wasHome) {
+    localHome.value = false;
   }
+  emitUpdate();
 };
 
 const handleHome = async () => {
-  loading.value = true;
-  try {
-    if (computedIsHome.value) {
-      await saveHome(null);
-      localHome.value = false;
-    } else {
-      if (!localMember.value) {
-        await toggleMembership(props.theater, "join");
-        localMember.value = true;
-      }
-      await saveHome(props.theater.id);
-      localHome.value = true;
-    }
-    emitUpdate();
-  } finally {
-    loading.value = false;
+  const wasHome = computedIsHome.value;
+  await handleHomeToggle();
+
+  if (wasHome) {
+    localHome.value = false;
+  } else {
+    localHome.value = true;
   }
+
+  emitUpdate();
 };
 </script>
 
@@ -101,7 +93,7 @@ const handleHome = async () => {
     <UButton
       :size="size"
       color="primary"
-      :loading="loading"
+      :loading="relationshipLoading"
       @click="handleFollow"
     >
       {{ followLabel }}
@@ -111,10 +103,11 @@ const handleHome = async () => {
       variant="ghost"
       :color="computedIsHome ? 'primary' : 'neutral'"
       icon="i-heroicons-home"
-      :loading="loading"
+      :disabled="!localMember && !computedIsHome"
+      :loading="relationshipLoading"
       @click="handleHome"
     >
-      {{ homeLabel }}
+      {{ computedIsHome ? "Home theater" : "Set home" }}
     </UButton>
   </div>
 </template>

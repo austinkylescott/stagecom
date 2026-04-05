@@ -4,39 +4,35 @@ import { useHomeTheater } from "~/composables/useHomeTheater";
 export const useHomeTheaterState = () => {
   const { data, refresh: refreshHome } = useHomeTheater();
 
-  const homeTheater = computed(() => data.value?.theater || null);
-  const homeShows = computed(() => data.value?.shows || []);
-  const homeCandidates = computed(() => data.value?.candidates || []);
-  const homeMembership = computed(() => data.value?.membership || { status: null, roles: [] });
+  const homeTheaters = computed(() => data.value?.homeTheaters || []);
+  const candidateTheaters = computed(() => data.value?.candidateTheaters || []);
+  const primaryHome = computed(() => homeTheaters.value[0] || null);
+  const homeTheater = computed(() => primaryHome.value?.theater || null);
+  const homeMembership = computed(
+    () => primaryHome.value?.membership || { isHome: false, roles: [], status: null },
+  );
   const homePermissions = computed(
     () =>
-      data.value?.permissions || {
-        isMember: false,
+      primaryHome.value?.permissions || {
         canCreateShow: false,
         canReview: false,
       },
   );
-  const homeStats = computed(
-    () =>
-      data.value?.stats || {
-        pendingReviewCount: 0,
-        publicShowCount: 0,
-        upcomingPublicCount: 0,
-      },
-  );
-  const homeId = computed(() => homeTheater.value?.id || null);
-  const hasHome = computed(() => Boolean(homeId.value));
+  const homeIds = computed(() => homeTheaters.value.map((entry) => entry.theater.id));
+  const homeId = computed(() => homeIds.value[0] || null);
+  const hasHome = computed(() => homeTheaters.value.length > 0);
 
   return {
+    candidateTheaters,
     data,
     refreshHome,
+    homeIds,
+    homeTheaters,
     homeTheater,
-    homeShows,
-    homeCandidates,
     homeMembership,
     homePermissions,
-    homeStats,
     homeId,
     hasHome,
+    primaryHome,
   };
 };

@@ -83,19 +83,27 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // If the user is leaving their current home theater, clear it.
-    const { data: profile } = await serviceSupabase
-      .from("profiles")
-      .select("home_theater_id")
-      .eq("id", userId)
-      .maybeSingle();
+    const { data: remainingHomeMemberships } = await serviceSupabase
+      .from("theater_memberships")
+      .select("theater_id,home_rank")
+      .eq("user_id", userId)
+      .eq("status", "active")
+      .eq("is_home", true);
 
-    if (profile?.home_theater_id === theater.id) {
-      await serviceSupabase
-        .from("profiles")
-        .update({ home_theater_id: null })
-        .eq("id", userId);
-    }
+    const nextPrimaryHomeTheaterId =
+      (remainingHomeMemberships ?? [])
+        .slice()
+        .sort(
+          (left, right) =>
+            (left.home_rank ?? Number.MAX_SAFE_INTEGER) -
+            (right.home_rank ?? Number.MAX_SAFE_INTEGER),
+        )[0]?.theater_id ?? null;
+
+    await serviceSupabase
+      .from("profiles")
+      .update({ home_theater_id: nextPrimaryHomeTheaterId })
+      .eq("id", userId);
+
     return { status: "left" };
   }
 

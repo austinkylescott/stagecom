@@ -12,11 +12,19 @@ Postgres-first, Supabase-friendly schema blueprint.
 - slug (unique)
 - tagline (promo blurb)
 - timezone (IANA timezone like `America/New_York`; event times display in the theater's local zone)
+- upcoming_shows_limit (int; total number of upcoming public shows shown on the theater board, including the dashboard slot)
+- upcoming_other_events_limit (int; total number of upcoming public non-show events shown on the theater board, including the dashboard slot)
 - street
 - city
 - state_region
 - postal_code
 - country
+
+Rules:
+- Theater board limits are theater-level admin settings.
+- The first show and first non-show event from these limits feed the dashboard cards.
+- Remaining items from the same fetched slices feed the lower board sections.
+- These limits should shape fetch size directly; do not fetch more items than the board can render.
 
 ---
 
@@ -25,10 +33,17 @@ Postgres-first, Supabase-friendly schema blueprint.
 - user_id
 - roles (array of theater_role; admin, manager, staff, instructor, member)
 - status (active, inactive)
+- is_home (boolean; source of truth for home-theater pinning)
+- home_rank (int nullable; optional ordering metadata for pinned home theaters)
 
 Rules:
 - Membership changes must happen through explicit membership flows or authorized theater staff actions
-- `home_theater_id` is a profile preference and must never create or reactivate membership
+- Home-theater state must only exist on active memberships
+- Setting or clearing home-theater state must never create or reactivate membership
+- Leaving a theater must remove its home-theater state automatically
+
+Compatibility note:
+- `profiles.home_theater_id` may remain as a legacy compatibility pointer during migration, but it is no longer the product source of truth once multi-home support is enabled
 
 ---
 

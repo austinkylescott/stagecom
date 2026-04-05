@@ -1,23 +1,27 @@
-# Current Feature
-
-Design System Standardization v1
+# Current Feature: Multi-Home Theater Hub And Calendar v1
 
 ## Status
 
-Complete
+In Progress
 
 ## Goals
 
-- Extract reusable theater/dashboard presentation components from the theater detail page.
-- Standardize shell button and dropdown primitives around the locked nav and account patterns.
-- Expand Nuxt UI theming only where the pattern is truly shared.
-- Publish a design-system bible and update AI workflow docs to prevent visual drift.
+- Replace the single-home theater assumption with a multi-home model tied to active theater memberships.
+- Make `/theaters` a personalized hub that shows one compact dashboard module per home theater and no longer depends on browse-directory payloads by default.
+- Keep `/theaters/[slug]` as the primary theater-specific board with sections for the dashboard, upcoming shows, and upcoming public non-show events.
+- Make `/theaters/[slug]/calendar` the theater-wide calendar surface with compact month navigation, day selection, and date-specific event rows.
+- Preserve explicit theater relationship and permission rules while reducing unnecessary fetch cost through section-specific, occurrence-aware queries.
+- Keep browse/discovery on `/theaters/browse` and optimize browse query patterns separately from the personalized hub.
 
 ## Notes
 
-- Locked anchors are the theater dashboard, navbar, account button, and shell dropdown behavior.
-- Prefer Nuxt UI primitives, then app-level theme config, then component-level `:ui`, then inline Tailwind utilities.
-- The homepage may inform palette and tone, but it is not the structural source of truth for authenticated surfaces.
+- This spec is sourced from `docs/specs/2026-04-02/feature-spec-multi-home-theater-hub-and-calendar-v1.md`.
+- Recommended data-model direction is to move home-theater preference onto `theater_memberships` via fields such as `is_home` and optional `home_rank`, with migration from `profiles.home_theater_id`.
+- Home-theater status must never create, reactivate, or upgrade membership; leaving a theater must automatically clear home status.
+- Add a dedicated hub endpoint for `/theaters`, keep `/api/theaters` for browse/discovery, and shape theater/calendar payloads around actual rendered sections.
+- Theater boards should support theater-level admin settings for how many upcoming shows and upcoming non-show events are displayed; the first item in each slice feeds the dashboard and the remainder feeds the lower sections.
+- Preserve the locked authenticated design language and semantic colors: theater surfaces use `--stage-theater`, programming/event surfaces use `--stage-event`, and people/relationship surfaces use `--stage-performer`.
+- Significant implementation areas will require coordinated updates across app routes/components, server contracts, data-model docs, generated DB types, and mock-data workflow/config when seeded assumptions change.
 
 ## History
 

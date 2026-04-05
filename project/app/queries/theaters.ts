@@ -50,6 +50,35 @@ export const theatersQueryOptions = defineQueryOptions<
 });
 
 export type TheaterDetails = {
+  boardSettings: {
+    upcomingOtherEventsLimit: number;
+    upcomingShowsLimit: number;
+  };
+  dashboard: {
+    upNextOtherEvent: TheaterEventItem | null;
+    upNextShow: TheaterEventItem | null;
+  };
+  membership: {
+    status: string | null;
+    roles: string[];
+    isHome: boolean;
+  };
+  permissions: {
+    canCreateShow: boolean;
+    canReview: boolean;
+  };
+  programming: {
+    nextThirtyDays: TheaterEventItem[];
+    upcomingShows: TheaterEventItem[];
+  };
+  stats: {
+    memberCount: number;
+    totalShows: number;
+    pendingReviewCount: number;
+    publicShowCount: number;
+    upcomingPublicOccurrenceCount: number;
+    visibleNextThirtyDaysCount: number;
+  };
   theater: {
     id: string;
     name: string;
@@ -62,41 +91,42 @@ export type TheaterDetails = {
     postal_code: string | null;
     country: string | null;
   };
-  membership: {
-    status: string | null;
-    roles: string[];
-    isHome: boolean;
+};
+
+export type TheaterMeta = Pick<
+  TheaterDetails,
+  "boardSettings" | "membership" | "permissions" | "theater"
+>;
+
+export type TheaterUpcomingResponse = {
+  otherEvents: TheaterEventItem[];
+  shows: TheaterEventItem[];
+};
+
+export type TheaterEventPerson = {
+  userId: string;
+  displayName: string | null;
+  avatarUrl: string | null;
+};
+
+export type TheaterEventItem = {
+  occurrenceId: string;
+  startsAt: string;
+  endsAt: string | null;
+  occurrenceStatus: Enums<"show_occurrence_status">;
+  show: {
+    id: string;
+    title: string;
+    description: string | null;
+    status: Enums<"show_status">;
+    eventType: Enums<"event_type"> | null;
+    ticketUrl: string | null;
+    theaterId: string;
+    theaterName: string;
+    theaterSlug: string;
   };
-  permissions: {
-    canReview: boolean;
-  };
-  stats: {
-    memberCount: number;
-    totalShows: number;
-    pendingReviewCount: number;
-    publicShowCount: number;
-    upcomingPublicOccurrenceCount: number;
-  };
-  shows: {
-    public: {
-      id: string;
-      title: string;
-      description: string | null;
-      eventType?: string | null;
-      startsAt: string | null;
-      ticketUrl: string | null;
-      producers: {
-        userId: string;
-        displayName: string | null;
-        avatarUrl: string | null;
-      }[];
-      cast: {
-        userId: string;
-        displayName: string | null;
-        avatarUrl: string | null;
-      }[];
-    }[];
-  };
+  producers: TheaterEventPerson[];
+  cast: TheaterEventPerson[];
 };
 
 export type TheaterScheduleParams = {
@@ -146,6 +176,42 @@ export const theaterDetailsQueryOptions = defineQueryOptions<
     key: queryKeys.theater(params?.slug || ""),
     query: () =>
       $fetch<TheaterDetails>(`/api/theaters/${params?.slug}`, {
+        headers,
+        credentials: "include",
+      }),
+    enabled: Boolean(params?.slug),
+    staleTime: 20_000,
+  } as const;
+});
+
+export const theaterMetaQueryOptions = defineQueryOptions<
+  { slug: string },
+  TheaterMeta
+>((params) => {
+  const headers = getRequestHeaders();
+
+  return {
+    key: queryKeys.theaterMeta(params?.slug || ""),
+    query: () =>
+      $fetch<TheaterMeta>(`/api/theaters/${params?.slug}/meta`, {
+        headers,
+        credentials: "include",
+      }),
+    enabled: Boolean(params?.slug),
+    staleTime: 20_000,
+  } as const;
+});
+
+export const theaterUpcomingQueryOptions = defineQueryOptions<
+  { slug: string },
+  TheaterUpcomingResponse
+>((params) => {
+  const headers = getRequestHeaders();
+
+  return {
+    key: queryKeys.theaterUpcoming(params?.slug || ""),
+    query: () =>
+      $fetch<TheaterUpcomingResponse>(`/api/theaters/${params?.slug}/upcoming`, {
         headers,
         credentials: "include",
       }),
@@ -275,19 +341,24 @@ export const applyOptimisticMembershipToTheaterDetail = (
   theater: TheaterMembershipTarget,
   action: MembershipAction,
 ) => {
-  queryCache.setQueryData(
-    queryKeys.theater(theater.slug),
-    (previous: unknown) => {
-      if (!previous) return previous;
-      const payload = previous as TheaterDetails;
-      return {
-        ...payload,
-        membership: {
-          ...payload.membership,
-          status: action === "join" ? "active" : null,
-          isHome: action === "leave" ? false : payload.membership?.isHome,
-        },
-      };
-    },
-  );
+  const applyMembershipUpdate = <
+    T extends TheaterDetails | TheaterMeta
+  >(
+    previous: unknown,
+  ) => {
+    if (!previous) return previous;
+    const payload = previous as T;
+    return {
+      ...payload,
+      membership: {
+        ...payload.membership,
+        status: action === "join" ? "active" : null,
+        isHome: action === "leave" ? false : payload.membership?.isHome,
+      },
+    };
+  };
+
+  queryCache.setQueryData(queryKeys.theater(theater.slug), applyMembershipUpdate);
+  queryCache.setQueryData(queryKeys.theaterMeta(theater.slug), applyMembershipUpdate);
+  queryCache.setQueryData(queryKeys.theaterShell(theater.slug), applyMembershipUpdate);
 };

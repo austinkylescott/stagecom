@@ -93,17 +93,17 @@ export default defineAppConfig({
         {
           color: ["primary", "info"],
           variant: "soft",
-          class: "bg-[rgba(94,144,217,0.2)]",
+          class: "bg-stage-surface-theater",
         },
         {
           color: ["warning", "success"],
           variant: "soft",
-          class: "bg-[rgba(231,180,55,0.22)]",
+          class: "bg-stage-surface-event",
         },
         {
           color: "error",
           variant: "soft",
-          class: "bg-[rgba(191,77,70,0.18)]",
+          class: "bg-stage-surface-performer",
         },
         {
           color: "neutral",
@@ -113,7 +113,7 @@ export default defineAppConfig({
         {
           color: ["primary", "info", "warning", "success", "error", "neutral"],
           variant: "ghost",
-          class: "bg-[rgba(251,247,239,0.78)]",
+          class: "bg-stage-surface-paper",
         },
         {
           color: ["primary", "info", "warning", "success", "error", "neutral"],
@@ -134,7 +134,7 @@ export default defineAppConfig({
     },
     card: {
       slots: {
-        root: "overflow-hidden rounded-none border-3 border-(--stage-ink) bg-[rgba(251,247,239,0.94)] shadow-[8px_8px_0_0_var(--stage-ink)]",
+        root: "overflow-hidden rounded-none border-3 border-(--stage-ink) bg-stage-surface-paper-strong shadow-[8px_8px_0_0_var(--stage-ink)]",
         header: "px-5 py-4 sm:px-6 sm:py-5",
         body: "px-5 py-5 sm:px-6 sm:py-6",
         footer: "px-5 py-4 sm:px-6 sm:py-5",
@@ -144,7 +144,7 @@ export default defineAppConfig({
       variants: {
         variant: {
           outline:
-            "bg-[rgba(251,247,239,0.92)] text-(--stage-ink) ring-[2px] ring-inset ring-(--stage-ink) placeholder:text-[color:rgba(43,41,38,0.55)] focus:ring-[3px] focus:ring-(--stage-coral)",
+            "bg-stage-surface-paper-strong text-(--stage-ink) ring-[2px] ring-inset ring-(--stage-ink) placeholder:text-stage-ink/55 focus:ring-[3px] focus:ring-(--stage-coral)",
         },
       },
       defaultVariants: {
@@ -155,7 +155,7 @@ export default defineAppConfig({
       variants: {
         variant: {
           outline:
-            "bg-[rgba(251,247,239,0.92)] text-(--stage-ink) ring-[2px] ring-inset ring-(--stage-ink) placeholder:text-[color:rgba(43,41,38,0.55)] focus:ring-[3px] focus:ring-(--stage-coral)",
+            "bg-stage-surface-paper-strong text-(--stage-ink) ring-[2px] ring-inset ring-(--stage-ink) placeholder:text-stage-ink/55 focus:ring-[3px] focus:ring-(--stage-coral)",
         },
       },
       defaultVariants: {
@@ -166,7 +166,7 @@ export default defineAppConfig({
       variants: {
         variant: {
           outline:
-            "bg-[rgba(251,247,239,0.92)] text-(--stage-ink) ring-[2px] ring-inset ring-(--stage-ink) focus:ring-[3px] focus:ring-(--stage-coral)",
+            "bg-stage-surface-paper-strong text-(--stage-ink) ring-[2px] ring-inset ring-(--stage-ink) focus:ring-[3px] focus:ring-(--stage-coral)",
         },
       },
       defaultVariants: {
@@ -194,17 +194,17 @@ export default defineAppConfig({
         {
           color: ["primary", "info"],
           variant: "soft",
-          class: "bg-[rgba(94,144,217,0.18)] text-(--stage-ink)",
+          class: "bg-stage-surface-theater text-(--stage-ink)",
         },
         {
           color: ["warning", "success"],
           variant: "soft",
-          class: "bg-[rgba(231,180,55,0.22)] text-(--stage-ink)",
+          class: "bg-stage-surface-event text-(--stage-ink)",
         },
         {
           color: "error",
           variant: "soft",
-          class: "bg-[rgba(191,77,70,0.18)] text-(--stage-ink)",
+          class: "bg-stage-surface-performer text-(--stage-ink)",
         },
         {
           color: "neutral",
@@ -223,7 +223,7 @@ export default defineAppConfig({
         viewport: "p-0",
         group: "p-0",
         item:
-          "rounded-none border-b border-[rgba(43,41,38,0.12)] px-3 py-3 last:border-b-0 data-[highlighted]:bg-(--stage-paper-strong) data-[highlighted]:text-(--stage-ink)",
+          "rounded-none border-b border-stage-ink/10 px-3 py-3 last:border-b-0 data-[highlighted]:bg-(--stage-paper-strong) data-[highlighted]:text-(--stage-ink)",
         itemLeadingIcon: "size-4 text-(--stage-ink)",
         itemLabel: "text-sm font-medium text-(--stage-ink)",
         itemDescription: "mt-0.5 text-xs stage-muted",
@@ -242,7 +242,7 @@ export default defineAppConfig({
           "min-w-80 rounded-none border-3 border-(--stage-ink) bg-(--stage-cream) p-0 shadow-[8px_8px_0_0_var(--stage-ink)]",
         childList: "grid gap-0",
         childItem:
-          "rounded-none border-b border-[rgba(43,41,38,0.12)] transition-colors last:border-b-0 hover:bg-(--stage-theater-soft) focus-within:bg-(--stage-theater-soft)",
+          "rounded-none border-b border-stage-ink/10 transition-colors last:border-b-0 hover:bg-(--stage-theater-soft) focus-within:bg-(--stage-theater-soft)",
         childLink:
           "flex w-full items-start gap-3 rounded-none border-0 px-3 py-3 shadow-none",
         childLinkWrapper: "min-w-0 flex-1",
@@ -254,7 +254,7 @@ export default defineAppConfig({
       slots: {
         root: "rounded-xl border-3 border-(--stage-ink) bg-(--stage-cream) text-(--stage-ink) shadow-[6px_6px_0_0_var(--stage-ink)]",
         title: "font-display text-xl uppercase tracking-[0.08em]",
-        description: "text-sm leading-6 text-[color:rgba(43,41,38,0.72)]",
+        description: "text-sm leading-6 text-stage-ink/70",
       },
     },
     pagination: {

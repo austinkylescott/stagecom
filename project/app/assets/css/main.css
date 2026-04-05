@@ -18,6 +18,25 @@
   --font-sans: "Public Sans", sans-serif;
   --font-serif: "Merriweather", serif;
   --font-mono: "JetBrains Mono", monospace;
+  --color-stage-ink: var(--stage-ink);
+  --color-stage-paper: var(--stage-paper);
+  --color-stage-paper-strong: var(--stage-paper-strong);
+  --color-stage-paper-muted: var(--stage-paper-muted);
+  --color-stage-theater: var(--stage-theater);
+  --color-stage-theater-soft: var(--stage-theater-soft);
+  --color-stage-event: var(--stage-event);
+  --color-stage-event-soft: var(--stage-event-soft);
+  --color-stage-performer: var(--stage-performer);
+  --color-stage-performer-soft: var(--stage-performer-soft);
+  --color-stage-cream: var(--stage-cream);
+  --color-stage-surface-theater: color-mix(in srgb, var(--stage-theater) 26%, white);
+  --color-stage-surface-event: color-mix(in srgb, var(--stage-event) 18%, white);
+  --color-stage-surface-performer: color-mix(in srgb, var(--stage-performer) 16%, white);
+  --color-stage-surface-paper: color-mix(in srgb, var(--stage-paper) 88%, white);
+  --color-stage-surface-paper-strong: color-mix(in srgb, var(--stage-paper) 96%, white);
+  --color-stage-surface-chip: color-mix(in srgb, var(--stage-cream) 84%, white);
+  --color-stage-surface-skeleton-strong: color-mix(in srgb, var(--stage-ink) 12%, white);
+  --color-stage-surface-skeleton-soft: color-mix(in srgb, var(--stage-ink) 8%, white);
 }
 
 :root {

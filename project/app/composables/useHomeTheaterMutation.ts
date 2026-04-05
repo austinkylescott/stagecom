@@ -18,8 +18,8 @@ export const useHomeTheaterMutation = () => {
     { previous?: HomePayload }
   >({
     mutation: saveHomeTheater,
-    onMutate: ({ theaterId }) => ({
-      previous: applyOptimisticHomeTheaterUpdate(queryCache, theaterId),
+    onMutate: ({ theaterId, isHome }) => ({
+      previous: applyOptimisticHomeTheaterUpdate(queryCache, theaterId, isHome),
     }),
     onSuccess: () => invalidateHomeTheaterRelatedQueries(queryCache),
     onError: (_err, _vars, ctx) => {
@@ -27,8 +27,8 @@ export const useHomeTheaterMutation = () => {
     },
   });
 
-  const saveHome = async (theaterId: string | null) => {
-    await mutation.mutateAsync({ theaterId });
+  const saveHome = async (theaterId: string | null, isHome?: boolean) => {
+    await mutation.mutateAsync({ isHome, theaterId });
   };
 
   return { saveHome };

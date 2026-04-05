@@ -1,0 +1,4 @@
+- generic [ref=e4]:
+  - heading "500" [level=1] [ref=e5]
+  - heading "Missing Supabase service role env vars" [level=2] [ref=e6]
+  - paragraph [ref=e7]: "[GET] \"/api/theaters/focus-theater\": 500 Missing Supabase service role env vars"
