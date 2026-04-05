@@ -360,5 +360,4 @@ export const applyOptimisticMembershipToTheaterDetail = (
 
   queryCache.setQueryData(queryKeys.theater(theater.slug), applyMembershipUpdate);
   queryCache.setQueryData(queryKeys.theaterMeta(theater.slug), applyMembershipUpdate);
-  queryCache.setQueryData(queryKeys.theaterShell(theater.slug), applyMembershipUpdate);
 };
