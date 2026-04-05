@@ -1,27 +1,16 @@
-# Current Feature: Multi-Home Theater Hub And Calendar v1
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Replace the single-home theater assumption with a multi-home model tied to active theater memberships.
-- Make `/theaters` a personalized hub that shows one compact dashboard module per home theater and no longer depends on browse-directory payloads by default.
-- Keep `/theaters/[slug]` as the primary theater-specific board with sections for the dashboard, upcoming shows, and upcoming public non-show events.
-- Make `/theaters/[slug]/calendar` the theater-wide calendar surface with compact month navigation, day selection, and date-specific event rows.
-- Preserve explicit theater relationship and permission rules while reducing unnecessary fetch cost through section-specific, occurrence-aware queries.
-- Keep browse/discovery on `/theaters/browse` and optimize browse query patterns separately from the personalized hub.
+- _No active feature loaded._
 
 ## Notes
 
-- This spec is sourced from `docs/specs/2026-04-02/feature-spec-multi-home-theater-hub-and-calendar-v1.md`.
-- Recommended data-model direction is to move home-theater preference onto `theater_memberships` via fields such as `is_home` and optional `home_rank`, with migration from `profiles.home_theater_id`.
-- Home-theater status must never create, reactivate, or upgrade membership; leaving a theater must automatically clear home status.
-- Add a dedicated hub endpoint for `/theaters`, keep `/api/theaters` for browse/discovery, and shape theater/calendar payloads around actual rendered sections.
-- Theater boards should support theater-level admin settings for how many upcoming shows and upcoming non-show events are displayed; the first item in each slice feeds the dashboard and the remainder feeds the lower sections.
-- Preserve the locked authenticated design language and semantic colors: theater surfaces use `--stage-theater`, programming/event surfaces use `--stage-event`, and people/relationship surfaces use `--stage-performer`.
-- Significant implementation areas will require coordinated updates across app routes/components, server contracts, data-model docs, generated DB types, and mock-data workflow/config when seeded assumptions change.
+- _Load a spec or inline description before starting the next feature._
 
 ## History
 
@@ -43,3 +32,4 @@ In Progress
 - Completed Authenticated Work Experience Refinement v1 with theater browse/home/admin/calendar surface separation, theater-board redesign, shared flat button-tone behavior, hydration fixes, and theater-local timezone handling
 - Completed Theater Dashboard Section Refinement v1 with a dedicated theater dashboard component, mobile-first overflow fixes, relocated action controls, alert-row refinement, and new Up Next event/show summary cards
 - Completed Design System Standardization v1 with shared Stage button/dropdown/header primitives, theater-page component extraction, expanded Nuxt UI theme configuration, and a new design-system bible plus subagent brief
+- Completed Multi-Home Theater Hub And Calendar v1 with multi-home membership-backed hub data, a split theater meta/upcoming board flow, theater board admin limits, leaner query invalidation and caching, calendar/hub/theater detail surface updates, shared upcoming card/detail primitives, and synchronized schema/mock-data tooling
