@@ -83,13 +83,15 @@ export type TheaterDetails = {
     id: string;
     name: string;
     slug: string;
-    tagline: string | null;
+    tagline: string;
     timezone: string;
-    street: string | null;
-    city: string | null;
-    state_region: string | null;
-    postal_code: string | null;
-    country: string | null;
+    street: string;
+    city: string;
+    state_region: string;
+    postal_code: string;
+    country: string;
+    website_url: string | null;
+    logo_url: string | null;
   };
 };
 

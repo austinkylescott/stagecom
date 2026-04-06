@@ -3,6 +3,7 @@
 - `001-init.sql` — drops and recreates core tables/enums/triggers per `docs/data/data-model.md`.
 - `002-seed.sql` — legacy one-off demo seed data; useful as a reference, but the config-driven workflow below is the preferred mock-data path now.
 - `003-event-type-migration.sql` — converts legacy `shows.is_practice` to `shows.event_type` and removes `is_practice`.
+- `004-theater-identity-requirements.sql` — requires tagline and full address for theaters, and adds optional public profile URL fields.
 - `project/scripts/mock-data.mjs` — generates deterministic mock SQL from a JSON config with real auth user IDs.
 
 Behavior notes:
@@ -17,6 +18,7 @@ PGHOST="$DB_HOST" PGPORT="$DB_PORT" PGDATABASE="$DB_NAME" PGUSER="$DB_USER" PGPA
 PGHOST="$DB_HOST" PGPORT="$DB_PORT" PGDATABASE="$DB_NAME" PGUSER="$DB_USER" PGPASSWORD="$DB_PASSWORD" psql -f docs/sql/002-seed.sql
 # Optional for existing databases that still have shows.is_practice:
 PGHOST="$DB_HOST" PGPORT="$DB_PORT" PGDATABASE="$DB_NAME" PGUSER="$DB_USER" PGPASSWORD="$DB_PASSWORD" psql -f docs/sql/003-event-type-migration.sql
+PGHOST="$DB_HOST" PGPORT="$DB_PORT" PGDATABASE="$DB_NAME" PGUSER="$DB_USER" PGPASSWORD="$DB_PASSWORD" psql -f docs/sql/004-theater-identity-requirements.sql
 ```
 
 ### Project scripts

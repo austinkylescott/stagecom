@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   const { data: theater, error: theaterError } = await supabase
     .from("theaters")
     .select(
-      "id,name,slug,tagline,timezone,upcoming_shows_limit,upcoming_other_events_limit,street,city,state_region,postal_code,country",
+      "id,name,slug,tagline,timezone,upcoming_shows_limit,upcoming_other_events_limit,street,city,state_region,postal_code,country,website_url,logo_url",
     )
     .eq("slug", slug)
     .maybeSingle();

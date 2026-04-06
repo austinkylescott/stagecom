@@ -18,11 +18,33 @@ select id, name, tz from u
 on conflict (id) do update set display_name = excluded.display_name, timezone = excluded.timezone;
 
 -- Theater
-insert into theaters (id, name, slug)
+insert into theaters (
+  id,
+  name,
+  slug,
+  tagline,
+  timezone,
+  street,
+  city,
+  state_region,
+  postal_code,
+  country,
+  website_url,
+  logo_url
+)
 values (
   'aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaa1',
   'Downtown Improv Co',
-  'downtown-improv'
+  'downtown-improv',
+  'Neighborhood improv theater with weekly shows and classes.',
+  'America/New_York',
+  '120 W 28th St',
+  'New York',
+  'NY',
+  '10001',
+  'USA',
+  'https://downtownimprov.example.com',
+  'https://images.example.com/downtown-improv-logo.png'
 ) on conflict (id) do nothing;
 
 -- Memberships

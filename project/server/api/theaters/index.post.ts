@@ -4,7 +4,7 @@ import { isValidTimeZone } from "../../utils/timezone";
 
 /**
  * POST /api/theaters
- * Create a theater and make creator a manager.
+ * Create a theater and make creator an admin.
  */
 const slugify = (value: string) =>
   value
@@ -15,20 +15,34 @@ const slugify = (value: string) =>
     .replace(/^-+|-+$/g, "")
     .slice(0, 60) || "theater";
 
+const emptyToNull = (value: unknown) => {
+  if (typeof value !== "string") return value;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+};
+
 const createTheaterSchema = z.object({
   name: z.string().trim().min(1, "name required"),
   slug: z.string().trim().min(1).max(60).optional(),
-  tagline: z.string().trim().min(1).nullable().optional(),
+  tagline: z.string().trim().min(1, "tagline required"),
   timezone: z
     .string()
     .trim()
     .min(1, "timezone required")
     .refine((value) => isValidTimeZone(value), "valid IANA timezone required"),
-  street: z.string().trim().min(1).nullable().optional(),
-  city: z.string().trim().min(1).nullable().optional(),
-  state_region: z.string().trim().min(1).nullable().optional(),
-  postal_code: z.string().trim().min(1).nullable().optional(),
-  country: z.string().trim().min(1).nullable().optional(),
+  street: z.string().trim().min(1, "street required"),
+  city: z.string().trim().min(1, "city required"),
+  state_region: z.string().trim().min(1, "state/region required"),
+  postal_code: z.string().trim().min(1, "postal code required"),
+  country: z.string().trim().min(1, "country required"),
+  website_url: z.preprocess(
+    emptyToNull,
+    z.string().trim().url("valid website URL required").nullable(),
+  ).optional(),
+  logo_url: z.preprocess(
+    emptyToNull,
+    z.string().trim().url("valid logo URL required").nullable(),
+  ).optional(),
 });
 
 export default defineEventHandler(async (event) => {
@@ -61,13 +75,15 @@ export default defineEventHandler(async (event) => {
   const {
     name,
     slug: incomingSlug,
-    tagline = null,
+    tagline,
     timezone,
-    street = null,
-    city = null,
-    state_region = null,
-    postal_code = null,
-    country = null,
+    street,
+    city,
+    state_region,
+    postal_code,
+    country,
+    website_url = null,
+    logo_url = null,
   } = parsedBody;
 
   // Compute slug if missing; ensure uniqueness
@@ -106,8 +122,10 @@ export default defineEventHandler(async (event) => {
       state_region,
       postal_code,
       country,
+      website_url,
+      logo_url,
     })
-    .select("id,slug,name,tagline,timezone,city,state_region,country")
+    .select("id,slug")
     .single();
 
   if (insertError) {

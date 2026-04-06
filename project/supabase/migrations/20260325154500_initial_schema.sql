@@ -41,15 +41,17 @@ create unique index idx_profiles_handle_lower_unique on profiles (lower(handle))
 
 create table theaters (
     id uuid primary key default gen_random_uuid(),
-    name text not null,
-    slug text not null unique,
-    tagline text,
-    timezone text not null default 'UTC',
-    street text,
-    city text,
-    state_region text,
-    postal_code text,
-    country text,
+    name text not null check (btrim(name) <> ''),
+    slug text not null unique check (btrim(slug) <> ''),
+    tagline text not null check (btrim(tagline) <> ''),
+    timezone text not null default 'UTC' check (btrim(timezone) <> ''),
+    street text not null check (btrim(street) <> ''),
+    city text not null check (btrim(city) <> ''),
+    state_region text not null check (btrim(state_region) <> ''),
+    postal_code text not null check (btrim(postal_code) <> ''),
+    country text not null check (btrim(country) <> ''),
+    website_url text,
+    logo_url text,
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );

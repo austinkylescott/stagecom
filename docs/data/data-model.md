@@ -19,12 +19,16 @@ Postgres-first, Supabase-friendly schema blueprint.
 - state_region
 - postal_code
 - country
+- website_url (nullable public website link)
+- logo_url (nullable public image/logo URL)
 
 Rules:
+- Theater creation requires a real public identity, not just a name. `name`, `tagline`, `timezone`, `street`, `city`, `state_region`, `postal_code`, and `country` are required theater fields.
 - Theater board limits are theater-level admin settings.
 - The first show and first non-show event from these limits feed the dashboard cards.
 - Remaining items from the same fetched slices feed the lower board sections.
 - These limits should shape fetch size directly; do not fetch more items than the board can render.
+- `website_url` and `logo_url` support richer public theater presentation, but they are secondary profile fields rather than required creation-time identity.
 
 ---
 

@@ -228,20 +228,22 @@ function pushTheaterUpserts(lines, theaters) {
     asSqlUuid(resolveTheaterId(theater)),
     asSqlString(requireString(theater.name, `theaters[${theater.key}].name`)),
     asSqlString(requireString(theater.slug, `theaters[${theater.key}].slug`)),
-    asSqlNullableString(optionalString(theater.tagline)),
+    asSqlString(requireString(theater.tagline, `theaters[${theater.key}].tagline`)),
     asSqlString(optionalString(theater.timezone) ?? "UTC"),
     String(optionalInteger(theater.upcomingShowsLimit) ?? 5),
     String(optionalInteger(theater.upcomingOtherEventsLimit) ?? 5),
-    asSqlNullableString(optionalString(theater.street)),
-    asSqlNullableString(optionalString(theater.city)),
-    asSqlNullableString(optionalString(theater.stateRegion)),
-    asSqlNullableString(optionalString(theater.postalCode)),
-    asSqlNullableString(optionalString(theater.country)),
+    asSqlString(requireString(theater.street, `theaters[${theater.key}].street`)),
+    asSqlString(requireString(theater.city, `theaters[${theater.key}].city`)),
+    asSqlString(requireString(theater.stateRegion, `theaters[${theater.key}].stateRegion`)),
+    asSqlString(requireString(theater.postalCode, `theaters[${theater.key}].postalCode`)),
+    asSqlString(requireString(theater.country, `theaters[${theater.key}].country`)),
+    asSqlNullableString(optionalString(theater.websiteUrl)),
+    asSqlNullableString(optionalString(theater.logoUrl)),
   ].join(", ")})`);
 
   lines.push("-- Theaters");
   lines.push(
-    "insert into theaters (id, name, slug, tagline, timezone, upcoming_shows_limit, upcoming_other_events_limit, street, city, state_region, postal_code, country)",
+    "insert into theaters (id, name, slug, tagline, timezone, upcoming_shows_limit, upcoming_other_events_limit, street, city, state_region, postal_code, country, website_url, logo_url)",
   );
   lines.push(`values\n${rows.join(",\n")}`);
   lines.push(
@@ -256,7 +258,9 @@ function pushTheaterUpserts(lines, theaters) {
     "  city = excluded.city,",
     "  state_region = excluded.state_region,",
     "  postal_code = excluded.postal_code,",
-    "  country = excluded.country;",
+    "  country = excluded.country,",
+    "  website_url = excluded.website_url,",
+    "  logo_url = excluded.logo_url;",
     "",
   );
 }

@@ -77,6 +77,25 @@ The mock-data generator supports theater-level board display limits through opti
 
 These values seed the total number of upcoming public shows and non-show public events the theater board will display, including the dashboard slot for each type.
 
+## Theater Identity Shape
+
+The mock-data generator treats the following theater fields as required because theater creation now requires a complete public identity:
+
+- `theaters[].name`
+- `theaters[].slug`
+- `theaters[].tagline`
+- `theaters[].timezone`
+- `theaters[].street`
+- `theaters[].city`
+- `theaters[].stateRegion`
+- `theaters[].postalCode`
+- `theaters[].country`
+
+It also supports richer optional profile fields:
+
+- `theaters[].websiteUrl`
+- `theaters[].logoUrl`
+
 ## Commands
 
 Run commands from `project/`.
@@ -120,7 +139,9 @@ The example config intentionally covers:
 - Theater manager, staff, producer, and performer roles
 - Multi-home membership-compatible theater pinning via membership-backed home state
 - Theater-local timezone display scenarios via `theaters[].timezone`
+- Theater public identity scenarios via required `tagline` and full address fields
 - Theater board display-limit scenarios via `theaters[].upcomingShowsLimit` and `theaters[].upcomingOtherEventsLimit`
+- Optional website/logo theater profile fields via `theaters[].websiteUrl` and `theaters[].logoUrl`
 - Explicit cast membership separate from producer roles
 - Approved, pending review, and draft show states
 - Show and practice event types
