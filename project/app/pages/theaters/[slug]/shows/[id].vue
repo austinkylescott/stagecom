@@ -280,34 +280,41 @@ const statusColors = {
 </script>
 
 <template>
-  <div class="mx-auto max-w-7xl space-y-8 px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-    <div class="flex items-center gap-2 text-sm stage-muted">
-      <NuxtLink :to="`/theaters/${slug}`" class="hover:underline">
-        {{ show?.theaterName ?? slug }}
-      </NuxtLink>
-      <span>/</span>
-      <span>{{ show?.title ?? "Show" }}</span>
-    </div>
-
-    <div v-if="error" class="stage-panel px-5 py-4 text-sm text-red-700">
-      {{ error?.data?.message || error?.message }}
-    </div>
-
-    <div v-if="statusError" class="stage-panel px-5 py-4 text-sm text-red-700">
-      {{ statusError }}
-    </div>
-
-    <div
-      v-if="statusNotice"
-      class="stage-panel px-5 py-4 text-sm text-emerald-700"
+  <div class="space-y-0">
+    <StageSection
+      outer-class="border-b-3 border-(--stage-ink) bg-(--stage-cream) stage-texture overflow-hidden"
+      inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8"
     >
-      {{ statusNotice }}
-    </div>
+      <div class="space-y-4">
+        <div class="flex flex-wrap items-center gap-2 text-sm stage-muted">
+          <NuxtLink :to="`/theaters/${slug}`" class="stage-link">
+            {{ show?.theaterName ?? slug }}
+          </NuxtLink>
+          <span>/</span>
+          <span>{{ show?.title ?? "Show" }}</span>
+        </div>
 
-    <div v-if="isLoading && !show" class="text-sm stage-muted">Loading...</div>
+        <div v-if="error" class="stage-panel px-5 py-4 text-sm text-red-700">
+          {{ error?.data?.message || error?.message }}
+        </div>
 
-    <section v-if="show" class="stage-panel-dark stage-grid-board p-6 sm:p-8">
-      <div class="grid gap-6 xl:grid-cols-[1.12fr_0.88fr]">
+        <div v-if="statusError" class="stage-panel px-5 py-4 text-sm text-red-700">
+          {{ statusError }}
+        </div>
+
+        <div
+          v-if="statusNotice"
+          class="stage-panel px-5 py-4 text-sm text-emerald-700"
+        >
+          {{ statusNotice }}
+        </div>
+
+        <div v-if="isLoading && !show" class="stage-panel px-5 py-6 text-sm stage-muted">
+          Loading show detail…
+        </div>
+
+        <section v-if="show" class="stage-panel-dark stage-grid-board p-6 sm:p-8">
+          <div class="grid gap-6 xl:grid-cols-[1.12fr_0.88fr]">
         <div class="space-y-5">
           <div class="flex items-start justify-between gap-3 flex-wrap">
             <div class="space-y-2">
@@ -505,30 +512,37 @@ const statusColors = {
             </div>
           </div>
         </div>
+          </div>
+        </section>
       </div>
-    </section>
+    </StageSection>
 
-    <section v-if="show" class="stage-panel stage-dot-board p-5 sm:p-6">
-      <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p class="stage-overline">Operational view</p>
-          <h2 class="mt-2 font-display text-4xl uppercase tracking-[0.08em]">
-            Working cards
-          </h2>
+    <StageSection
+      v-if="show"
+      outer-class="border-b-3 border-(--stage-ink) bg-[rgba(251,247,239,0.52)]"
+      inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8"
+    >
+      <section class="stage-panel stage-dot-board p-5 sm:p-6">
+        <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p class="stage-overline">Operational view</p>
+            <h2 class="mt-2 font-display text-4xl uppercase tracking-[0.08em]">
+              Working cards
+            </h2>
+          </div>
+          <p class="max-w-2xl text-sm stage-muted">
+            Use these as quick summaries of setup, cast movement, and program
+            order before you scroll into the detailed cast controls.
+          </p>
         </div>
-        <p class="max-w-2xl text-sm stage-muted">
-          Use these as quick summaries of setup, cast movement, and program
-          order before you scroll into the detailed cast controls.
-        </p>
-      </div>
 
-      <div class="grid gap-6 lg:grid-cols-3">
-        <StageFeatureCard
-          title="Show Setup"
-          subtitle="Clear ownership and casting controls"
-          tone="bg-(--stage-gold)"
-        >
-          <div class="space-y-4 text-(--stage-ink)">
+        <div class="grid gap-6 lg:grid-cols-3">
+          <StageFeatureCard
+            title="Show Setup"
+            subtitle="Clear ownership and casting controls"
+            tone="bg-(--stage-gold)"
+          >
+            <div class="space-y-4 text-(--stage-ink)">
             <div
               class="flex items-center justify-between border-b-2 border-[rgba(43,41,38,0.16)] pb-3"
             >
@@ -729,33 +743,40 @@ const statusColors = {
               Open Program View
             </UButton>
           </div>
-        </StageFeatureCard>
-      </div>
-    </section>
-
-    <UCard v-if="show" id="production-controls">
-      <template #header>
-        <div>
-          <p class="stage-overline">Production controls</p>
-          <h2 class="mt-2 font-display text-4xl uppercase tracking-[0.08em]">
-            Cast and invitation management
-          </h2>
+          </StageFeatureCard>
         </div>
-      </template>
-      <ShowCastPanel
-        v-if="data"
-        :show-id="show.id"
-        :theater-id="show.theaterId"
-        :theater-slug="show.theaterSlug ?? ''"
-        :producers="producers"
-        :cast="cast"
-        :viewer-cast="viewerCast"
-        :is-producer="isProducer"
-        :can-request-to-join="data.permissions.canRequestToJoin"
-        :can-see-pending-cast="canSeePendingCast"
-        :viewer-cast-resolved="authDetailResolved"
-        :refresh-show="refresh"
-      />
-    </UCard>
+      </section>
+    </StageSection>
+
+    <StageSection
+      v-if="show"
+      outer-class="border-b-3 border-(--stage-ink) bg-[rgba(251,247,239,0.42)]"
+      inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8"
+    >
+      <UCard id="production-controls" class="stage-dot-board">
+        <template #header>
+          <StageSectionHeader
+            overline="Production controls"
+            title="Cast and invitation management"
+            description="This is the operational panel for producers and eligible performers to manage requests, invites, and lineup movement."
+            description-class="max-w-3xl"
+          />
+        </template>
+        <ShowCastPanel
+          v-if="data"
+          :show-id="show.id"
+          :theater-id="show.theaterId"
+          :theater-slug="show.theaterSlug ?? ''"
+          :producers="producers"
+          :cast="cast"
+          :viewer-cast="viewerCast"
+          :is-producer="isProducer"
+          :can-request-to-join="data.permissions.canRequestToJoin"
+          :can-see-pending-cast="canSeePendingCast"
+          :viewer-cast-resolved="authDetailResolved"
+          :refresh-show="refresh"
+        />
+      </UCard>
+    </StageSection>
   </div>
 </template>
