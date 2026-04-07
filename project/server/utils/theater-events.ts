@@ -219,6 +219,7 @@ export const getVisibleTheaterShowsForRows = async ({
         userId: membership.userId,
         isProducer: producerShowIds.has(show.id),
         isTheaterStaff,
+        isShowStaff: false,
         isActiveTheaterMember: membership.status === "active",
         viewerCast: castByShowId.get(show.id) ?? null,
       },

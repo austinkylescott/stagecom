@@ -218,7 +218,7 @@ const formatDateTime = (value: string | null) =>
                 :to="`/theaters/${slug}/shows/new`"
                 icon="i-heroicons-plus"
               >
-                New show
+                Propose event
               </UButton>
               <UButton
                 variant="ghost"

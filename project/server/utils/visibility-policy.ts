@@ -24,6 +24,7 @@ export type ShowVisibilityViewer = {
   userId: string | null;
   isProducer: boolean;
   isTheaterStaff: boolean;
+  isShowStaff: boolean;
   isActiveTheaterMember: boolean;
   viewerCast: ViewerCastState;
 };
@@ -76,7 +77,7 @@ export const canViewShow = (
     return false;
   }
 
-  if (viewer.isProducer || viewer.isTheaterStaff) {
+  if (viewer.isProducer || viewer.isTheaterStaff || viewer.isShowStaff) {
     return true;
   }
 
@@ -98,12 +99,13 @@ export const canViewAcceptedCast = (
 export const canViewPendingCast = (viewer: ShowVisibilityViewer) =>
   viewer.isProducer ||
   viewer.isTheaterStaff ||
+  viewer.isShowStaff ||
   viewer.viewerCast?.status === "accepted" ||
   (viewer.viewerCast?.status === "pending" &&
     viewer.viewerCast.source === "invited");
 
 export const canViewFullCastState = (viewer: ShowVisibilityViewer) =>
-  viewer.isProducer || viewer.isTheaterStaff;
+  viewer.isProducer || viewer.isTheaterStaff || viewer.isShowStaff;
 
 export const canRequestToJoinShow = (
   show: ShowVisibility,

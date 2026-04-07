@@ -54,7 +54,7 @@ const { formatLocation } = useLocationFormatter();
           v-else-if="isMember"
           class="stage-chip bg-(--stage-paper-strong) text-(--stage-ink)"
         >
-          Following
+          Member
         </span>
       </div>
       <p v-if="theater.tagline" class="text-sm leading-6 stage-muted">

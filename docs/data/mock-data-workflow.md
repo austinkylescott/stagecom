@@ -143,6 +143,9 @@ The example config intentionally covers:
 - Theater board display-limit scenarios via `theaters[].upcomingShowsLimit` and `theaters[].upcomingOtherEventsLimit`
 - Optional website/logo theater profile fields via `theaters[].websiteUrl` and `theaters[].logoUrl`
 - Explicit cast membership separate from producer roles
+- Optional richer show setup fields such as `summary`, `producerNote`, and `posterUrl`
+- Multi-occurrence show/event scheduling scenarios
+- Optional show staff assignments for operations roles such as front of house, box office, bar, and tech
 - Approved, pending review, and draft show states
 - Show and practice event types
 - Direct invite, theater casting, and public casting modes

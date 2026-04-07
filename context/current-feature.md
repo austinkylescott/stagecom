@@ -1,4 +1,4 @@
-# Current Feature
+# Current Feature: Schedule System Unification v1
 
 ## Status
 
@@ -6,11 +6,27 @@ Not Started
 
 ## Goals
 
-- _No active feature loaded._
+- Make `/schedule` the canonical signed-in user schedule page and keep `/shows` as a compatibility route.
+- Default `/schedule` to personal events while supporting personal, home-theater, and all-joined-theaters schedule scopes.
+- Rebuild `project/app/pages/theaters/[slug]/index.vue` as the theater-specific schedule home, closely matching the schedule page while staying theater-scoped.
+- Keep `/theaters/[slug]/calendar` usable as a compatibility route or thin alias.
+- Extract stable shared schedule composables and components for date state, URL query sync, calendars, week strips, filters, agendas, and event rows.
+- Tighten the schedule endpoints so the user schedule returns lean occurrence data with viewer relationship metadata and the theater schedule respects explicit show-staff visibility.
+- Remove dotted and gridded schedule-page backgrounds in favor of semantic event/paper/theater/performer surfaces.
+- Keep mobile-sized screens first-class across user and theater schedule pages.
+- Update schema, docs, mock-data expectations, and local/remote Supabase state if data expectations or indexes change.
 
 ## Notes
 
-- _Load a spec or inline description before starting the next feature._
+- Canonical spec: `docs/specs/2026-04-07/feature-spec-schedule-system-unification-v1.md`
+- `/schedule` answers "What events matter to me?" and defaults to `scope=personal`.
+- `/theaters/[slug]` answers "What is happening at this theater?" and should not default to personal-only filtering.
+- Keep the API route `GET /api/shows/schedule`, adding `scope=personal|home|joined` rather than renaming the backend route.
+- Preserve contextual role rules: producers are not assumed to be cast, and cast membership requires explicit `show_cast`.
+- Live Supabase already has the required core tables for this feature, including `show_staff_assignments`, `show_occurrences`, and home-theater membership fields.
+- Candidate migration: add `idx_show_roles_user` on `show_roles(user_id)` if implementation keeps user-role lookups by `user_id`.
+- If a migration is added, update local migration files/docs and apply it to local and remote Supabase.
+- Run `npm run check:server-conventions` and `npm run build` before completion.
 
 ## History
 

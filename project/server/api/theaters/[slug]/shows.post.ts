@@ -4,96 +4,50 @@ import type { Enums, TablesInsert } from "~/types/database.types";
 import { buildShowEvent, emitEvent } from "~~/server/utils/notify";
 import { hasStaffRole } from "~~/server/utils/permissions";
 import { getServiceRoleClient } from "~~/server/utils/service-role";
+import {
+  normalizeLegacyOccurrenceInput,
+  replaceShowOccurrences,
+  replaceShowStaffAssignments,
+  showDraftBodySchema,
+  validateReviewReadiness,
+} from "~~/server/utils/show-draft";
 
-/**
- * POST /api/theaters/:slug/shows
- * Create a show under a theater for an active theater member; creator is implied producer (handled later).
- */
 const paramsSchema = z.object({ slug: z.string().trim().min(1) });
-const emptyToUndefined = (value: unknown) => {
-  if (typeof value !== "string") return value;
-  const trimmed = value.trim();
-  return trimmed === "" ? undefined : trimmed;
-};
 
-const emptyToNull = (value: unknown) => {
-  if (value === null || value === undefined) return null;
-  if (typeof value === "string") {
-    const trimmed = value.trim();
-    return trimmed === "" ? null : trimmed;
-  }
-  return value;
-};
-
-const normalizeDateInput = (value: unknown) => {
-  const normalized = emptyToUndefined(value);
-  if (normalized === undefined) return undefined;
-  if (typeof normalized !== "string") return normalized;
-
-  const date = new Date(normalized);
-  if (Number.isNaN(date.getTime())) return normalized;
-
-  return date.toISOString();
-};
-
-const bodySchema = z
-  .object({
-    title: z.string().trim().min(1),
-    description: z
-      .preprocess(emptyToNull, z.string().trim().nullable())
-      .optional(),
-    castingMode: z.enum(["direct_invite", "theater_casting", "public_casting"]),
-    eventType: z
-      .enum(["show", "practice", "meeting", "audition", "workshop"])
-      .optional()
-      .default("show"),
-    castMin: z
-      .preprocess(emptyToNull, z.coerce.number().int().min(0).nullable())
-      .optional(),
-    castMax: z
-      .preprocess(emptyToNull, z.coerce.number().int().min(0).nullable())
-      .optional(),
-    ticketUrl: z
-      .preprocess(emptyToNull, z.string().trim().url().nullable())
-      .optional(),
-    startsAt: z
-      .preprocess(normalizeDateInput, z.string().datetime())
-      .optional(),
-    endsAt: z.preprocess(normalizeDateInput, z.string().datetime()).optional(),
-    submitForReview: z.coerce.boolean().optional().default(false),
-  })
-  .refine(
-    (data) =>
-      data.castMin === null ||
-      data.castMin === undefined ||
-      data.castMax === null ||
-      data.castMax === undefined ||
-      data.castMin <= data.castMax,
-    {
-      message: "Cast min cannot exceed cast max",
-      path: ["castMax"],
-    },
-  );
+const legacyCompatibleBodySchema = showDraftBodySchema.extend({
+  startsAt: z.string().optional(),
+  endsAt: z.string().optional(),
+  submitForReview: z.coerce.boolean().optional().default(false),
+});
 
 export default defineEventHandler(async (event) => {
   const { slug } = parseParams(event, paramsSchema);
-  const {
-    title,
-    description,
-    castingMode,
-    eventType,
-    castMin,
-    castMax,
-    ticketUrl,
-    startsAt,
-    endsAt,
-    submitForReview,
-  } = await parseBody(event, bodySchema);
+  const parsedBody = await parseBody(event, legacyCompatibleBodySchema);
   const supabase = await serverSupabaseClient(event);
   const serviceSupabase = getServiceRoleClient();
   const userId = await requireUserId(event, supabase);
 
-  // Lookup theater
+  const occurrences = normalizeLegacyOccurrenceInput({
+    occurrences: parsedBody.occurrences,
+    startsAt: parsedBody.startsAt,
+    endsAt: parsedBody.endsAt,
+  });
+
+  const body = {
+    ...parsedBody,
+    occurrences,
+  };
+
+  if (body.submitForReview) {
+    const readinessIssues = validateReviewReadiness(body);
+    if (readinessIssues.length > 0) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: readinessIssues.join(". "),
+      });
+    }
+  }
+
   const { data: theater, error: theaterError } = await supabase
     .from("theaters")
     .select("id")
@@ -103,21 +57,10 @@ export default defineEventHandler(async (event) => {
   if (theaterError) {
     throw createError({ statusCode: 500, statusMessage: theaterError.message });
   }
-  if (!theater) {
+  if (!theater?.id) {
     throw createError({ statusCode: 404, statusMessage: "Theater not found" });
   }
-  if (!theater.id) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: "Theater lookup missing id",
-    });
-  }
 
-  const status: Enums<"show_status"> = submitForReview
-    ? "pending_review"
-    : "draft";
-
-  // Ensure creator is at least an active member of the theater
   const { data: membership, error: membershipError } = await supabase
     .from("theater_memberships")
     .select("status")
@@ -131,6 +74,7 @@ export default defineEventHandler(async (event) => {
       statusMessage: membershipError.message,
     });
   }
+
   if (!membership || membership.status !== "active") {
     throw createError({
       statusCode: 403,
@@ -138,22 +82,27 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const event_type: Enums<"event_type"> = eventType;
-  const casting_mode: Enums<"casting_mode"> = castingMode;
+  const status: Enums<"show_status"> = body.submitForReview
+    ? "pending_review"
+    : "draft";
 
   const payload: TablesInsert<"shows"> = {
     theater_id: theater.id,
-    title,
-    description,
-    event_type,
+    title: body.title,
+    summary: body.summary ?? null,
+    description: body.description ?? null,
+    producer_note: body.producerNote ?? null,
+    poster_url: body.posterUrl ?? null,
+    event_type: body.eventType,
     status,
-    casting_mode,
+    casting_mode: body.castingMode,
     is_public_listed: false,
     cast_min:
-      castMin === undefined || castMin === null ? null : Number(castMin),
+      body.castMin === undefined || body.castMin === null ? null : Number(body.castMin),
     cast_max:
-      castMax === undefined || castMax === null ? null : Number(castMax),
-    ticket_url: ticketUrl || null,
+      body.castMax === undefined || body.castMax === null ? null : Number(body.castMax),
+    ticket_url: body.ticketUrl ?? null,
+    on_sale_at: body.onSaleAt ?? null,
     created_by_user_id: userId,
   };
 
@@ -182,60 +131,32 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  if (startsAt) {
-    const startDate = new Date(startsAt);
-    const endDate = endsAt ? new Date(endsAt) : null;
+  await replaceShowOccurrences({
+    occurrences: body.occurrences,
+    serviceSupabase,
+    showId: show.id,
+  });
 
-    if (Number.isNaN(startDate.getTime())) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: "Invalid start time",
+  await replaceShowStaffAssignments({
+    serviceSupabase,
+    showId: show.id,
+    staffAssignments: body.staffAssignments,
+  });
+
+  if (body.submitForReview) {
+    const { error: reviewError } = await serviceSupabase
+      .from("show_review_events")
+      .insert({
+        show_id: show.id,
+        action: "submitted",
+        actor_user_id: userId,
+        note: null,
       });
-    }
-    if (endDate && endDate <= startDate) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: "End time must be after start time",
-      });
-    }
-
-    const { error: occError } = await supabase.from("show_occurrences").insert({
-      show_id: show.id,
-      starts_at: startsAt,
-      ends_at: endsAt || null,
-      status: "scheduled",
-    });
-
-    if (occError) {
-      throw createError({ statusCode: 500, statusMessage: occError.message });
-    }
-  }
-
-  if (submitForReview) {
-    const { error: reviewError } = await serviceSupabase.from("show_review_events").insert({
-      show_id: show.id,
-      action: "submitted",
-      actor_user_id: userId,
-      note: null,
-    });
 
     if (reviewError) {
       throw createError({
         statusCode: 500,
         statusMessage: reviewError.message,
-      });
-    }
-
-    const { data: theaterInfo, error: theaterInfoError } = await supabase
-      .from("theaters")
-      .select("slug")
-      .eq("id", theater.id)
-      .maybeSingle();
-
-    if (theaterInfoError) {
-      throw createError({
-        statusCode: 500,
-        statusMessage: theaterInfoError.message,
       });
     }
 
@@ -258,13 +179,18 @@ export default defineEventHandler(async (event) => {
       await emitEvent(
         buildShowEvent("show.submitted_for_review", {
           showId: show.id,
-          showTitle: title,
-          theaterSlug: theaterInfo?.slug ?? slug,
+          showTitle: body.title,
+          theaterSlug: slug,
           recipientId: membershipRow.user_id,
+          note: null,
         }),
       );
     }
   }
 
-  return { id: show.id, status };
+  return {
+    id: show.id,
+    status,
+    submittedForReview: body.submitForReview,
+  };
 });

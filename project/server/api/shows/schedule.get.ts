@@ -91,7 +91,43 @@ export default defineEventHandler(async (event) => {
   }
 
   const theaterIds = (memberships ?? []).map((membership) => membership.theater_id);
-  if (!theaterIds.length) {
+  const [
+    relatedRoleResult,
+    relatedCastResult,
+    relatedStaffResult,
+  ] = await Promise.all([
+    serviceSupabase
+      .from("show_roles")
+      .select("show_id,role")
+      .eq("user_id", userId),
+    serviceSupabase
+      .from("show_cast")
+      .select("show_id,source,status")
+      .eq("user_id", userId),
+    serviceSupabase
+      .from("show_staff_assignments")
+      .select("show_id")
+      .eq("user_id", userId),
+  ]);
+
+  if (relatedRoleResult.error || relatedCastResult.error || relatedStaffResult.error) {
+    throw createError({
+      statusCode: 500,
+      statusMessage:
+        relatedRoleResult.error?.message ||
+        relatedCastResult.error?.message ||
+        relatedStaffResult.error?.message ||
+        "Failed to load related show relationships",
+    });
+  }
+
+  const relatedShowIds = [
+    ...(relatedRoleResult.data ?? []).map((row) => row.show_id),
+    ...(relatedCastResult.data ?? []).map((row) => row.show_id),
+    ...(relatedStaffResult.data ?? []).map((row) => row.show_id),
+  ];
+
+  if (!theaterIds.length && !relatedShowIds.length) {
     return {
       items: [],
       filters: {
@@ -102,22 +138,21 @@ export default defineEventHandler(async (event) => {
     };
   }
 
-  const { data: theaters, error: theaterError } = await supabase
-    .from("theaters")
-    .select("id,name,slug")
-    .in("id", theaterIds);
+  const showQuery = serviceSupabase
+    .from("shows")
+    .select("id,title,status,theater_id,event_type,casting_mode,is_public_listed");
 
-  if (theaterError) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: theaterError.message,
-    });
+  if (theaterIds.length > 0 && relatedShowIds.length > 0) {
+    showQuery.or(
+      `theater_id.in.(${theaterIds.join(",")}),id.in.(${relatedShowIds.join(",")})`,
+    );
+  } else if (theaterIds.length > 0) {
+    showQuery.in("theater_id", theaterIds);
+  } else {
+    showQuery.in("id", relatedShowIds);
   }
 
-  const { data: shows, error: showError } = await serviceSupabase
-    .from("shows")
-    .select("id,title,status,theater_id,event_type,casting_mode,is_public_listed")
-    .in("theater_id", theaterIds);
+  const { data: shows, error: showError } = await showQuery;
 
   if (showError) {
     throw createError({
@@ -138,33 +173,17 @@ export default defineEventHandler(async (event) => {
     };
   }
 
-  const [
-    { data: roleRows, error: roleError },
-    { data: castRows, error: castError },
-  ] = await Promise.all([
-    serviceSupabase
-      .from("show_roles")
-      .select("show_id,role")
-      .in("show_id", showIds)
-      .eq("user_id", userId),
-    serviceSupabase
-      .from("show_cast")
-      .select("show_id,source,status")
-      .in("show_id", showIds)
-      .eq("user_id", userId),
-  ]);
+  const effectiveTheaterIds = [...new Set((shows ?? []).map((show) => show.theater_id))];
 
-  if (roleError) {
+  const { data: theaters, error: theaterError } = await supabase
+    .from("theaters")
+    .select("id,name,slug")
+    .in("id", effectiveTheaterIds);
+
+  if (theaterError) {
     throw createError({
       statusCode: 500,
-      statusMessage: roleError.message,
-    });
-  }
-
-  if (castError) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: castError.message,
+      statusMessage: theaterError.message,
     });
   }
 
@@ -181,11 +200,16 @@ export default defineEventHandler(async (event) => {
     ]) ?? [],
   );
   const producerShowIds = new Set(
-    (roleRows ?? [])
+    (relatedRoleResult.data ?? [])
       .filter((row) => row.role === "producer")
       .map((row) => row.show_id),
   );
-  const castByShowId = new Map((castRows ?? []).map((row) => [row.show_id, row]));
+  const castByShowId = new Map(
+    (relatedCastResult.data ?? []).map((row) => [row.show_id, row]),
+  );
+  const showStaffIds = new Set(
+    (relatedStaffResult.data ?? []).map((row) => row.show_id),
+  );
 
   const visibleShows = ((shows as ShowRow[] | null | undefined) ?? []).filter(
     (show) => {
@@ -202,6 +226,7 @@ export default defineEventHandler(async (event) => {
           userId,
           isProducer: producerShowIds.has(show.id),
           isTheaterStaff: Boolean(membership && hasStaffRole(membership.roles)),
+          isShowStaff: showStaffIds.has(show.id),
           isActiveTheaterMember: membership?.status === "active",
           viewerCast: viewerCast
             ? {

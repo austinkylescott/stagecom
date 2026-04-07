@@ -83,6 +83,7 @@ Run commands from `project/` unless there is a clear reason not to.
 - Do not commit until the relevant verification passes, especially `npm run build` when the task changes shipped application behavior.
 - Use focused conventional commits such as `feat:`, `fix:`, or `chore:`.
 - Never add AI-generated attribution text to commit messages.
+  - That includes "Co-Authored by Claude \*\*\*\*" type messages.
 
 ## Change Discipline
 

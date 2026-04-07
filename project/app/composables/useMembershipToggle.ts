@@ -41,7 +41,7 @@ export const useMembershipToggle = (
     onSuccess: async (_data, vars) => {
       options.onSuccess?.(vars.action);
       toast?.add({
-        title: vars.action === "join" ? "Followed" : "Unfollowed",
+        title: vars.action === "join" ? "Joined theater" : "Left theater",
         color: vars.action === "join" ? "primary" : "error",
       });
       await Promise.all([

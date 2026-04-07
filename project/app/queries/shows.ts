@@ -52,14 +52,26 @@ export type ShowScheduleResponse = {
 
 export type CreateShowPayload = {
   title: string;
-  description: string;
+  summary?: string | null;
+  description?: string | null;
+  producerNote?: string | null;
+  posterUrl?: string | null;
   eventType: string;
   castingMode: string;
-  startsAt?: string;
-  endsAt?: string;
   castMin?: number | null;
   castMax?: number | null;
-  ticketUrl?: string;
+  ticketUrl?: string | null;
+  onSaleAt?: string | null;
+  occurrences?: {
+    startsAt: string;
+    endsAt?: string | null;
+  }[];
+  staffAssignments?: {
+    userId: string;
+    assignmentType: string;
+    status?: string;
+    note?: string | null;
+  }[];
 };
 
 export type CreateShowInput = {
@@ -71,7 +83,10 @@ export type ShowDetailResponse = {
   show: {
     id: string;
     title: string;
+    summary: string | null;
     description: string | null;
+    producerNote: string | null;
+    posterUrl: string | null;
     status: Enums<"show_status">;
     eventType: Enums<"event_type">;
     castingMode: Enums<"casting_mode">;
@@ -96,6 +111,15 @@ export type ShowDetailResponse = {
     displayName: string | null;
     avatarUrl: string | null;
   }[];
+  staffAssignments: {
+    id: string;
+    userId: string;
+    assignmentType: string;
+    status: string;
+    note: string | null;
+    displayName: string | null;
+    avatarUrl: string | null;
+  }[];
   cast: {
     userId: string;
     source: Enums<"show_cast_source">;
@@ -116,6 +140,10 @@ export type ShowDetailResponse = {
   } | null;
   permissions: {
     isProducer: boolean;
+    isTheaterStaff: boolean;
+    isShowStaff: boolean;
+    canEditDraft: boolean;
+    canManagePublication: boolean;
     canRequestToJoin: boolean;
     canSeePendingCast: boolean;
   };

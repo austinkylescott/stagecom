@@ -77,7 +77,7 @@ export const useTheaterRelationshipActions = ({
 
     items.push([
       {
-        label: isMember.value ? "Unfollow theater" : "Follow theater",
+        label: isMember.value ? "Leave theater" : "Join theater",
         icon: isMember.value
           ? "i-heroicons-minus-circle"
           : "i-heroicons-plus-circle",

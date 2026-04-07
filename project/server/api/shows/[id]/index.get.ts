@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
   const { data: show, error: showError } = await serviceSupabase
     .from("shows")
     .select(
-      "id,title,description,status,event_type,casting_mode,cast_min,cast_max,is_cast_finalized,is_public_listed,ticket_url,on_sale_at,theater_id,created_by_user_id",
+      "id,title,summary,description,producer_note,poster_url,status,event_type,casting_mode,cast_min,cast_max,is_cast_finalized,is_public_listed,ticket_url,on_sale_at,theater_id,created_by_user_id",
     )
     .eq("id", showId)
     .maybeSingle();
@@ -35,6 +35,7 @@ export default defineEventHandler(async (event) => {
 
   let isProducer = false;
   let isTheaterStaff = false;
+  let isShowStaff = false;
   let isActiveTheaterMember = false;
   let viewerCastRow: {
     user_id: string;
@@ -49,6 +50,7 @@ export default defineEventHandler(async (event) => {
       { data: roleRow, error: roleError },
       { data: membershipRow, error: membershipError },
       { data: castRow, error: castError },
+      { data: showStaffRow, error: showStaffError },
     ] = await Promise.all([
       serviceSupabase
         .from("show_roles")
@@ -68,6 +70,13 @@ export default defineEventHandler(async (event) => {
         .eq("show_id", showId)
         .eq("user_id", userId)
         .maybeSingle(),
+      serviceSupabase
+        .from("show_staff_assignments")
+        .select("id")
+        .eq("show_id", showId)
+        .eq("user_id", userId)
+        .limit(1)
+        .maybeSingle(),
     ]);
 
     if (roleError) {
@@ -82,11 +91,18 @@ export default defineEventHandler(async (event) => {
     if (castError) {
       throw createError({ statusCode: 500, statusMessage: castError.message });
     }
+    if (showStaffError) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: showStaffError.message,
+      });
+    }
 
     isProducer = roleRow?.role === "producer";
     isActiveTheaterMember = membershipRow?.status === "active";
     isTheaterStaff =
       isActiveTheaterMember && hasStaffRole(membershipRow.roles);
+    isShowStaff = Boolean(showStaffRow?.id);
     viewerCastRow = castRow;
   }
 
@@ -94,6 +110,7 @@ export default defineEventHandler(async (event) => {
     userId,
     isProducer,
     isTheaterStaff,
+    isShowStaff,
     isActiveTheaterMember,
     viewerCast: viewerCastRow
       ? {
@@ -151,6 +168,18 @@ export default defineEventHandler(async (event) => {
 
   if (producersError) {
     throw createError({ statusCode: 500, statusMessage: producersError.message });
+  }
+
+  const { data: staffRows, error: staffError } = await serviceSupabase
+    .from("show_staff_assignments")
+    .select(
+      "id,user_id,assignment_type,status,note,profiles(display_name,avatar_url)",
+    )
+    .eq("show_id", showId)
+    .order("assignment_type", { ascending: true });
+
+  if (staffError) {
+    throw createError({ statusCode: 500, statusMessage: staffError.message });
   }
 
   const canSeePendingCast = canViewPendingCast(viewer);
@@ -238,7 +267,10 @@ export default defineEventHandler(async (event) => {
     show: {
       id: show.id,
       title: show.title,
+      summary: show.summary,
       description: show.description,
+      producerNote: canViewFullCastState(viewer) ? show.producer_note : null,
+      posterUrl: show.poster_url,
       status: show.status,
       eventType: show.event_type,
       castingMode: show.casting_mode,
@@ -254,10 +286,29 @@ export default defineEventHandler(async (event) => {
     },
     occurrences: occurrences ?? [],
     producers,
+    staffAssignments: (staffRows ?? []).map((row) => {
+      const profile = Array.isArray(row.profiles)
+        ? row.profiles[0]
+        : row.profiles;
+
+      return {
+        id: row.id,
+        userId: row.user_id,
+        assignmentType: row.assignment_type,
+        status: row.status,
+        note: row.note,
+        displayName: profile?.display_name ?? null,
+        avatarUrl: profile?.avatar_url ?? null,
+      };
+    }),
     cast,
     viewerCast,
     permissions: {
       isProducer,
+      isTheaterStaff,
+      isShowStaff,
+      canEditDraft: isProducer || isTheaterStaff,
+      canManagePublication: isTheaterStaff,
       canRequestToJoin: canRequestToJoinShow(
         {
           status: show.status,

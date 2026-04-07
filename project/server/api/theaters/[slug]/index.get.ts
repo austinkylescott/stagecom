@@ -14,6 +14,17 @@ import {
 import { getServiceRoleClient } from "~~/server/utils/service-role";
 
 const paramsSchema = z.object({ slug: z.string().trim().min(1) });
+const THEATER_SELECT_WITH_IDENTITY =
+  "id,name,slug,tagline,timezone,upcoming_shows_limit,upcoming_other_events_limit,street,city,state_region,postal_code,country,website_url,logo_url";
+const THEATER_SELECT_BASE =
+  "id,name,slug,tagline,timezone,upcoming_shows_limit,upcoming_other_events_limit,street,city,state_region,postal_code,country";
+
+const hasMissingIdentityColumnError = (message: string | undefined) =>
+  Boolean(
+    message &&
+      (message.includes("theaters.website_url") ||
+        message.includes("theaters.logo_url")),
+  );
 
 export default defineEventHandler(async (event) => {
   const { slug } = parseParams(event, paramsSchema);
@@ -21,13 +32,28 @@ export default defineEventHandler(async (event) => {
   const serviceSupabase = getServiceRoleClient();
   const userId = await getOptionalUserId(event, supabase);
 
-  const { data: theater, error: theaterError } = await supabase
+  let { data: theater, error: theaterError } = await supabase
     .from("theaters")
-    .select(
-      "id,name,slug,tagline,timezone,upcoming_shows_limit,upcoming_other_events_limit,street,city,state_region,postal_code,country,website_url,logo_url",
-    )
+    .select(THEATER_SELECT_WITH_IDENTITY)
     .eq("slug", slug)
     .maybeSingle();
+
+  if (theaterError && hasMissingIdentityColumnError(theaterError.message)) {
+    const fallbackResult = await supabase
+      .from("theaters")
+      .select(THEATER_SELECT_BASE)
+      .eq("slug", slug)
+      .maybeSingle();
+
+    theaterError = fallbackResult.error;
+    theater = fallbackResult.data
+      ? {
+          ...fallbackResult.data,
+          logo_url: null,
+          website_url: null,
+        }
+      : null;
+  }
 
   if (theaterError) {
     throw createError({ statusCode: 500, statusMessage: theaterError.message });

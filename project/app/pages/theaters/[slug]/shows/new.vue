@@ -1,207 +1,176 @@
 <script setup lang="ts">
+import { useRequestHeaders } from "#app";
 import type { FetchError } from "ofetch";
-import StageFeatureCard from "~/components/StageFeatureCard.vue";
+import ShowBuilderEditor from "~/components/ShowBuilderEditor.vue";
 import { useCreateShow } from "~/composables/useShowMutations";
+import type { TheaterMeta } from "~/queries/theaters";
+import type { PerformersResponse } from "~/queries/people";
+import {
+  createEmptyOccurrence,
+  createEmptyShowBuilderForm,
+  createEmptyStaffAssignment,
+  toCreateShowPayload,
+} from "~/utils/showBuilder";
 
 const route = useRoute();
 const router = useRouter();
-
 const slug = computed(() => route.params.slug as string);
 
-const form = reactive({
-  title: "",
-  description: "",
-  eventType: "show",
-  castingMode: "direct_invite",
-  startsAt: "",
-  endsAt: "",
-  castMin: null as number | null,
-  castMax: null as number | null,
-  ticketUrl: "",
-});
+const { data: meta } = await useAsyncData(
+  () =>
+    $fetch<TheaterMeta>(`/api/theaters/${slug.value}/meta`, {
+      headers: import.meta.server ? useRequestHeaders(["cookie"]) : undefined,
+      credentials: "include",
+    }),
+  { server: true },
+);
 
+const theaterId = computed(() => meta.value?.theater.id);
+
+const { data: initialMembers } = await useAsyncData(
+  () => {
+    if (!theaterId.value) {
+      return Promise.resolve<PerformersResponse>({
+        profiles: [],
+        memberships: [],
+        page: 1,
+        pageSize: 50,
+        total: 0,
+        totalPages: 1,
+      });
+    }
+
+    return $fetch<PerformersResponse>("/api/performers", {
+      headers: import.meta.server ? useRequestHeaders(["cookie"]) : undefined,
+      credentials: "include",
+      params: {
+        theaterId: theaterId.value,
+        page: 1,
+        pageSize: 50,
+      },
+    });
+  },
+  { server: true, watch: [theaterId] },
+);
+
+const form = reactive(createEmptyShowBuilderForm());
 const loading = ref(false);
 const error = ref("");
 const notice = ref("");
 
 const createShow = useCreateShow(slug.value);
 
+const memberOptions = computed(() =>
+  (initialMembers.value?.profiles ?? []).map((profile) => ({
+    label: profile.display_name || "Unnamed member",
+    value: profile.id,
+  })),
+);
+
 const submit = async (submitForReview: boolean) => {
   loading.value = true;
   error.value = "";
   notice.value = "";
 
-  // Basic client validation
-  if (!form.title.trim()) {
-    error.value = "Title is required";
-    loading.value = false;
-    return;
-  }
-
-  if (
-    form.castMin !== null &&
-    form.castMax !== null &&
-    form.castMin > form.castMax
-  ) {
-    error.value = "Cast min cannot exceed cast max";
-    loading.value = false;
-    return;
-  }
-
-  if (
-    form.endsAt &&
-    form.startsAt &&
-    new Date(form.endsAt) <= new Date(form.startsAt)
-  ) {
-    error.value = "End time must be after start time";
-    loading.value = false;
-    return;
-  }
-
   try {
-    await createShow.mutateAsync({ submitForReview, payload: { ...form } });
+    const result = await createShow.mutateAsync({
+      submitForReview,
+      payload: toCreateShowPayload(form),
+    });
+
     notice.value = submitForReview ? "Submitted for review" : "Draft saved";
-    if (submitForReview) await router.push(`/theaters/${slug.value}/review`);
+
+    const nextPath = submitForReview
+      ? `/theaters/${slug.value}/shows/${result.id}`
+      : `/theaters/${slug.value}/shows/${result.id}/edit`;
+
+    await router.push(nextPath);
+  } catch (createError: any) {
+    const fetchError = createError as FetchError;
+    error.value =
+      fetchError?.data?.statusMessage ||
+      fetchError?.data?.message ||
+      fetchError?.message ||
+      "Failed to create event";
   } finally {
     loading.value = false;
   }
+};
+
+const addOccurrence = () => {
+  form.occurrences.push(createEmptyOccurrence());
+};
+
+const removeOccurrence = (index: number) => {
+  if (form.occurrences.length === 1) {
+    form.occurrences[0] = createEmptyOccurrence();
+    return;
+  }
+
+  form.occurrences.splice(index, 1);
+};
+
+const addStaff = () => {
+  form.staffAssignments.push(createEmptyStaffAssignment());
+};
+
+const removeStaff = (index: number) => {
+  form.staffAssignments.splice(index, 1);
 };
 </script>
 
 <template>
   <div class="space-y-0">
-    <StageSection outer-class="border-b-3 border-(--stage-ink) bg-(--stage-cream) stage-texture overflow-hidden" inner-class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
-      <div class="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <span class="stage-kicker">Show setup</span>
-          <h1 class="mt-4 stage-section-title">Create an event with clear ownership.</h1>
+    <StageSection
+      outer-class="border-b-3 border-(--stage-ink) bg-stage-surface-event stage-texture overflow-hidden"
+      inner-class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8"
+    >
+      <div class="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
+        <div class="max-w-4xl">
+          <span class="stage-kicker">Event proposal</span>
+          <h1 class="mt-4 stage-section-title">Build the event before the theater reviews it.</h1>
           <p class="mt-3 max-w-3xl text-lg leading-8 stage-muted">
-            Start with the public-facing basics, then set casting rules and save it as a draft or send it to theater review.
+            Capture the schedule, public listing essentials, and early staffing plan so theater staff can evaluate the proposal without leaving Stagecom.
           </p>
         </div>
-        <UButton variant="ghost" :to="`/theaters/${slug}/review`">
-          Review queue
-        </UButton>
+        <div class="grid gap-3 sm:grid-cols-3 xl:min-w-[28rem]">
+          <div class="stage-stat bg-stage-surface-paper-strong">
+            <span class="stage-overline text-stage-ink/60">Track</span>
+            <span class="stage-stat-value mt-2">Show Ops</span>
+          </div>
+          <div class="stage-stat bg-stage-surface-paper-strong">
+            <span class="stage-overline text-stage-ink/60">Default mode</span>
+            <span class="stage-stat-value mt-2">Draft</span>
+          </div>
+          <div class="flex items-end justify-start sm:justify-end">
+            <UButton variant="ghost" color="warning" :to="`/theaters/${slug}`">
+              Back to theater
+            </UButton>
+          </div>
+        </div>
       </div>
     </StageSection>
 
-    <StageSection outer-class="border-b-3 border-(--stage-ink) bg-[rgba(251,247,239,0.5)]" inner-class="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-      <StageFeatureCard
-        title="Show Setup"
-        subtitle="Clear ownership and casting controls"
-        tone="bg-(--stage-gold)"
-      >
-        <div class="space-y-6 text-(--stage-ink)">
-          <div class="grid gap-4 md:grid-cols-2">
-            <UFormField label="Title" required>
-              <UInput v-model="form.title" placeholder="Harold Night" />
-            </UFormField>
-            <UFormField label="Event Type">
-              <URadioGroup
-                variant="table"
-                v-model="form.eventType"
-                :items="[
-                  {
-                    label: 'Show',
-                    description: 'A ticketed performance open to the public',
-                    value: 'show',
-                  },
-                  {
-                    label: 'Practice',
-                    description: 'A rehearsal for a team or specific show',
-                    value: 'practice',
-                  },
-                  {
-                    label: 'Meeting',
-                    description: 'A meeting with working groups',
-                    value: 'meeting',
-                  },
-                  {
-                    label: 'Audition',
-                    description:
-                      'An audition for a specific show or general casting call',
-                    value: 'audition',
-                  },
-                  {
-                    label: 'Workshop',
-                    description: 'A short class open to community members',
-                    value: 'workshop',
-                  },
-                ]"
-              />
-            </UFormField>
-          </div>
-
-          <UFormField
-            label="Description"
-            description="What is this about?"
-            required
-          >
-            <UTextarea v-model="form.description" :rows="4" />
-          </UFormField>
-
-          <div class="grid gap-4 md:grid-cols-2">
-            <UFormField
-              label="Casting mode"
-              description="Who can request or be invited?"
-            >
-              <USelect
-                v-model="form.castingMode"
-                :items="[
-                  { label: 'Direct invite', value: 'direct_invite' },
-                  { label: 'Theater casting', value: 'theater_casting' },
-                  { label: 'Public casting', value: 'public_casting' },
-                ]"
-              />
-            </UFormField>
-            <div class="grid grid-cols-2 gap-3">
-              <UFormField label="Cast min">
-                <UInput
-                  v-model.number="form.castMin"
-                  type="number"
-                  min="0"
-                  placeholder="e.g. 6"
-                />
-              </UFormField>
-              <UFormField label="Cast max">
-                <UInput
-                  v-model.number="form.castMax"
-                  type="number"
-                  min="0"
-                  placeholder="e.g. 10"
-                />
-              </UFormField>
-            </div>
-          </div>
-
-          <div class="grid gap-4 md:grid-cols-2">
-            <UFormField label="Start" description="Local time">
-              <UInput type="datetime-local" v-model="form.startsAt" />
-            </UFormField>
-            <UFormField label="End" description="Optional">
-              <UInput type="datetime-local" v-model="form.endsAt" />
-            </UFormField>
-          </div>
-
-          <UFormField label="Ticket URL" description="Optional">
-            <UInput
-              v-model="form.ticketUrl"
-              placeholder="https://tickets.example.com"
-            />
-          </UFormField>
-
-          <div class="flex items-center gap-3 flex-wrap">
-            <UButton :loading="loading" color="warning" @click="submit(true)">
-              Submit for review
-            </UButton>
-            <UButton :loading="loading" variant="ghost" @click="submit(false)">
-              Save as draft
-            </UButton>
-            <p v-if="notice" class="text-sm text-emerald-600">{{ notice }}</p>
-            <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
-          </div>
-        </div>
-      </StageFeatureCard>
+    <StageSection
+      outer-class="border-b-3 border-(--stage-ink) bg-stage-surface-paper stage-texture"
+      inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8"
+    >
+      <ShowBuilderEditor
+        mode="create"
+        :form="form"
+        :theater-name="meta?.theater.name"
+        :busy="loading"
+        :notice="notice"
+        :error="error"
+        :member-options="memberOptions"
+        primary-action-label="Save draft"
+        @add-occurrence="addOccurrence"
+        @remove-occurrence="removeOccurrence"
+        @add-staff="addStaff"
+        @remove-staff="removeStaff"
+        @save="submit(false)"
+        @submit="submit(true)"
+      />
     </StageSection>
   </div>
 </template>

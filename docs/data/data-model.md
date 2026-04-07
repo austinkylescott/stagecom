@@ -56,7 +56,10 @@ Compatibility note:
 - created_by_user_id
 - status (draft, pending_review, approved, rejected, cancelled)
 - title
+- summary (nullable short promo copy for cards and listings)
 - description
+- producer_note (nullable internal note for theater review)
+- poster_url (nullable public artwork URL; placeholder used when empty)
 - event_type (show, practice, meeting, audition, workshop)
 
 Casting:
@@ -73,6 +76,7 @@ Public listing / ticketing readiness:
 Visibility rules:
 - Approved + publicly listed shows may be visible outside the owning theater
 - Draft, pending, rejected, and other non-public shows require an authorized relationship such as producer, theater staff, or explicit cast involvement
+- `summary`, `description`, `poster_url`, schedule data, and approved ticketing fields together should be enough for Stagecom to serve as the public-facing event record without a separate CMS in v1
 
 ---
 
@@ -94,6 +98,26 @@ Recommended even for v1:
 - starts_at (timestamptz)
 - ends_at (timestamptz nullable)
 - status (scheduled, changed, cancelled)
+
+Rules:
+- Shows may have multiple occurrences
+- Producers should be able to draft occurrence groups before review submission
+
+---
+
+### show_staff_assignments
+Show-level operations assignments:
+- id (uuid)
+- show_id
+- user_id
+- assignment_type (`front_of_house`, `box_office`, `bar`, `tech`, `other`)
+- status (`assigned`, `confirmed`, `cancelled`)
+- note (nullable)
+
+Rules:
+- Assigned staff must be explicit, not inferred from theater-level roles
+- Show staff may inspect full show operations but are not allowed to edit proposal-defining fields by default
+- Theater admins and staff may assign or update show staff as part of event operations
 
 ---
 

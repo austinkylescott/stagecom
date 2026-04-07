@@ -4,6 +4,7 @@ import type { Enums } from "~/types/database.types";
 import { buildShowEvent, emitEvent } from "~~/server/utils/notify";
 import { hasStaffRole } from "~~/server/utils/permissions";
 import { getServiceRoleClient } from "~~/server/utils/service-role";
+import { validateReviewReadiness } from "~~/server/utils/show-draft";
 
 const paramsSchema = z.object({ id: z.string().trim().min(1) });
 const bodySchema = z.object({
@@ -51,7 +52,7 @@ const TRANSITIONS: Record<
     nextStatus: "approved",
     allowedFrom: ["pending_review"],
     requiresStaff: true,
-    nextPublicListed: true,
+    nextPublicListed: false,
     reviewAction: "approved",
     notifyType: "show.approved",
   },
@@ -95,7 +96,7 @@ export default defineEventHandler(async (event) => {
 
   const { data: show, error: showError } = await supabase
     .from("shows")
-    .select("id,title,theater_id,status,theaters(slug)")
+    .select("id,title,summary,description,theater_id,status,theaters(slug)")
     .eq("id", showId)
     .maybeSingle();
 
@@ -154,6 +155,46 @@ export default defineEventHandler(async (event) => {
       statusCode: 409,
       statusMessage: `Cannot ${action} from status ${show.status}`,
     });
+  }
+
+  if (action === "submit_for_review") {
+    const { data: occurrences, error: occurrencesError } = await supabase
+      .from("show_occurrences")
+      .select("id,starts_at,ends_at")
+      .eq("show_id", showId);
+
+    if (occurrencesError) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: occurrencesError.message,
+      });
+    }
+
+    const readinessIssues = validateReviewReadiness({
+      title: show.title,
+      summary: show.summary,
+      description: show.description,
+      producerNote: null,
+      posterUrl: null,
+      eventType: "show",
+      castingMode: "direct_invite",
+      castMin: null,
+      castMax: null,
+      ticketUrl: null,
+      onSaleAt: null,
+      occurrences: (occurrences ?? []).map((occurrence) => ({
+        startsAt: occurrence.starts_at,
+        endsAt: occurrence.ends_at,
+      })),
+      staffAssignments: [],
+    });
+
+    if (readinessIssues.length > 0) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: readinessIssues.join(". "),
+      });
+    }
   }
 
   const { error: updateError } = await supabase
