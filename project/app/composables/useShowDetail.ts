@@ -5,6 +5,7 @@ import {
   applyOptimisticShowCastRequest,
   rollbackOptimisticShowDetail,
   showDetailQueryOptions,
+  type CreateShowPayload,
   type ShowDetailResponse,
   type UpdateShowStatusAction,
 } from "~/queries/shows";
@@ -144,18 +145,62 @@ export const useUpdateShowStatus = (
 export const useUpdateShowSettings = (showId: Ref<string>) => {
   const queryCache = useQueryCache();
 
-  return useMutation<void, { isCastFinalized: boolean }>({
-    mutation: ({ isCastFinalized }) =>
+  return useMutation<
+    void,
+    { isCastFinalized?: boolean; isPublicListed?: boolean }
+  >({
+    mutation: ({ isCastFinalized, isPublicListed }) =>
       $fetch(`/api/shows/${showId.value}/settings`, {
         method: "PATCH",
         credentials: "include",
-        body: { isCastFinalized },
+        body: { isCastFinalized, isPublicListed },
       }),
     onSuccess: () => {
       queryCache.invalidateQueries({
         key: queryKeys.showDetail(showId.value),
         exact: true,
       });
+    },
+  });
+};
+
+export const useUpdateShowDraft = (
+  showId: Ref<string>,
+  theaterSlug?: Ref<string | null | undefined>,
+) => {
+  const queryCache = useQueryCache();
+
+  return useMutation<void, CreateShowPayload>({
+    mutation: (body) =>
+      $fetch(`/api/shows/${showId.value}/draft`, {
+        method: "PATCH",
+        credentials: "include",
+        body,
+      }),
+    onSuccess: () => {
+      queryCache.invalidateQueries({
+        key: queryKeys.showDetail(showId.value),
+        exact: true,
+      });
+      queryCache.invalidateQueries({
+        key: queryKeys.memberShows(),
+        exact: true,
+      });
+      queryCache.invalidateQueries({
+        key: queryKeys.memberShowsSchedulePrefix(),
+        exact: false,
+      });
+
+      if (theaterSlug?.value) {
+        queryCache.invalidateQueries({
+          key: queryKeys.theater(theaterSlug.value),
+          exact: false,
+        });
+        queryCache.invalidateQueries({
+          key: queryKeys.theaterSchedulePrefix(),
+          exact: false,
+        });
+      }
     },
   });
 };

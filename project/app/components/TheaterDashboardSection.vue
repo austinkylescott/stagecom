@@ -43,7 +43,7 @@ const eventEmptyCta = computed(() =>
 const showEmptyCta = computed(() =>
   props.isMember
     ? {
-        label: "Host a show",
+        label: "Propose an event",
         to: createEventPath.value,
         icon: "i-heroicons-plus",
       }

@@ -1,6 +1,6 @@
 export type StageButtonTone = "neutral" | "theater" | "event" | "performer";
 
-const baseRestClass = "bg-[rgba(251,247,239,0.78)]";
+const baseRestClass = "bg-(--stage-btn-rest)";
 
 export const stageButtonToneClasses = (
   tone: StageButtonTone,

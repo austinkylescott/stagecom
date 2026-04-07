@@ -42,6 +42,10 @@ class MockQueryBuilder {
     return this;
   }
 
+  or() {
+    return this;
+  }
+
   order() {
     return this;
   }
@@ -165,6 +169,7 @@ describe("show schedule route", () => {
         },
       ],
       show_roles: [{ data: [] }],
+      show_staff_assignments: [{ data: [] }],
       show_cast: [
         {
           data: [
@@ -301,6 +306,7 @@ describe("show schedule route", () => {
         },
       ],
       show_roles: [{ data: [] }],
+      show_staff_assignments: [{ data: [] }],
       show_cast: [
         {
           data: [
@@ -390,6 +396,7 @@ describe("show schedule route", () => {
         },
       ],
       show_roles: [{ data: [] }],
+      show_staff_assignments: [{ data: [] }],
       show_cast: [
         {
           data: [

@@ -59,9 +59,18 @@ const show = computed(() => data.value?.show ?? null);
 const occurrences = computed(() => data.value?.occurrences ?? []);
 const nextOccurrence = computed(() => occurrences.value[0] ?? null);
 const producers = computed(() => data.value?.producers ?? []);
+const staffAssignments = computed(() => data.value?.staffAssignments ?? []);
 const cast = computed(() => data.value?.cast ?? []);
 const viewerCast = computed(() => data.value?.viewerCast ?? null);
 const isProducer = computed(() => data.value?.permissions.isProducer ?? false);
+const isTheaterStaff = computed(
+  () => data.value?.permissions.isTheaterStaff ?? false,
+);
+const isShowStaff = computed(() => data.value?.permissions.isShowStaff ?? false);
+const canEditDraft = computed(() => data.value?.permissions.canEditDraft ?? false);
+const canManagePublication = computed(
+  () => data.value?.permissions.canManagePublication ?? false,
+);
 const canSeePendingCast = computed(
   () => data.value?.permissions.canSeePendingCast ?? false,
 );
@@ -190,6 +199,29 @@ const toggleCastFinalized = async () => {
   }
 };
 
+const togglePublicListing = async () => {
+  if (!show.value) return;
+
+  statusNotice.value = "";
+  statusError.value = "";
+
+  try {
+    await updateShowSettings.mutateAsync({
+      isPublicListed: !show.value.isPublicListed,
+    });
+    statusNotice.value = show.value.isPublicListed
+      ? "Event hidden from the public board"
+      : "Event published to the public board";
+    await refresh();
+  } catch (err: any) {
+    statusError.value =
+      err?.data?.statusMessage ||
+      err?.data?.message ||
+      err?.message ||
+      "Action failed";
+  }
+};
+
 const canSubmitForReview = computed(
   () =>
     isProducer.value &&
@@ -209,6 +241,8 @@ const canReopenDraft = computed(
 );
 const viewerRoleLabel = computed(() => {
   if (isProducer.value) return "Producer";
+  if (isTheaterStaff.value) return "Theater staff";
+  if (isShowStaff.value) return "Show staff";
   if (viewerCast.value?.status === "accepted") return "Confirmed performer";
   if (viewerCast.value?.status === "pending") {
     return viewerCast.value.source === "requested"
@@ -248,6 +282,16 @@ const viewerActionLabel = computed(() => {
     if (!show.value?.isCastFinalized)
       return "Track responses, place performers, and finalize the cast when ready.";
     return "Use this page to monitor lineup, schedule, and show-day readiness.";
+  }
+
+  if (isTheaterStaff.value) {
+    return show.value?.isPublicListed
+      ? "The event is approved and public. Use the controls here to manage publication and operations."
+      : "This event is approved for theater use, but it is not public yet.";
+  }
+
+  if (isShowStaff.value) {
+    return "You are staffed on this event. Use this page as your working record for timing, cast, and show-day coordination.";
   }
 
   if (viewerCast.value?.status === "accepted") {
@@ -337,11 +381,25 @@ const statusColors = {
               <UBadge :color="statusColors[show.status]" variant="soft">
                 {{ show.status }}
               </UBadge>
+              <UBadge
+                v-if="show.status === 'approved'"
+                :color="show.isPublicListed ? 'primary' : 'neutral'"
+                variant="soft"
+              >
+                {{ show.isPublicListed ? "Public" : "Private" }}
+              </UBadge>
               <UBadge v-if="show.isCastFinalized" color="error" variant="soft">
                 Cast finalized
               </UBadge>
             </div>
           </div>
+
+          <p
+            v-if="show.summary"
+            class="max-w-3xl text-base font-semibold uppercase tracking-[0.14em] text-(--stage-gold)"
+          >
+            {{ show.summary }}
+          </p>
 
           <p
             v-if="show.description"
@@ -381,6 +439,16 @@ const statusColors = {
                 }}
               </p>
             </div>
+          </div>
+
+          <div
+            v-if="show.producerNote && (isProducer || isTheaterStaff)"
+            class="stage-dark-inset p-4"
+          >
+            <p class="stage-overline text-(--stage-paper-muted)">Internal note</p>
+            <p class="mt-3 text-sm leading-7 text-(--stage-cream)">
+              {{ show.producerNote }}
+            </p>
           </div>
 
           <div class="grid gap-3 sm:grid-cols-3">
@@ -441,6 +509,15 @@ const statusColors = {
               Program view
             </UButton>
             <UButton
+              v-if="canEditDraft"
+              size="sm"
+              color="neutral"
+              variant="soft"
+              :to="`/theaters/${slug}/shows/${show.id}/edit`"
+            >
+              Edit setup
+            </UButton>
+            <UButton
               v-if="canSubmitForReview"
               size="sm"
               color="warning"
@@ -458,6 +535,16 @@ const statusColors = {
               @click="toggleCastFinalized"
             >
               {{ show.isCastFinalized ? "Reopen cast" : "Finalize cast" }}
+            </UButton>
+            <UButton
+              v-if="canManagePublication && show.status === 'approved'"
+              size="sm"
+              :color="show.isPublicListed ? 'neutral' : 'primary'"
+              variant="soft"
+              :loading="isUpdatingSettings"
+              @click="togglePublicListing"
+            >
+              {{ show.isPublicListed ? "Unpublish" : "Publish" }}
             </UButton>
             <UButton
               v-if="canReopenDraft"
@@ -509,6 +596,13 @@ const statusColors = {
               >
                 External link
               </a>
+            </div>
+            <div
+              v-if="show.onSaleAt"
+              class="stage-dark-inset p-4 text-sm text-(--stage-paper-muted)"
+            >
+              <span class="font-semibold text-(--stage-cream)">On sale:</span>
+              <span class="ml-2">{{ formatDateTime(show.onSaleAt) }}</span>
             </div>
           </div>
         </div>
@@ -631,7 +725,39 @@ const statusColors = {
               </UButton>
             </div>
           </div>
-        </StageFeatureCard>
+          </StageFeatureCard>
+
+          <StageFeatureCard
+            title="Public Listing"
+            subtitle="What the public board can trust"
+            tone="bg-(--stage-theater)"
+          >
+            <div class="space-y-4 text-(--stage-ink)">
+              <div class="border-2 border-(--stage-ink) bg-[rgba(43,41,38,0.04)] p-3">
+                <div class="text-xs font-semibold uppercase stage-muted">Summary</div>
+                <div class="mt-2 font-medium">
+                  {{ show.summary || "No public summary added yet." }}
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div class="border-2 border-(--stage-ink) bg-[rgba(43,41,38,0.04)] p-3">
+                  <div class="text-xs font-semibold uppercase stage-muted">Poster</div>
+                  <div class="mt-2 font-medium">
+                    {{ show.posterUrl ? "Artwork linked" : "Placeholder" }}
+                  </div>
+                </div>
+                <div class="border-2 border-(--stage-ink) bg-[rgba(43,41,38,0.04)] p-3">
+                  <div class="text-xs font-semibold uppercase stage-muted">Visibility</div>
+                  <div class="mt-2 font-medium">
+                    {{ show.isPublicListed ? "Public board" : "Internal only" }}
+                  </div>
+                </div>
+              </div>
+              <p class="text-sm stage-muted">
+                Approval and publication are separate. Theater staff can approve an event without making it visible to the public board.
+              </p>
+            </div>
+          </StageFeatureCard>
 
         <StageFeatureCard
           title="Cast Invitations"
@@ -743,6 +869,34 @@ const statusColors = {
               Open Program View
             </UButton>
           </div>
+          </StageFeatureCard>
+        </div>
+
+        <div v-if="staffAssignments.length" class="mt-6">
+          <StageFeatureCard
+            title="Show Staff"
+            subtitle="Operations assignments for this event"
+            tone="bg-(--stage-theater)"
+          >
+            <div class="grid gap-3 md:grid-cols-2">
+              <div
+                v-for="assignment in staffAssignments"
+                :key="assignment.id"
+                class="border-2 border-(--stage-ink) bg-[rgba(43,41,38,0.04)] p-3 text-(--stage-ink)"
+              >
+                <div class="flex items-center justify-between gap-3">
+                  <div class="font-medium">
+                    {{ assignment.displayName || assignment.userId }}
+                  </div>
+                  <span class="stage-chip bg-(--stage-theater) text-(--stage-ink)">
+                    {{ assignment.assignmentType.replaceAll("_", " ") }}
+                  </span>
+                </div>
+                <p v-if="assignment.note" class="mt-2 text-sm stage-muted">
+                  {{ assignment.note }}
+                </p>
+              </div>
+            </div>
           </StageFeatureCard>
         </div>
       </section>

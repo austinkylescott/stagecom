@@ -8,7 +8,10 @@ import {
 export const useCreateShow = (slug: string) => {
   const queryCache = useQueryCache();
 
-  return useMutation<void, CreateShowInput>({
+  return useMutation<
+    { id: string; status: string; submittedForReview: boolean },
+    CreateShowInput
+  >({
     mutation: ({ submitForReview, payload }) =>
       $fetch(`/api/theaters/${slug}/shows`, {
         method: "POST",

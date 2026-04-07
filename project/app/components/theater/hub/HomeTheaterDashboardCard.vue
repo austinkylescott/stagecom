@@ -23,7 +23,7 @@ const formatDateTime = (value: string) =>
   }).format(new Date(value));
 
 const relationshipLabel = computed(() =>
-  props.entry.membership.isHome ? "Following + home theater" : "Following",
+  props.entry.membership.isHome ? "Member + home theater" : "Member",
 );
 
 const removeHome = () => emit("remove-home", props.entry.theater.id);

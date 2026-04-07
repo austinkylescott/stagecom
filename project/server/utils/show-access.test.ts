@@ -23,6 +23,7 @@ const anonymousViewer: ShowAccessContext = {
   userId: null,
   isProducer: false,
   isTheaterStaff: false,
+  isShowStaff: false,
   isActiveTheaterMember: false,
   viewerCast: null,
 };

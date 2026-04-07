@@ -30,7 +30,7 @@ const comingSoonText = "Feature coming soon";
         size="sm"
       />
       <div class="min-w-0 flex-1 space-y-2">
-        <p class="truncate text-sm font-semibold text-slate-900">
+        <p class="truncate text-sm font-semibold text-(--stage-ink)">
           {{ displayName }}
         </p>
         <UBadge size="xs" color="error" variant="soft">

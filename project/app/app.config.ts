@@ -252,9 +252,78 @@ export default defineAppConfig({
     },
     alert: {
       slots: {
-        root: "rounded-xl border-3 border-(--stage-ink) bg-(--stage-cream) text-(--stage-ink) shadow-[6px_6px_0_0_var(--stage-ink)]",
+        root: "rounded-none border-3 border-(--stage-ink) bg-(--stage-cream) text-(--stage-ink) shadow-[6px_6px_0_0_var(--stage-ink)]",
         title: "font-display text-xl uppercase tracking-[0.08em]",
         description: "text-sm leading-6 text-stage-ink/70",
+      },
+    },
+    formField: {
+      slots: {
+        label:
+          "font-bold text-(--stage-ink) uppercase tracking-[0.1em] text-[11px]",
+        description: "stage-muted text-xs",
+        error: "text-(--stage-performer) text-xs font-semibold mt-1",
+        hint: "stage-muted text-xs",
+        help: "stage-muted text-xs mt-1",
+      },
+    },
+    modal: {
+      slots: {
+        overlay: "bg-[rgba(43,41,38,0.45)]",
+        content:
+          "rounded-none border-3 border-(--stage-ink) bg-(--stage-cream) shadow-[8px_8px_0_0_var(--stage-ink)] divide-y-0",
+        header: "px-5 py-4 sm:px-6 sm:py-5",
+        body: "px-5 py-5 sm:px-6 sm:py-6",
+        footer: "px-5 py-4 sm:px-6 sm:py-5",
+        title:
+          "font-display text-xl uppercase tracking-[0.08em] text-(--stage-ink)",
+        description: "text-sm stage-muted",
+      },
+      variants: {
+        fullscreen: {
+          false: {
+            content:
+              "!rounded-none ring-0 shadow-[8px_8px_0_0_var(--stage-ink)]",
+          },
+        },
+      },
+    },
+    drawer: {
+      slots: {
+        overlay: "bg-[rgba(43,41,38,0.45)]",
+        content:
+          "!rounded-none border-3 border-(--stage-ink) bg-(--stage-cream) shadow-[0_-8px_0_0_var(--stage-ink)]",
+        handle: "!bg-(--stage-ink)",
+        title:
+          "font-display text-xl uppercase tracking-[0.08em] text-(--stage-ink)",
+        description: "text-sm stage-muted",
+      },
+    },
+    tooltip: {
+      slots: {
+        content:
+          "rounded-none border-2 border-(--stage-ink) bg-(--stage-ink) text-(--stage-cream) px-2.5 py-1.5 text-xs font-semibold shadow-[4px_4px_0_0_rgba(0,0,0,0.3)]",
+        arrow: "fill-(--stage-ink)",
+      },
+    },
+    selectMenu: {
+      slots: {
+        base: "rounded-none bg-stage-surface-paper-strong text-(--stage-ink) ring-[2px] ring-inset ring-(--stage-ink) focus:ring-[3px] focus:ring-(--stage-coral)",
+        content:
+          "rounded-none border-3 border-(--stage-ink) bg-(--stage-cream) shadow-[8px_8px_0_0_var(--stage-ink)]",
+        group: "p-0",
+        item: "rounded-none border-b border-stage-ink/10 px-3 py-2.5 last:border-b-0 data-[highlighted]:bg-(--stage-paper-strong) data-[highlighted]:text-(--stage-ink)",
+        itemLabel: "text-sm font-medium text-(--stage-ink)",
+        itemDescription: "text-xs stage-muted",
+        empty: "py-4 text-sm stage-muted",
+      },
+    },
+    table: {
+      slots: {
+        root: "overflow-hidden border-3 border-(--stage-ink) bg-(--stage-surface-base) shadow-[var(--stage-shadow)]",
+        th: "bg-(--stage-surface-th) px-4 py-3.5 text-xs font-bold uppercase tracking-[0.1em] text-(--stage-ink)",
+        td: "px-4 py-3.5 text-sm text-(--stage-ink)",
+        empty: "py-6 text-center text-sm stage-muted",
       },
     },
     pagination: {

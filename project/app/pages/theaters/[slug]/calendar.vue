@@ -356,7 +356,7 @@ watch(
                 icon="i-heroicons-plus"
                 :to="`/theaters/${slug}/shows/new`"
               >
-                New show
+                Propose event
               </UButton>
             </div>
           </template>

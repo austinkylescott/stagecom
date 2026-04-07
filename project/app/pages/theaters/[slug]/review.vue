@@ -142,7 +142,7 @@ const updateStatus = async (
                 :to="`/theaters/${slug}/shows/new`"
                 icon="i-heroicons-plus"
               >
-                New show
+                Propose event
               </UButton>
             </div>
           </div>

@@ -22,7 +22,7 @@ export const useTheaterRelationship = ({
   const relationshipLoading = ref(false);
 
   const followLabel = computed(() =>
-    isMember.value ? "Unfollow" : "Follow",
+    isMember.value ? "Leave theater" : "Join theater",
   );
 
   const homeLabel = computed(() =>
@@ -31,7 +31,7 @@ export const useTheaterRelationship = ({
 
   const passiveRelationshipLabel = computed(() => {
     if (isHome.value && isMember.value) {
-      return "Following + home theater";
+      return "Member + home theater";
     }
 
     if (isHome.value) {
@@ -39,7 +39,7 @@ export const useTheaterRelationship = ({
     }
 
     if (isMember.value) {
-      return "Following";
+      return "Member";
     }
 
     return null;

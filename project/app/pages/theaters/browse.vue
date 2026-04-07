@@ -183,7 +183,7 @@ const cancelLeaveHome = () => {
           <div>
             <h1 class="stage-section-title">Browse and manage theater membership.</h1>
             <p class="mt-3 max-w-3xl text-lg leading-8 stage-muted">
-              Use discovery intentionally here. Search all theaters, follow or leave communities, and choose when to change your home base without turning the main theater hub into a permanent directory.
+              Use discovery intentionally here. Search all theaters, join or leave communities, and choose when to change your home base without turning the main theater hub into a permanent directory.
             </p>
           </div>
         </div>
@@ -208,9 +208,9 @@ const cancelLeaveHome = () => {
           </p>
         </div>
         <div class="stage-stat">
-          <span class="stage-overline">Following</span>
+          <span class="stage-overline">Memberships</span>
           <span class="stage-stat-value">{{ myTheaters.length }}</span>
-          <p class="mt-2 text-sm stage-muted">Communities you already belong to or track.</p>
+          <p class="mt-2 text-sm stage-muted">Theaters where you already hold membership.</p>
         </div>
         <div class="stage-stat">
           <span class="stage-overline">Browse results</span>
@@ -225,10 +225,10 @@ const cancelLeaveHome = () => {
 
       <div class="grid gap-6 lg:grid-cols-2">
         <TheaterList
-          title="Following"
+          title="Your memberships"
           :theaters="myTheaters"
           :pending="isLoading"
-          empty-message="You're not following any theaters yet."
+          empty-message="You are not a member of any theaters yet."
           primary-label="Open"
           :show-follow="true"
           :loading-ids="membershipBusyIds"

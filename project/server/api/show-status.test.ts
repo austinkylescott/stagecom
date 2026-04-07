@@ -168,6 +168,8 @@ describe("show status route", () => {
             {
               id: "show-1",
               title: "House Team Night",
+              summary: "A late show with two teams.",
+              description: "A full hour of house team improv.",
               theater_id: "theater-1",
               status: "draft",
               theaters: { slug: "theater-1" },
@@ -175,6 +177,17 @@ describe("show status route", () => {
           ],
         },
         { data: [] },
+      ],
+      show_occurrences: [
+        {
+          data: [
+            {
+              id: "occ-1",
+              starts_at: "2026-04-10T00:00:00.000Z",
+              ends_at: "2026-04-10T01:00:00.000Z",
+            },
+          ],
+        },
       ],
       theater_memberships: [
         { data: [] },

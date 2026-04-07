@@ -98,7 +98,7 @@ const roleLabel = computed(() => {
             variant="ghost"
             icon="i-heroicons-plus"
           >
-            New show
+            Propose event
           </UButton>
         </div>
       </div>
@@ -195,7 +195,7 @@ const roleLabel = computed(() => {
               variant="ghost"
               icon="i-heroicons-plus"
             >
-              Create show
+              Propose event
             </UButton>
             <UButton
               to="/shows"

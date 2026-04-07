@@ -347,7 +347,10 @@ export type Database = {
           is_cast_finalized: boolean;
           is_public_listed: boolean;
           on_sale_at: string | null;
+          poster_url: string | null;
+          producer_note: string | null;
           status: Database["public"]["Enums"]["show_status"];
+          summary: string | null;
           theater_id: string;
           ticket_url: string | null;
           title: string;
@@ -365,7 +368,10 @@ export type Database = {
           is_cast_finalized?: boolean;
           is_public_listed?: boolean;
           on_sale_at?: string | null;
+          poster_url?: string | null;
+          producer_note?: string | null;
           status?: Database["public"]["Enums"]["show_status"];
+          summary?: string | null;
           theater_id: string;
           ticket_url?: string | null;
           title: string;
@@ -383,7 +389,10 @@ export type Database = {
           is_cast_finalized?: boolean;
           is_public_listed?: boolean;
           on_sale_at?: string | null;
+          poster_url?: string | null;
+          producer_note?: string | null;
           status?: Database["public"]["Enums"]["show_status"];
+          summary?: string | null;
           theater_id?: string;
           ticket_url?: string | null;
           title?: string;
@@ -402,6 +411,51 @@ export type Database = {
             columns: ["theater_id"];
             isOneToOne: false;
             referencedRelation: "theaters";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      show_staff_assignments: {
+        Row: {
+          assignment_type: string;
+          created_at: string;
+          id: string;
+          note: string | null;
+          show_id: string;
+          status: string;
+          user_id: string;
+        };
+        Insert: {
+          assignment_type: string;
+          created_at?: string;
+          id?: string;
+          note?: string | null;
+          show_id: string;
+          status?: string;
+          user_id: string;
+        };
+        Update: {
+          assignment_type?: string;
+          created_at?: string;
+          id?: string;
+          note?: string | null;
+          show_id?: string;
+          status?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "show_staff_assignments_show_id_fkey";
+            columns: ["show_id"];
+            isOneToOne: false;
+            referencedRelation: "shows";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "show_staff_assignments_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
         ];

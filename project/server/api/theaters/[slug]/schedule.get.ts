@@ -171,6 +171,7 @@ export default defineEventHandler(async (event) => {
         userId,
         isProducer: producerShowIds.has(show.id),
         isTheaterStaff: Boolean(membership && hasStaffRole(membership.roles)),
+        isShowStaff: false,
         isActiveTheaterMember: membership?.status === "active",
         viewerCast: viewerCast
           ? {

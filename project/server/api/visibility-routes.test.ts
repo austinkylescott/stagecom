@@ -66,6 +66,10 @@ class MockQueryBuilder {
     return Promise.resolve(this.nextResult());
   }
 
+  limit() {
+    return this;
+  }
+
   maybeSingle() {
     const result = this.nextResult();
     return Promise.resolve({
@@ -160,6 +164,7 @@ describe("visibility route wiring", () => {
       show_roles: [{ data: [] }],
       theater_memberships: [{ data: [] }],
       show_cast: [{ data: [] }],
+      show_staff_assignments: [{ data: [] }],
     });
 
     vi.doMock("#supabase/server", () => ({
@@ -236,6 +241,7 @@ describe("visibility route wiring", () => {
         },
       ],
       show_roles: [{ data: [] }],
+      show_staff_assignments: [{ data: [] }],
       show_cast: [
         {
           data: [
