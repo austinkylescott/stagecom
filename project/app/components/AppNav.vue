@@ -190,12 +190,6 @@ watch(
               title="Stagecom menu"
               description="Primary navigation for moving between Stagecom sections."
               :handle="true"
-              :ui="{
-                content:
-                  'rounded-none border-t-3 border-x-3 border-(--stage-ink) bg-(--stage-cream) shadow-[0_-8px_0_0_var(--stage-ink)]',
-                handle: 'bg-(--stage-ink)',
-                overlay: 'bg-[rgba(43,41,38,0.45)]',
-              }"
             >
               <StageButton
                 class="lg:hidden"
@@ -327,6 +321,7 @@ watch(
               </template>
             </UDrawer>
             <AppNotificationsBell v-if="isAuthed" />
+            <AppColorModeToggle />
             <AppAccountMenu />
           </div>
         </div>

@@ -23,11 +23,11 @@ const emit = defineEmits<{
           <p class="font-semibold">Make this your home theater?</p>
         </template>
         <div class="space-y-2">
-          <p class="text-sm text-slate-700">
+          <p class="text-sm text-(--stage-ink)">
             {{ theaterName || "This theater" }} will show in your dashboard as
             the default place for schedules and invites.
           </p>
-          <p class="text-sm text-slate-600">
+          <p class="text-sm stage-muted">
             You can change your home theater anytime from this page.
           </p>
         </div>

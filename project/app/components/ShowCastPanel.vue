@@ -207,7 +207,7 @@ const inactiveStatusLabel = (member: ShowCastMember) => {
         v-if="isProducer"
         class="flex items-center gap-2"
       >
-        <span class="text-xs font-medium uppercase tracking-wide text-slate-500">
+        <span class="text-xs font-medium uppercase tracking-wide stage-muted">
           Sort
         </span>
         <USelect

@@ -6,8 +6,7 @@
   font-family: "Cubano";
   src:
     local("Cubano"),
-    url("/fonts/Cubano.woff2") format("woff2"),
-    url("/fonts/Cubano.woff") format("woff");
+    url("/fonts/Cubano.ttf") format("truetype");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -57,6 +56,9 @@
   --stage-cream: #fbf7ef;
   --stage-shadow: 8px 8px 0 0 var(--stage-ink);
   --stage-shadow-sm: 5px 5px 0 0 var(--stage-ink);
+  --stage-btn-rest: rgba(251, 247, 239, 0.78);
+  --stage-surface-base: rgba(251, 247, 239, 0.92);
+  --stage-surface-th: rgba(239, 227, 205, 0.88);
   --ui-primary: var(--stage-theater);
   --ui-secondary: var(--stage-event);
   --ui-success: #4f8e61;
@@ -66,10 +68,47 @@
   --ui-neutral: var(--stage-ink);
 }
 
+.dark {
+  --stage-ink: #ede7dd;
+  --stage-ink-soft: #b8ad9e;
+  --stage-paper: #2a2623;
+  --stage-paper-strong: #201d1a;
+  --stage-paper-muted: #38332e;
+  --stage-theater: #7db8af;
+  --stage-theater-soft: #2d4541;
+  --stage-event: #dea03f;
+  --stage-event-soft: #3a2e18;
+  --stage-performer: #d4706a;
+  --stage-performer-soft: #3d2522;
+  --stage-cream: #1a1714;
+  --stage-shadow: 8px 8px 0 0 rgba(0, 0, 0, 0.5);
+  --stage-shadow-sm: 5px 5px 0 0 rgba(0, 0, 0, 0.5);
+  --stage-btn-rest: rgba(42, 38, 35, 0.6);
+  --stage-surface-base: rgba(42, 38, 35, 0.92);
+  --stage-surface-th: rgba(32, 29, 26, 0.88);
+  --ui-primary: var(--stage-theater);
+  --ui-secondary: var(--stage-event);
+  --ui-success: #5fa872;
+  --ui-info: var(--stage-theater);
+  --ui-warning: var(--stage-event);
+  --ui-error: var(--stage-performer);
+  --ui-neutral: var(--stage-ink);
+  --color-stage-surface-theater: color-mix(in srgb, var(--stage-theater) 18%, var(--stage-cream));
+  --color-stage-surface-event: color-mix(in srgb, var(--stage-event) 14%, var(--stage-cream));
+  --color-stage-surface-performer: color-mix(in srgb, var(--stage-performer) 12%, var(--stage-cream));
+  --color-stage-surface-paper: color-mix(in srgb, var(--stage-paper) 88%, var(--stage-cream));
+  --color-stage-surface-paper-strong: color-mix(in srgb, var(--stage-paper) 96%, var(--stage-cream));
+  --color-stage-surface-chip: color-mix(in srgb, var(--stage-cream) 84%, var(--stage-paper));
+  --color-stage-surface-skeleton-strong: color-mix(in srgb, var(--stage-ink) 12%, var(--stage-cream));
+  --color-stage-surface-skeleton-soft: color-mix(in srgb, var(--stage-ink) 8%, var(--stage-cream));
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
     background: var(--stage-ink);
+    scrollbar-color: var(--stage-ink) var(--stage-cream);
+    scrollbar-width: thin;
   }
 
   body {
@@ -83,9 +122,21 @@
     font-family: var(--font-sans);
   }
 
+  .dark body {
+    background:
+      radial-gradient(circle at top left, rgba(130, 191, 182, 0.08), transparent 34%),
+      radial-gradient(circle at top right, rgba(234, 165, 66, 0.06), transparent 28%),
+      radial-gradient(circle at 50% 100%, rgba(199, 96, 86, 0.05), transparent 36%),
+      linear-gradient(180deg, #1a1714 0%, #1e1b18 38%, #22201c 100%);
+  }
+
   ::selection {
     color: var(--stage-ink);
     background: color-mix(in srgb, var(--stage-theater) 40%, white);
+  }
+
+  .dark ::selection {
+    background: color-mix(in srgb, var(--stage-theater) 30%, var(--stage-cream));
   }
 
   a,
@@ -109,13 +160,13 @@
 @layer components {
   .stage-frame {
     border: 3px solid var(--stage-ink);
-    background: rgba(251, 247, 239, 0.9);
+    background: var(--stage-surface-base);
     box-shadow: var(--stage-shadow);
   }
 
   .stage-panel {
     border: 3px solid var(--stage-ink);
-    background: rgba(251, 247, 239, 0.95);
+    background: var(--stage-surface-base);
     box-shadow: var(--stage-shadow);
   }
 
@@ -127,11 +178,22 @@
     box-shadow: var(--stage-shadow);
   }
 
+  .dark .stage-panel-dark {
+    color: var(--stage-ink);
+    background:
+      linear-gradient(145deg, rgba(237, 231, 221, 0.06), rgba(237, 231, 221, 0.1));
+  }
+
   .stage-dark-inset {
     border: 3px solid var(--stage-ink);
     background:
       linear-gradient(180deg, rgba(251, 247, 239, 0.18), rgba(216, 204, 181, 0.14));
     box-shadow: var(--stage-shadow-sm);
+  }
+
+  .dark .stage-dark-inset {
+    background:
+      linear-gradient(180deg, rgba(237, 231, 221, 0.06), rgba(237, 231, 221, 0.04));
   }
 
   .stage-panel-accent {
@@ -141,10 +203,15 @@
     box-shadow: var(--stage-shadow);
   }
 
+  .dark .stage-panel-accent {
+    background:
+      linear-gradient(180deg, rgba(222, 160, 63, 0.25), rgba(42, 38, 35, 0.96));
+  }
+
   .stage-message {
     border: 3px solid var(--stage-ink);
     border-radius: 1rem;
-    background: rgba(251, 247, 239, 0.95);
+    background: var(--stage-surface-base);
     box-shadow: var(--stage-shadow);
   }
 
@@ -155,7 +222,7 @@
     border: 2px solid var(--stage-ink);
     padding: 0.35rem 0.8rem;
     color: var(--stage-ink);
-    background: color-mix(in srgb, var(--stage-theater) 28%, white);
+    background: color-mix(in srgb, var(--stage-theater) 28%, var(--stage-cream));
     font-size: 0.72rem;
     font-weight: 800;
     letter-spacing: 0.12em;
@@ -193,13 +260,13 @@
 
   .stage-grid-board {
     background-image:
-      linear-gradient(rgba(43, 41, 38, 0.12) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(43, 41, 38, 0.12) 1px, transparent 1px);
+      linear-gradient(color-mix(in srgb, var(--stage-ink) 12%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in srgb, var(--stage-ink) 12%, transparent) 1px, transparent 1px);
     background-size: 1.5rem 1.5rem;
   }
 
   .stage-dot-board {
-    background-image: radial-gradient(rgba(43, 41, 38, 0.14) 1px, transparent 1px);
+    background-image: radial-gradient(color-mix(in srgb, var(--stage-ink) 14%, transparent) 1px, transparent 1px);
     background-size: 0.8rem 0.8rem;
   }
 
@@ -211,7 +278,7 @@
   .stage-stat {
     border: 3px solid var(--stage-ink);
     padding: 1rem;
-    background: rgba(251, 247, 239, 0.92);
+    background: var(--stage-surface-base);
     box-shadow: var(--stage-shadow-sm);
   }
 
@@ -226,7 +293,7 @@
 
   .stage-list-card {
     border: 3px solid var(--stage-ink);
-    background: rgba(251, 247, 239, 0.94);
+    background: var(--stage-surface-base);
     box-shadow: var(--stage-shadow-sm);
   }
 
@@ -249,7 +316,7 @@
     gap: 0.45rem;
     border: 2px solid var(--stage-ink);
     padding: 0.28rem 0.72rem;
-    background: rgba(251, 247, 239, 0.9);
+    background: var(--stage-surface-base);
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.06em;
@@ -258,7 +325,7 @@
 
   .stage-chip-dark {
     color: var(--stage-cream);
-    background: rgba(43, 41, 38, 0.9);
+    background: color-mix(in srgb, var(--stage-ink) 90%, transparent);
   }
 
   .stage-link {
@@ -269,6 +336,10 @@
 
   .stage-muted {
     color: color-mix(in srgb, var(--stage-ink) 72%, white);
+  }
+
+  .dark .stage-muted {
+    color: color-mix(in srgb, var(--stage-ink) 55%, var(--stage-cream));
   }
 
   .stage-texture {
@@ -301,7 +372,7 @@
   .stage-data-table {
     overflow: hidden;
     border: 3px solid var(--stage-ink);
-    background: rgba(251, 247, 239, 0.92);
+    background: var(--stage-surface-base);
     box-shadow: var(--stage-shadow);
   }
 
@@ -312,12 +383,12 @@
   }
 
   .stage-data-table :where(th) {
-    background: rgba(239, 227, 205, 0.88);
+    background: var(--stage-surface-th);
   }
 
   .stage-data-table :where(td),
   .stage-data-table :where(th) {
-    border-color: rgba(43, 41, 38, 0.12);
+    border-color: color-mix(in srgb, var(--stage-ink) 12%, transparent);
   }
 }
 
