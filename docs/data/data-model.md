@@ -54,6 +54,7 @@ Compatibility note:
 ### shows
 - theater_id
 - created_by_user_id
+- slug (unique within a theater)
 - status (draft, pending_review, approved, rejected, cancelled)
 - title
 - summary (nullable short promo copy for cards and listings)
@@ -77,6 +78,11 @@ Visibility rules:
 - Approved + publicly listed shows may be visible outside the owning theater
 - Draft, pending, rejected, and other non-public shows require an authorized relationship such as producer, theater staff, or explicit cast involvement
 - `summary`, `description`, `poster_url`, schedule data, and approved ticketing fields together should be enough for Stagecom to serve as the public-facing event record without a separate CMS in v1
+
+Routing rules:
+- Public/canonical event URLs use `/theater/[theaterSlug]/event/[eventSlug]`
+- `shows.slug` only needs to be unique inside a single theater
+- Theater ownership still lives in data and permissions, not just in the URL
 
 ---
 
@@ -118,6 +124,26 @@ Rules:
 - Assigned staff must be explicit, not inferred from theater-level roles
 - Show staff may inspect full show operations but are not allowed to edit proposal-defining fields by default
 - Theater admins and staff may assign or update show staff as part of event operations
+
+---
+
+## Route Read Model
+
+Canonical routes:
+- `/callsheet` is the canonical signed-in home and schedule page.
+- `/theater/[slug]` is the canonical theater homepage.
+- `/theater/[slug]/admin` is the canonical theater operations home.
+- `/event/new` is the canonical event creation route.
+- `/theater/[theaterSlug]/event/[eventSlug]` is the canonical event detail route.
+
+User schedule scope:
+- `personal` is the default and includes only explicit producer, cast, or show-staff relationships.
+- `home` includes visible occurrences at active home-theater memberships.
+- `joined` includes visible occurrences across active joined theater memberships.
+
+Relationship annotations:
+- Schedule occurrence rows stay lean and may include viewer relationship labels: `producer`, `cast`, `show_staff`, `theater_member`, and `home_theater`.
+- Relationship labels annotate why an occurrence appears or how the viewer relates to it; producers are not inferred as cast, and cast still requires an explicit `show_cast` row.
 
 ---
 

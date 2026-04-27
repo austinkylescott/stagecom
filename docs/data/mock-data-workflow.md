@@ -144,6 +144,7 @@ The example config intentionally covers:
 - Optional website/logo theater profile fields via `theaters[].websiteUrl` and `theaters[].logoUrl`
 - Explicit cast membership separate from producer roles
 - Optional richer show setup fields such as `summary`, `producerNote`, and `posterUrl`
+- Theater-scoped event slugs via optional `shows[].slug` or generated title-based fallback
 - Multi-occurrence show/event scheduling scenarios
 - Optional show staff assignments for operations roles such as front of house, box office, bar, and tech
 - Approved, pending review, and draft show states

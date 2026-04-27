@@ -1,32 +1,37 @@
-# Current Feature: Schedule System Unification v1
+# Current Feature: Design Reset Program v1
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-- Make `/schedule` the canonical signed-in user schedule page and keep `/shows` as a compatibility route.
-- Default `/schedule` to personal events while supporting personal, home-theater, and all-joined-theaters schedule scopes.
-- Rebuild `project/app/pages/theaters/[slug]/index.vue` as the theater-specific schedule home, closely matching the schedule page while staying theater-scoped.
-- Keep `/theaters/[slug]/calendar` usable as a compatibility route or thin alias.
-- Extract stable shared schedule composables and components for date state, URL query sync, calendars, week strips, filters, agendas, and event rows.
-- Tighten the schedule endpoints so the user schedule returns lean occurrence data with viewer relationship metadata and the theater schedule respects explicit show-staff visibility.
-- Remove dotted and gridded schedule-page backgrounds in favor of semantic event/paper/theater/performer surfaces.
-- Keep mobile-sized screens first-class across user and theater schedule pages.
-- Update schema, docs, mock-data expectations, and local/remote Supabase state if data expectations or indexes change.
+- Replace the schedule-era sitemap with a smaller canonical route set.
+- Replace the current authenticated design authority with a new sitemap, design-reset spec, and component-system spec.
+- Define the canonical route inventory, page purposes, and page archetypes for every current page.
+- Shift the route model toward collection-style theater discovery and flatter canonical theater/event URLs.
+- Produce a Google Stitch prompt and translation matrix that can drive a full app redesign.
+- Refine the Stitch prompt so it strongly encodes the intended aesthetic, semantic palette, and system-level design direction.
+- Lock the redesign font direction to Cubano for display and Public Sans for body, even if Stitch must approximate them.
+- Add a v3 Stitch prompt that explicitly corrects traditional-theater language, black-heavy design bias, and invented navigation.
+- Define `/dev/components` as a concrete system-reference spec, not just a general expectation.
+- Define the `/dev/components` page outline and fixture strategy so implementation can rebuild it deliberately.
+- Update design and coding guidance so the current Stage wrapper system is no longer treated as locked.
+- Keep `/dev/components` as a permanent design-system overview and demo surface with deterministic sample data.
+- Keep the product aligned to the PRD while preparing for a big-bang frontend rebuild.
 
 ## Notes
 
-- Canonical spec: `docs/specs/2026-04-07/feature-spec-schedule-system-unification-v1.md`
-- `/schedule` answers "What events matter to me?" and defaults to `scope=personal`.
-- `/theaters/[slug]` answers "What is happening at this theater?" and should not default to personal-only filtering.
-- Keep the API route `GET /api/shows/schedule`, adding `scope=personal|home|joined` rather than renaming the backend route.
-- Preserve contextual role rules: producers are not assumed to be cast, and cast membership requires explicit `show_cast`.
-- Live Supabase already has the required core tables for this feature, including `show_staff_assignments`, `show_occurrences`, and home-theater membership fields.
-- Candidate migration: add `idx_show_roles_user` on `show_roles(user_id)` if implementation keeps user-role lookups by `user_id`.
-- If a migration is added, update local migration files/docs and apply it to local and remote Supabase.
-- Run `npm run check:server-conventions` and `npm run build` before completion.
+- Canonical specs live under `docs/specs/2026-04-12/`.
+- Consult `wiki/` first for project context, then use `docs/` for raw verification and source updates.
+- If this feature changes durable product, data, architecture, feature, or design knowledge, update the corresponding pages in `wiki/` before marking the feature complete.
+- This phase is design-first: docs, route architecture, prompt artifacts, and implementation guardrails.
+- The current Stage components and current authenticated surfaces are context, not locked references.
+- Keep current route reality visible in the spec package, including `/dev/components` as an internal surface to classify.
+- Current sitemap direction: `/theaters` is the collection/discovery entry, `/{theaterSlug}` is the canonical theater page, and `/{theaterSlug}/{eventSlug}` is the canonical public event page.
+- `/dev/components` should expose the full implemented design system with durable sample states, not ephemeral date-dependent demos.
+- Preserve PRD role invariants while redefining page structure and system ownership.
+- Frontend rebuild comes after the new design authority and sitemap are locked.
 
 ## History
 
@@ -49,3 +54,4 @@ Not Started
 - Completed Theater Dashboard Section Refinement v1 with a dedicated theater dashboard component, mobile-first overflow fixes, relocated action controls, alert-row refinement, and new Up Next event/show summary cards
 - Completed Design System Standardization v1 with shared Stage button/dropdown/header primitives, theater-page component extraction, expanded Nuxt UI theme configuration, and a new design-system bible plus subagent brief
 - Completed Multi-Home Theater Hub And Calendar v1 with multi-home membership-backed hub data, a split theater meta/upcoming board flow, theater board admin limits, leaner query invalidation and caching, calendar/hub/theater detail surface updates, shared upcoming card/detail primitives, and synchronized schema/mock-data tooling
+- Completed Sitemap Reset v1 with the smaller canonical route set, theater-scoped event URLs, retired plural/compatibility pages, and aligned route/layout foundations

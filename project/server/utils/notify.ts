@@ -17,6 +17,7 @@ export type ShowEventType =
 
 type CastEventBase = {
   showId: string;
+  showSlug: string;
   showTitle: string;
   theaterSlug: string;
   actorId?: string;
@@ -27,6 +28,7 @@ type CastEventBase = {
 
 type ShowEventBase = {
   showId: string;
+  showSlug: string;
   showTitle: string;
   theaterSlug: string;
   note?: string;

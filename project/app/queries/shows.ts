@@ -5,6 +5,7 @@ import type { Enums } from "~/types/database.types";
 
 export type ShowItem = {
   id: string;
+  slug: string;
   title: string;
   description: string | null;
   status: Enums<"show_status">;
@@ -23,6 +24,7 @@ export type ShowScheduleParams = {
   type: string;
   status: string;
   timeline: "all" | "upcoming" | "past";
+  scope: "personal" | "home" | "joined";
 };
 
 export type ShowScheduleItem = {
@@ -32,6 +34,7 @@ export type ShowScheduleItem = {
   occurrenceStatus: Enums<"show_occurrence_status">;
   show: {
     id: string;
+    slug: string;
     title: string;
     status: Enums<"show_status">;
     eventType: Enums<"event_type"> | null;
@@ -39,6 +42,7 @@ export type ShowScheduleItem = {
     theaterName: string;
     theaterSlug: string;
   };
+  viewerRelationships: string[];
 };
 
 export type ShowScheduleResponse = {
@@ -82,6 +86,7 @@ export type CreateShowInput = {
 export type ShowDetailResponse = {
   show: {
     id: string;
+    slug: string;
     title: string;
     summary: string | null;
     description: string | null;
@@ -204,6 +209,32 @@ export const showDetailQueryOptions = defineQueryOptions<
   } as const;
 });
 
+export const eventDetailQueryOptions = defineQueryOptions<
+  { theaterSlug: string; eventSlug: string },
+  ShowDetailResponse
+>((params) => {
+  const headers = import.meta.server
+    ? useRequestHeaders(["cookie"])
+    : undefined;
+
+  return {
+    key: queryKeys.eventDetail(
+      params?.theaterSlug ?? "",
+      params?.eventSlug ?? "",
+    ),
+    query: () =>
+      $fetch<ShowDetailResponse>(
+        `/api/theaters/${params?.theaterSlug}/events/${params?.eventSlug}`,
+        {
+          credentials: "include",
+          headers,
+        },
+      ),
+    enabled: Boolean(params?.theaterSlug && params?.eventSlug),
+    staleTime: 20_000,
+  } as const;
+});
+
 export const memberShowsScheduleQueryOptions = defineQueryOptions<
   ShowScheduleParams,
   ShowScheduleResponse
@@ -219,6 +250,7 @@ export const memberShowsScheduleQueryOptions = defineQueryOptions<
       type: params?.type ?? "",
       status: params?.status ?? "",
       timeline: params?.timeline ?? "all",
+      scope: params?.scope ?? "personal",
     }),
     query: () =>
       $fetch<ShowScheduleResponse>("/api/shows/schedule", {
@@ -230,6 +262,7 @@ export const memberShowsScheduleQueryOptions = defineQueryOptions<
           type: params?.type || undefined,
           status: params?.status || undefined,
           timeline: params?.timeline ?? "all",
+          scope: params?.scope ?? "personal",
         },
       }),
     staleTime: 20_000,

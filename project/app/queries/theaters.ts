@@ -118,6 +118,7 @@ export type TheaterEventItem = {
   occurrenceStatus: Enums<"show_occurrence_status">;
   show: {
     id: string;
+    slug: string;
     title: string;
     description: string | null;
     status: Enums<"show_status">;
@@ -146,6 +147,7 @@ export type TheaterScheduleItem = {
   occurrenceStatus: Enums<"show_occurrence_status">;
   show: {
     id: string;
+    slug: string;
     title: string;
     status: Enums<"show_status">;
     eventType: Enums<"event_type"> | null;
@@ -153,6 +155,7 @@ export type TheaterScheduleItem = {
     theaterName: string;
     theaterSlug: string;
   };
+  viewerRelationships: string[];
 };
 
 export type TheaterScheduleResponse = {

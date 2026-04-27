@@ -1,143 +1,93 @@
 <script setup lang="ts">
-import * as z from "zod";
-import type { FormSubmitEvent, AuthFormField } from "@nuxt/ui";
-
 const supabase = useSupabaseClient();
 const route = useRoute();
 const authError = ref<string | null>(null);
 const isSubmitting = ref(false);
+const email = ref("");
+const password = ref("");
+
 const redirectTarget = computed(() => {
   const redirect = route.query.redirect;
-  return typeof redirect === "string" && redirect.startsWith("/")
-    ? redirect
-    : "/";
+  return typeof redirect === "string" && redirect.startsWith("/") ? redirect : "/callsheet";
 });
 
-const signInWithOAuth = async (provider: "google" | "github") => {
-  authError.value = null;
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider,
-  });
-  if (error) {
-    authError.value = error.message;
-  }
-};
-
-const toast = useToast();
-
-const fields: AuthFormField[] = [
-  {
-    name: "email",
-    type: "email",
-    label: "Email",
-    placeholder: "Enter your email",
-    required: true,
-  },
-  {
-    name: "password",
-    label: "Password",
-    type: "password",
-    placeholder: "Enter your password",
-    required: true,
-  },
-  {
-    name: "remember",
-    label: "Remember me",
-    type: "checkbox",
-  },
-];
-
-const providers = [
-  {
-    label: "Google",
-    icon: "i-simple-icons-google",
-    onClick: () => {
-      toast.add({ title: "Google", description: "Login with Google" });
-      signInWithOAuth("google");
-    },
-  },
-  {
-    label: "GitHub",
-    icon: "i-simple-icons-github",
-    onClick: () => {
-      toast.add({ title: "GitHub", description: "Login with GitHub" });
-      signInWithOAuth("github");
-    },
-  },
-];
-
-const schema = z.object({
-  email: z.email("Invalid email"),
-  password: z
-    .string("Password is required")
-    .min(8, "Must be at least 8 characters"),
-});
-
-type Schema = z.output<typeof schema>;
-
-async function onSubmit(payload: FormSubmitEvent<Schema>) {
+const onSubmit = async () => {
   authError.value = null;
   isSubmitting.value = true;
 
   const { error } = await supabase.auth.signInWithPassword({
-    email: payload.data.email,
-    password: payload.data.password,
+    email: email.value,
+    password: password.value,
   });
+
+  isSubmitting.value = false;
 
   if (error) {
     authError.value = error.message;
-  } else {
-    await navigateTo(redirectTarget.value);
+    return;
   }
 
-  isSubmitting.value = false;
-}
+  await navigateTo(redirectTarget.value);
+};
 </script>
 
 <template>
-  <div class="space-y-8 px-4 py-6">
-    <section class="mx-auto w-full max-w-3xl stage-message stage-texture overflow-hidden px-6 py-7 sm:px-8 sm:py-8">
-      <span class="stage-kicker">Welcome back</span>
-      <h1 class="mt-4 stage-section-title">Sign in to run your scene.</h1>
-      <p class="mt-3 max-w-2xl text-lg leading-8 stage-muted">
-        Auth screens should live inside the same homepage system, even while relying on Nuxt UI form primitives.
-      </p>
+  <div class="grid min-h-screen grid-cols-1 pt-16 md:grid-cols-2">
+    <section class="flex flex-col justify-between border-b-[4px] border-(--stage-ink) bg-(--stage-ink) p-8 text-(--stage-cream) md:border-b-0 md:border-r-[4px] md:p-12">
+      <div>
+        <p class="stitch-nav-label mb-8 text-sm text-(--stage-theater)">Stagecom Access Terminal</p>
+        <h1 class="stitch-display text-6xl font-black md:text-7xl">Run The Scene.</h1>
+        <p class="mt-6 max-w-xl text-lg font-medium text-(--stage-cream)/80">
+          Sign in to your callsheet, theater roster, notifications, and production board.
+        </p>
+      </div>
+      <div class="mt-12 border-l-[4px] border-(--stage-event) pl-4 text-sm font-black uppercase tracking-[0.2em]">
+        Built for performers, producers, and theater crews.
+      </div>
     </section>
-    <div class="flex flex-col items-center justify-center gap-4">
-      <UPageCard class="w-full max-w-md">
-      <UAuthForm
-        :schema="schema"
-        :fields="fields"
-        :providers="providers"
-        title="Welcome back!"
-        icon="i-lucide-lock"
-        :loading="isSubmitting"
-        @submit="onSubmit"
-      >
-        <template #description>
-          Don't have an account?
-          <ULink to="/signup" class="text-primary font-medium">Sign up</ULink>.
-        </template>
-        <template #password-hint>
-          <ULink to="#" class="text-primary font-medium" tabindex="-1"
-            >Forgot password?</ULink
+
+    <section class="flex items-center justify-center bg-(--stage-paper) p-6 md:p-10">
+      <div class="w-full max-w-xl stitch-border-heavy bg-(--stage-cream) stitch-shadow-lg">
+        <div class="border-b-[4px] border-(--stage-ink) bg-(--stage-paper) p-6">
+          <p class="stitch-nav-label text-xs tracking-[0.22em] text-(--stage-theater)">Login</p>
+          <h2 class="stitch-display mt-3 text-4xl font-black">Identify Yourself</h2>
+        </div>
+
+        <form class="space-y-5 p-6 md:p-8" @submit.prevent="onSubmit">
+          <div>
+            <label class="mb-2 block text-xs font-black uppercase tracking-[0.2em]">Email</label>
+            <input v-model="email" type="email" required class="stitch-input" placeholder="YOU@THEATER.COM">
+          </div>
+
+          <div>
+            <label class="mb-2 block text-xs font-black uppercase tracking-[0.2em]">Password</label>
+            <input
+              v-model="password"
+              type="password"
+              required
+              class="stitch-input"
+              placeholder="ENTER YOUR PASSWORD"
+            >
+          </div>
+
+          <div v-if="authError" class="stitch-border bg-(--stage-performer-soft) p-4 text-sm font-bold">
+            {{ authError }}
+          </div>
+
+          <button
+            type="submit"
+            class="stitch-display w-full border-[4px] border-(--stage-ink) bg-(--stage-event) px-6 py-4 text-2xl font-black shadow-[6px_6px_0_0_var(--stage-ink)] transition-all hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[4px_4px_0_0_var(--stage-ink)] disabled:cursor-wait disabled:opacity-70"
+            :disabled="isSubmitting"
           >
-        </template>
-        <template #validation>
-          <UAlert
-            v-if="authError"
-            color="error"
-            icon="i-lucide-info"
-            :title="authError"
-          />
-        </template>
-        <template #footer>
-          By signing in, you agree to our
-          <ULink to="#" class="text-primary font-medium">Terms of Service</ULink
-          >.
-        </template>
-      </UAuthForm>
-      </UPageCard>
-    </div>
+            {{ isSubmitting ? "Entering..." : "Enter Stagecom" }}
+          </button>
+
+          <div class="flex items-center justify-between gap-4 text-sm font-bold uppercase">
+            <NuxtLink to="/signup" class="underline underline-offset-4">Need an account?</NuxtLink>
+            <NuxtLink to="/confirm" class="underline underline-offset-4">Confirm sign up</NuxtLink>
+          </div>
+        </form>
+      </div>
+    </section>
   </div>
 </template>

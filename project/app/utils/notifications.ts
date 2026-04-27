@@ -1,5 +1,8 @@
+import { toEventPath } from "~/utils/routes";
+
 export type NotificationPayload = {
   showId?: string;
+  showSlug?: string;
   showTitle?: string;
   theaterSlug?: string;
   actorName?: string;
@@ -19,9 +22,7 @@ export const formatNotification = (
 ): FormattedNotification => {
   const p = payload ?? {};
   const href =
-    p.theaterSlug && p.showId
-      ? `/theaters/${p.theaterSlug}/shows/${p.showId}`
-      : null;
+    p.theaterSlug && p.showSlug ? toEventPath(p.theaterSlug, p.showSlug) : null;
 
   const show = p.showTitle ? `"${p.showTitle}"` : "a show";
   const actor = p.actorName ?? "Someone";

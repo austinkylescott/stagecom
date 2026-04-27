@@ -44,6 +44,7 @@ export const queryKeys = {
     type: string;
     status: string;
     timeline: string;
+    scope: string;
   }) => ["member-shows-schedule", params] as const,
 
   memberShowsSchedulePrefix: () => ["member-shows-schedule"] as const,
@@ -59,6 +60,9 @@ export const queryKeys = {
   profile: (userId: string) => ["profile", { userId }] as const,
 
   showDetail: (id: string) => ["show-detail", { id }] as const,
+
+  eventDetail: (theaterSlug: string, eventSlug: string) =>
+    ["event-detail", { theaterSlug, eventSlug }] as const,
 
   notifications: () => ["notifications"] as const,
 

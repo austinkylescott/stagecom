@@ -3,6 +3,11 @@ import { computed, type Ref } from "vue";
 import { useHomeTheaterState } from "~/composables/useHomeTheaterState";
 import { useTheaterRelationship } from "~/composables/useTheaterRelationship";
 import type { TheaterDetails } from "~/queries/theaters";
+import {
+  toEventCreatePath,
+  toTheaterAdminPath,
+  toTheaterPath,
+} from "~/utils/routes";
 
 type TheaterTarget = TheaterDetails["theater"] | null;
 
@@ -52,9 +57,9 @@ export const useTheaterRelationshipActions = ({
     const items: DropdownMenuItem[][] = [
       [
         {
-          label: "Full calendar",
+          label: "Theater schedule",
           icon: "i-heroicons-calendar-days",
-          to: `/theaters/${slug.value}/calendar`,
+          to: toTheaterPath(slug.value),
         },
       ],
     ];
@@ -63,7 +68,7 @@ export const useTheaterRelationshipActions = ({
       items[0]?.push({
         label: "Create an event",
         icon: "i-heroicons-plus",
-        to: `/theaters/${slug.value}/shows/new`,
+        to: toEventCreatePath(slug.value),
       });
     }
 
@@ -71,7 +76,7 @@ export const useTheaterRelationshipActions = ({
       items[0]?.push({
         label: "Theater admin",
         icon: "i-heroicons-shield-check",
-        to: `/theaters/${slug.value}/admin`,
+        to: toTheaterAdminPath(slug.value),
       });
     }
 

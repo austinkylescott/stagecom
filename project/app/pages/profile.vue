@@ -1,94 +1,45 @@
 <script setup lang="ts">
-const user = useSupabaseUser();
+import { useHomeTheaterState } from "~/composables/useHomeTheaterState";
+import { demoProfile, demoTheaters } from "~/utils/stitchDemo";
 
-// Keep the reactive profile in sync with the canonical row we control.
-const { profile, profileError, refreshProfile } = useUserIdentity();
+definePageMeta({
+  layout: "app",
+  middleware: "auth",
+});
+
+const identity = useUserIdentity();
+const profile = computed(() => identity.profile.value ?? demoProfile);
+const { homeTheater, homeTheaters } = useHomeTheaterState();
+const isSaving = ref(false);
+const saveMessage = ref<string | null>(null);
+const saveError = ref<string | null>(null);
 
 const form = reactive({
   displayName: "",
-  avatarUrl: "",
-  timezone: "UTC",
+  timezone: "",
   pronouns: "",
-  bio: "",
   city: "",
-  visibility: "theater_only",
-});
-
-const initial = reactive({
-  displayName: "",
-  avatarUrl: "",
-  timezone: "UTC",
-  pronouns: "",
+  visibility: "theater_only" as "public" | "private" | "theater_only",
   bio: "",
-  city: "",
-  visibility: "theater_only",
 });
-
-const loading = ref(false);
-const notice = ref("");
-const error = ref("");
-const hydrated = ref(false);
-const visibilityItems = [
-  { label: "Public", value: "public" },
-  { label: "Theater-only", value: "theater_only" },
-  { label: "Private", value: "private" },
-];
-const pronounItems = [
-  { label: "he/him", value: "he/him" },
-  { label: "she/her", value: "she/her" },
-  { label: "they/them", value: "they/them" },
-  { label: "–––", value: null },
-];
 
 watch(
-  () => [user.value?.id, profile.value],
-  () => {
-    if (!user.value) return;
-
-    // Populate form from the latest profile/user data.
-    const data = profile.value;
-    form.displayName = data?.display_name || user.value.email || "";
-    form.avatarUrl = data?.avatar_url || "";
-    form.timezone = data?.timezone || "UTC";
-    form.pronouns = data?.pronouns || "";
-    form.bio = data?.bio || "";
-    form.city = data?.city || "";
-    form.visibility = data?.visibility || "theater_only";
-
-    // Capture a clean baseline for dirty checking.
-    initial.displayName = form.displayName;
-    initial.avatarUrl = form.avatarUrl;
-    initial.timezone = form.timezone;
-    initial.pronouns = form.pronouns;
-    initial.bio = form.bio;
-    initial.city = form.city;
-    initial.visibility = form.visibility;
-    hydrated.value = true;
+  profile,
+  (value) => {
+    form.displayName = value.display_name ?? "";
+    form.timezone = value.timezone ?? "UTC";
+    form.pronouns = value.pronouns ?? "";
+    form.city = value.city ?? "";
+    form.visibility = value.visibility ?? "theater_only";
+    form.bio = value.bio ?? "";
   },
   { immediate: true },
 );
 
-const isDirty = computed(
-  () =>
-    form.displayName !== initial.displayName ||
-    form.avatarUrl !== initial.avatarUrl ||
-    form.timezone !== initial.timezone ||
-    form.pronouns !== initial.pronouns ||
-    form.bio !== initial.bio ||
-    form.city !== initial.city ||
-    form.visibility !== initial.visibility,
-);
-
-const save = async () => {
-  if (!user.value) return;
-  if (!form.displayName.trim()) {
-    error.value = "Display name is required";
-    return;
-  }
-
-  loading.value = true;
-  notice.value = "";
-  error.value = "";
+const saveProfile = async () => {
+  saveMessage.value = null;
+  saveError.value = null;
+  isSaving.value = true;
 
   try {
     await $fetch("/api/me/profile", {
@@ -96,134 +47,141 @@ const save = async () => {
       credentials: "include",
       body: {
         displayName: form.displayName,
-        avatarUrl: form.avatarUrl || null,
-        timezone: form.timezone || "UTC",
-        pronouns: form.pronouns || null,
-        bio: form.bio || null,
-        city: form.city || null,
-        visibility: form.visibility || "theater_only",
+        timezone: form.timezone,
+        pronouns: form.pronouns,
+        city: form.city,
+        bio: form.bio,
+        visibility: form.visibility,
       },
     });
-    notice.value = "Profile updated";
-    await refreshProfile();
-    initial.displayName = form.displayName;
-    initial.avatarUrl = form.avatarUrl;
-    initial.timezone = form.timezone;
-    initial.pronouns = form.pronouns;
-    initial.bio = form.bio;
-    initial.city = form.city;
-    initial.visibility = form.visibility;
-  } catch (upsertError: any) {
-    error.value =
-      upsertError?.data?.statusMessage ||
-      upsertError?.data?.message ||
-      upsertError?.message ||
-      "Failed to update profile";
+
+    await identity.refreshProfile();
+    saveMessage.value = "Profile saved.";
+  } catch (error: any) {
+    saveError.value =
+      error?.data?.statusMessage || error?.message || "Unable to save profile.";
+  } finally {
+    isSaving.value = false;
   }
-  loading.value = false;
 };
 </script>
 
 <template>
-  <div class="space-y-0">
-    <StageSection outer-class="border-b-3 border-(--stage-ink) bg-(--stage-cream) stage-texture overflow-hidden" inner-class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
-      <div>
-        <span class="stage-kicker">Profile</span>
-        <h1 class="mt-4 stage-section-title">How you appear across the scene.</h1>
-        <p class="mt-3 max-w-3xl text-lg leading-8 stage-muted">
-          Keep your identity readable for producers and theaters while staying explicit about what is public, theater-only, or private.
-        </p>
-      </div>
-    </StageSection>
+  <div class="bg-(--stage-cream) p-6 md:p-10">
+    <header class="mb-10">
+      <h1 class="stitch-display text-5xl font-black md:text-7xl">Profile</h1>
+      <p class="mt-2 text-lg font-bold text-(--stage-ink)/70">Identity, visibility, and theater-facing account context.</p>
+    </header>
 
-    <StageSection outer-class="border-b-3 border-(--stage-ink) bg-[rgba(251,247,239,0.52)]" inner-class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-      <UAlert v-if="!user" color="yellow" variant="soft">
-        <template #title>Sign in required</template>
-        <template #description>Log in to edit your profile.</template>
-      </UAlert>
-
-      <section v-else class="stage-page-grid stage-page-grid-rail">
-        <div class="stage-panel p-5 sm:p-6">
-          <div class="space-y-4">
-            <UFormField label="Display name" required>
-              <UInput v-model="form.displayName" />
-            </UFormField>
-
-            <UFormField label="Avatar URL" description="Optional">
-              <UInput
-                v-model="form.avatarUrl"
-                placeholder="https://example.com/avatar.png"
-              />
-            </UFormField>
-
-            <UFormField label="Pronouns" description="Optional">
-              <USelectMenu
-                v-model="form.pronouns"
-                :items="pronounItems"
-                value-key="value"
-                class="w-full"
-              />
-            </UFormField>
-
-            <UFormField label="City" description="Helps theaters find locals">
-              <UInput v-model="form.city" placeholder="Chicago, IL" />
-            </UFormField>
-
-            <UFormField label="Bio" description="Short intro or team affiliation">
-              <UTextarea v-model="form.bio" :rows="3" />
-            </UFormField>
-
-            <UFormField
-              label="Timezone"
-              description="IANA name, e.g. America/New_York"
-            >
-              <UInput v-model="form.timezone" placeholder="UTC" />
-            </UFormField>
-
-            <UFormField
-              label="Profile visibility"
-              description="Who can see your profile details"
-            >
-              <USelectMenu
-                v-model="form.visibility"
-                :items="visibilityItems"
-                class="w-full"
-                value-key="value"
-              />
-            </UFormField>
-
-            <div class="flex items-center gap-2 flex-wrap">
-              <UButton
-                :loading="loading"
-                :disabled="!isDirty"
-                color="primary"
-                @click="save"
-              >
-                Save
-              </UButton>
-              <p v-if="notice" class="text-sm text-emerald-600">{{ notice }}</p>
-              <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
-            </div>
+    <div class="grid gap-8 lg:grid-cols-12">
+      <section class="border-[4px] border-(--stage-ink) bg-(--stage-theater) p-8 shadow-[8px_8px_0_0_var(--stage-ink)] lg:col-span-7">
+        <div class="mb-6 flex items-start gap-5">
+          <div class="flex h-24 w-24 items-center justify-center border-[4px] border-(--stage-ink) bg-(--stage-paper) text-3xl font-black">
+            {{ identity.initials.value }}
+          </div>
+          <div>
+            <p class="stitch-nav-label text-xs tracking-[0.22em]">Account Sheet</p>
+            <h2 class="stitch-display mt-2 text-4xl font-black">{{ profile.display_name }}</h2>
+            <p class="mt-3 text-sm font-bold uppercase text-(--stage-ink)/70">
+              {{ profile.pronouns }} • {{ profile.city }} • {{ profile.timezone }}
+            </p>
           </div>
         </div>
 
-        <aside class="stage-panel-dark stage-grid-board p-5 sm:p-6">
-          <span class="stage-overline text-(--stage-cream)">What this controls</span>
-          <h2 class="mt-3 text-2xl font-black tracking-[-0.03em] text-(--stage-cream)">
-            Make it easy to recognize you.
-          </h2>
-          <div class="mt-4 space-y-4 text-sm leading-6 text-[rgba(251,247,239,0.82)]">
-            <p>
-              Display name, city, pronouns, and bio help theaters and collaborators
-              recognize you without guessing.
-            </p>
-            <p>
-              Visibility determines how widely your details appear across the
-              network, while timezone keeps scheduling readable for everyone else.
-            </p>
-          </div>
-        </aside>
+        <p class="max-w-2xl text-lg leading-relaxed">
+          {{ profile.bio }}
+        </p>
       </section>
-    </StageSection>
+
+      <section class="border-[4px] border-(--stage-ink) bg-(--stage-paper) p-6 shadow-[8px_8px_0_0_var(--stage-ink)] lg:col-span-5">
+        <h2 class="stitch-display mb-4 text-2xl font-black">Account Details</h2>
+        <div class="space-y-4">
+          <div class="border-b border-(--stage-ink)/10 pb-3">
+            <p class="text-xs font-black uppercase tracking-[0.18em] text-(--stage-ink)/60">Email</p>
+            <p class="mt-1 text-lg font-bold">{{ identity.email.value }}</p>
+          </div>
+          <div class="border-b border-(--stage-ink)/10 pb-3">
+            <p class="text-xs font-black uppercase tracking-[0.18em] text-(--stage-ink)/60">Home Theater</p>
+            <p class="mt-1 text-lg font-bold">{{ homeTheater?.name || demoTheaters.myTheaters[0]?.name }}</p>
+          </div>
+
+          <div class="grid gap-4">
+            <div>
+              <label class="mb-2 block text-xs font-black uppercase tracking-[0.18em]">Display Name</label>
+              <input v-model="form.displayName" class="stitch-input">
+            </div>
+            <div class="grid gap-4 md:grid-cols-2">
+              <div>
+                <label class="mb-2 block text-xs font-black uppercase tracking-[0.18em]">Timezone</label>
+                <input v-model="form.timezone" class="stitch-input">
+              </div>
+              <div>
+                <label class="mb-2 block text-xs font-black uppercase tracking-[0.18em]">City</label>
+                <input v-model="form.city" class="stitch-input">
+              </div>
+            </div>
+            <div class="grid gap-4 md:grid-cols-2">
+              <div>
+                <label class="mb-2 block text-xs font-black uppercase tracking-[0.18em]">Pronouns</label>
+                <input v-model="form.pronouns" class="stitch-input">
+              </div>
+              <div>
+                <label class="mb-2 block text-xs font-black uppercase tracking-[0.18em]">Visibility</label>
+                <select v-model="form.visibility" class="stitch-input">
+                  <option value="theater_only">Theater only</option>
+                  <option value="public">Public</option>
+                  <option value="private">Private</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class="mb-2 block text-xs font-black uppercase tracking-[0.18em]">Bio</label>
+              <textarea v-model="form.bio" rows="4" class="stitch-input" />
+            </div>
+          </div>
+
+          <div v-if="saveError" class="border-[4px] border-(--stage-ink) bg-(--stage-performer-soft) p-4 text-sm font-bold">
+            {{ saveError }}
+          </div>
+          <div v-if="saveMessage" class="border-[4px] border-(--stage-ink) bg-(--stage-theater-soft) p-4 text-sm font-bold">
+            {{ saveMessage }}
+          </div>
+
+          <button
+            class="stitch-display border-[4px] border-(--stage-ink) bg-(--stage-event) px-6 py-3 text-xl font-black shadow-[6px_6px_0_0_var(--stage-ink)] disabled:cursor-wait disabled:opacity-70"
+            :disabled="isSaving"
+            @click="saveProfile"
+          >
+            {{ isSaving ? "Saving..." : "Save Profile" }}
+          </button>
+        </div>
+      </section>
+
+      <section class="border-[4px] border-(--stage-ink) bg-(--stage-paper) p-6 shadow-[8px_8px_0_0_var(--stage-ink)] lg:col-span-12">
+        <div class="mb-6 flex items-center justify-between gap-4">
+          <h2 class="stitch-display text-3xl font-black">Membership Context</h2>
+          <span class="text-sm font-black uppercase tracking-[0.18em]">2 active theaters</span>
+        </div>
+
+        <div class="grid gap-6 md:grid-cols-2">
+          <article
+            v-for="theater in (homeTheaters.length ? homeTheaters.map((entry) => ({ ...entry.theater, isHome: entry.membership.isHome })) : [...demoTheaters.myTheaters, ...demoTheaters.theaters.slice(0, 1)])"
+            :key="theater.id"
+            class="stitch-border bg-(--stage-cream) p-5"
+          >
+            <h3 class="stitch-display text-2xl font-black">{{ theater.name }}</h3>
+            <p class="mt-2 text-sm font-bold text-(--stage-ink)/70">{{ theater.tagline }}</p>
+            <div class="mt-4 flex gap-2">
+              <span class="stitch-border bg-(--stage-theater-soft) px-2 py-1 text-[10px] font-black uppercase">
+                {{ theater.isHome ? "home theater" : "member" }}
+              </span>
+              <span class="stitch-border bg-(--stage-event-soft) px-2 py-1 text-[10px] font-black uppercase">
+                active
+              </span>
+            </div>
+          </article>
+        </div>
+      </section>
+    </div>
   </div>
 </template>

@@ -1,6 +1,8 @@
 # Feature Spec: Multi-Home Theater Hub And Calendar v1
 Derived from PRD v0.2 (Locked)
 
+Status note: Schedule System Unification v1 later made `/theaters/[slug]` the canonical theater schedule home and retained `/theaters/[slug]/calendar` as a compatibility redirect.
+
 ---
 
 ## Status

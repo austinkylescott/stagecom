@@ -1,9 +1,7 @@
 <template>
-  <UApp>
-    <AppNav />
-    <main>
-      <slot />
-    </main>
-    <AppFooter />
-  </UApp>
+  <AppNav />
+  <main>
+    <slot />
+  </main>
+  <AppFooter />
 </template>

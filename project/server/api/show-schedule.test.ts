@@ -224,6 +224,7 @@ describe("show schedule route", () => {
           theaterName: "Theater A",
           theaterSlug: "theater-a",
         },
+        viewerRelationships: ["cast", "theater_member"],
       },
     ]);
 
@@ -454,5 +455,218 @@ describe("show schedule route", () => {
     expect(response.items[0]?.occurrenceId).toBe("occ-upcoming");
 
     vi.useRealTimers();
+  });
+
+  it("defaults to personal scope and returns empty without explicit show relationships", async () => {
+    const supabase = createMockClient({
+      theater_memberships: [
+        {
+          data: [
+            {
+              theater_id: "theater-a",
+              roles: ["member"],
+              status: "active",
+              is_home: true,
+            },
+          ],
+        },
+      ],
+    });
+
+    const serviceSupabase = createMockClient({
+      show_roles: [{ data: [] }],
+      show_staff_assignments: [{ data: [] }],
+      show_cast: [{ data: [] }],
+    });
+
+    vi.doMock("#supabase/server", () => ({
+      serverSupabaseClient: vi.fn(async () => supabase),
+    }));
+    vi.doMock("~~/server/utils/service-role", () => ({
+      getServiceRoleClient: vi.fn(() => serviceSupabase),
+    }));
+
+    const { default: handler } = await importFresh<typeof import("./shows/schedule.get")>(
+      "./shows/schedule.get"
+    );
+
+    const response = await handler({} as never);
+
+    expect(response).toEqual({
+      items: [],
+      filters: {
+        theaters: [],
+        eventTypes: [],
+        statuses: [],
+      },
+    });
+  });
+
+  it("includes show-staff-only private schedule items", async () => {
+    const supabase = createMockClient({
+      theater_memberships: [
+        {
+          data: [
+            {
+              theater_id: "theater-a",
+              roles: ["member"],
+              status: "active",
+            },
+          ],
+        },
+      ],
+      theaters: [
+        {
+          data: [{ id: "theater-a", name: "Theater A", slug: "theater-a" }],
+        },
+      ],
+    });
+
+    const serviceSupabase = createMockClient({
+      shows: [
+        {
+          data: [
+            {
+              id: "show-staffed",
+              title: "Private Tech Rehearsal",
+              status: "draft",
+              theater_id: "theater-a",
+              event_type: "practice",
+              casting_mode: "direct_invite",
+              is_public_listed: false,
+            },
+          ],
+        },
+      ],
+      show_roles: [{ data: [] }],
+      show_staff_assignments: [{ data: [{ show_id: "show-staffed" }] }],
+      show_cast: [{ data: [] }],
+      show_occurrences: [
+        {
+          data: [
+            {
+              id: "occ-staffed",
+              show_id: "show-staffed",
+              starts_at: "2026-04-18T19:00:00.000Z",
+              ends_at: null,
+              status: "scheduled",
+            },
+          ],
+        },
+      ],
+    });
+
+    vi.doMock("#supabase/server", () => ({
+      serverSupabaseClient: vi.fn(async () => supabase),
+    }));
+    vi.doMock("~~/server/utils/service-role", () => ({
+      getServiceRoleClient: vi.fn(() => serviceSupabase),
+    }));
+
+    const { default: handler } = await importFresh<typeof import("./shows/schedule.get")>(
+      "./shows/schedule.get"
+    );
+
+    const response = await handler({} as never);
+
+    expect(response.items).toHaveLength(1);
+    expect(response.items[0]?.show.id).toBe("show-staffed");
+    expect(response.items[0]?.viewerRelationships).toEqual([
+      "show_staff",
+      "theater_member",
+    ]);
+  });
+
+  it("does not fail schedules when show staff assignments are missing from a stale schema cache", async () => {
+    const supabase = createMockClient({
+      theater_memberships: [
+        {
+          data: [
+            {
+              theater_id: "theater-a",
+              roles: ["member"],
+              status: "active",
+              is_home: true,
+            },
+          ],
+        },
+      ],
+      theaters: [
+        {
+          data: [{ id: "theater-a", name: "Theater A", slug: "theater-a" }],
+        },
+      ],
+    });
+
+    const serviceSupabase = createMockClient({
+      shows: [
+        {
+          data: [
+            {
+              id: "show-visible",
+              title: "House Team Night",
+              status: "approved",
+              theater_id: "theater-a",
+              event_type: "show",
+              casting_mode: "theater_casting",
+              is_public_listed: false,
+            },
+          ],
+        },
+      ],
+      show_roles: [{ data: [] }],
+      show_staff_assignments: [
+        {
+          error: {
+            message:
+              "Could not find the table 'public.show_staff_assignments' in the schema cache",
+          },
+        },
+      ],
+      show_cast: [
+        {
+          data: [
+            {
+              show_id: "show-visible",
+              source: "invited",
+              status: "accepted",
+            },
+          ],
+        },
+      ],
+      show_occurrences: [
+        {
+          data: [
+            {
+              id: "occ-1",
+              show_id: "show-visible",
+              starts_at: "2026-04-12T20:00:00.000Z",
+              ends_at: null,
+              status: "scheduled",
+            },
+          ],
+        },
+      ],
+    });
+
+    vi.doMock("#supabase/server", () => ({
+      serverSupabaseClient: vi.fn(async () => supabase),
+    }));
+    vi.doMock("~~/server/utils/service-role", () => ({
+      getServiceRoleClient: vi.fn(() => serviceSupabase),
+    }));
+
+    const { default: handler } = await importFresh<typeof import("./shows/schedule.get")>(
+      "./shows/schedule.get"
+    );
+
+    const response = await handler({} as never);
+
+    expect(response.items).toHaveLength(1);
+    expect(response.items[0]?.viewerRelationships).toEqual([
+      "cast",
+      "theater_member",
+      "home_theater",
+    ]);
   });
 });

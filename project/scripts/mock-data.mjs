@@ -367,6 +367,18 @@ function pushShowData(lines, shows, userByKey, theaterByKey) {
       asSqlUuid(resolveTheaterId(theater)),
       asSqlUuid(createdBy.id),
       asSqlEnum(optionalString(show.status) ?? "draft", "show_status"),
+      asSqlString(
+        optionalString(show.slug) ??
+          requireString(show.title, `shows[${showKey}].title`)
+            .trim()
+            .toLowerCase()
+            .replace(/['"]/g, "")
+            .replace(/^the\s+/, "")
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, "")
+            .slice(0, 60) ||
+          showKey.replace(/[^a-z0-9]+/gi, "-").toLowerCase(),
+      ),
       asSqlString(requireString(show.title, `shows[${showKey}].title`)),
       asSqlNullableString(optionalString(show.description)),
       asSqlEnum(optionalString(show.eventType) ?? "show", "event_type"),
@@ -492,7 +504,7 @@ function pushShowData(lines, shows, userByKey, theaterByKey) {
     }
   }
 
-  pushInsert(lines, "-- Shows", "shows", "(id, theater_id, created_by_user_id, status, title, description, event_type, casting_mode, cast_min, cast_max, is_cast_finalized, is_public_listed, ticket_url, on_sale_at)", showRows, [
+  pushInsert(lines, "-- Shows", "shows", "(id, theater_id, created_by_user_id, status, slug, title, description, event_type, casting_mode, cast_min, cast_max, is_cast_finalized, is_public_listed, ticket_url, on_sale_at)", showRows, [
     "on conflict (id) do update set",
     "  theater_id = excluded.theater_id,",
     "  created_by_user_id = excluded.created_by_user_id,",
