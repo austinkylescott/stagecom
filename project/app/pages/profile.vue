@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useHomeTheaterState } from "~/composables/useHomeTheaterState";
-import { demoProfile, demoTheaters } from "~/utils/stitchDemo";
 
 definePageMeta({
   layout: "app",
@@ -8,11 +7,14 @@ definePageMeta({
 });
 
 const identity = useUserIdentity();
-const profile = computed(() => identity.profile.value ?? demoProfile);
-const { homeTheater, homeTheaters } = useHomeTheaterState();
+const profile = computed(() => identity.profile.value);
+const { candidateTheaters, homeTheater, homeTheaters } = useHomeTheaterState();
 const isSaving = ref(false);
 const saveMessage = ref<string | null>(null);
 const saveError = ref<string | null>(null);
+const membershipCount = computed(
+  () => homeTheaters.value.length + candidateTheaters.value.length,
+);
 
 const form = reactive({
   displayName: "",
@@ -26,12 +28,12 @@ const form = reactive({
 watch(
   profile,
   (value) => {
-    form.displayName = value.display_name ?? "";
-    form.timezone = value.timezone ?? "UTC";
-    form.pronouns = value.pronouns ?? "";
-    form.city = value.city ?? "";
-    form.visibility = value.visibility ?? "theater_only";
-    form.bio = value.bio ?? "";
+    form.displayName = value?.display_name ?? "";
+    form.timezone = value?.timezone ?? "UTC";
+    form.pronouns = value?.pronouns ?? "";
+    form.city = value?.city ?? "";
+    form.visibility = value?.visibility ?? "theater_only";
+    form.bio = value?.bio ?? "";
   },
   { immediate: true },
 );
@@ -81,15 +83,15 @@ const saveProfile = async () => {
           </div>
           <div>
             <p class="stitch-nav-label text-xs tracking-[0.22em]">Account Sheet</p>
-            <h2 class="stitch-display mt-2 text-4xl font-black">{{ profile.display_name }}</h2>
+            <h2 class="stitch-display mt-2 text-4xl font-black">{{ identity.displayName.value }}</h2>
             <p class="mt-3 text-sm font-bold uppercase text-(--stage-ink)/70">
-              {{ profile.pronouns }} • {{ profile.city }} • {{ profile.timezone }}
+              {{ profile?.pronouns || "Pronouns unset" }} • {{ profile?.city || "City unset" }} • {{ profile?.timezone || "Timezone unset" }}
             </p>
           </div>
         </div>
 
         <p class="max-w-2xl text-lg leading-relaxed">
-          {{ profile.bio }}
+          {{ profile?.bio || "No profile bio yet." }}
         </p>
       </section>
 
@@ -102,7 +104,7 @@ const saveProfile = async () => {
           </div>
           <div class="border-b border-(--stage-ink)/10 pb-3">
             <p class="text-xs font-black uppercase tracking-[0.18em] text-(--stage-ink)/60">Home Theater</p>
-            <p class="mt-1 text-lg font-bold">{{ homeTheater?.name || demoTheaters.myTheaters[0]?.name }}</p>
+            <p class="mt-1 text-lg font-bold">{{ homeTheater?.name || "No home theater selected" }}</p>
           </div>
 
           <div class="grid gap-4">
@@ -160,12 +162,20 @@ const saveProfile = async () => {
       <section class="border-[4px] border-(--stage-ink) bg-(--stage-paper) p-6 shadow-[8px_8px_0_0_var(--stage-ink)] lg:col-span-12">
         <div class="mb-6 flex items-center justify-between gap-4">
           <h2 class="stitch-display text-3xl font-black">Membership Context</h2>
-          <span class="text-sm font-black uppercase tracking-[0.18em]">2 active theaters</span>
+          <span class="text-sm font-black uppercase tracking-[0.18em]">
+            {{ membershipCount }} active theater{{ membershipCount === 1 ? "" : "s" }}
+          </span>
         </div>
 
-        <div class="grid gap-6 md:grid-cols-2">
+        <div v-if="!membershipCount" class="text-sm font-bold text-(--stage-ink)/70">
+          You do not have any active theater memberships yet.
+        </div>
+        <div v-else class="grid gap-6 md:grid-cols-2">
           <article
-            v-for="theater in (homeTheaters.length ? homeTheaters.map((entry) => ({ ...entry.theater, isHome: entry.membership.isHome })) : [...demoTheaters.myTheaters, ...demoTheaters.theaters.slice(0, 1)])"
+            v-for="theater in [
+              ...homeTheaters.map((entry) => ({ ...entry.theater, isHome: entry.membership.isHome })),
+              ...candidateTheaters.map((theater) => ({ ...theater, isHome: false })),
+            ]"
             :key="theater.id"
             class="stitch-border bg-(--stage-cream) p-5"
           >

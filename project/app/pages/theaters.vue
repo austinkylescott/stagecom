@@ -2,7 +2,6 @@
 import { useQuery } from "@pinia/colada";
 import { theatersQueryOptions } from "~/queries/theaters";
 import { toTheaterPath } from "~/utils/routes";
-import { demoTheaters } from "~/utils/stitchDemo";
 
 definePageMeta({
   layout: "app",
@@ -18,11 +17,14 @@ const params = computed(() => ({
   pageSize: 20,
 }));
 
-const { data } = useQuery(theatersQueryOptions, params);
+const { data, error, isLoading } = useQuery(theatersQueryOptions, params);
 
-const theaters = computed(() => (data.value?.theaters?.length ? data.value : demoTheaters));
-const featured = computed(() => theaters.value.myTheaters[0] ?? theaters.value.theaters[0]);
-const secondary = computed(() => theaters.value.theaters.slice(0, 2));
+const theaters = computed(() => data.value?.theaters ?? []);
+const myTheaters = computed(() => data.value?.myTheaters ?? []);
+const featured = computed(() => myTheaters.value[0] ?? theaters.value[0] ?? null);
+const secondary = computed(() =>
+  theaters.value.filter((theater) => theater.id !== featured.value?.id).slice(0, 2),
+);
 const showCreateForm = ref(false);
 const isCreating = ref(false);
 const createError = ref<string | null>(null);
@@ -151,7 +153,40 @@ const createTheater = async () => {
     </div>
 
     <div class="grid grid-cols-1 gap-8 md:grid-cols-12">
-      <article class="overflow-hidden border-2 border-(--stage-ink) bg-(--stage-paper) shadow-[8px_8px_0_0_var(--stage-ink)] md:col-span-8 md:flex">
+      <article
+        v-if="isLoading"
+        class="border-2 border-(--stage-ink) bg-(--stage-paper) p-6 shadow-[8px_8px_0_0_var(--stage-ink)] md:col-span-12"
+      >
+        <h2 class="stitch-display text-3xl font-black">Loading Theaters</h2>
+        <p class="mt-3 text-sm font-bold text-(--stage-ink)/70">
+          Pulling your theater network.
+        </p>
+      </article>
+
+      <article
+        v-else-if="error"
+        class="border-[4px] border-(--stage-ink) bg-(--stage-performer-soft) p-6 shadow-[8px_8px_0_0_var(--stage-ink)] md:col-span-12"
+      >
+        <h2 class="stitch-display text-3xl font-black">Theaters Unavailable</h2>
+        <p class="mt-3 text-sm font-bold">
+          {{ error.message || "We couldn't load the theater directory." }}
+        </p>
+      </article>
+
+      <article
+        v-else-if="!featured"
+        class="border-2 border-(--stage-ink) bg-(--stage-paper) p-6 shadow-[8px_8px_0_0_var(--stage-ink)] md:col-span-12"
+      >
+        <h2 class="stitch-display text-3xl font-black">No Theaters Yet</h2>
+        <p class="mt-3 text-sm font-bold text-(--stage-ink)/70">
+          Create the first theater or adjust your search.
+        </p>
+      </article>
+
+      <article
+        v-else
+        class="overflow-hidden border-2 border-(--stage-ink) bg-(--stage-paper) shadow-[8px_8px_0_0_var(--stage-ink)] md:col-span-8 md:flex"
+      >
         <div class="h-64 overflow-hidden border-b-2 border-(--stage-ink) md:h-auto md:w-1/2 md:border-b-0 md:border-r-2">
           <img
             src="https://lh3.googleusercontent.com/aida-public/AB6AXuB156GmLi55mhkx_ojmGzbbtMaDNIYWtF35UO_ZT6Rm1aTddKcd_2DS5lj-3RbhaaNXjjblfuVYuHpQJiDTfdjIr1h6S9IJX6LzSf7z1aaRzdtqYfTuzK92dEuK6eQAwvX6B60dVQ8d-CkCB4_r8Mmk9VjYOVtbXyAY8s4kcd8-AeagpF_86gssUmNzoJn_D5OJEOBKTLH7pCrCOuCJ7Gi-MHCbyEN7EsY0r0-JvHaBM_53l76zLexI3h_eNva-CvZzS2tpacWaCyc"
@@ -208,7 +243,10 @@ const createTheater = async () => {
         </div>
       </article>
 
-      <div class="relative h-80 overflow-hidden border-2 border-(--stage-ink) bg-(--stage-paper) shadow-[8px_8px_0_0_var(--stage-ink)] md:col-span-8">
+      <div
+        v-if="featured"
+        class="relative h-80 overflow-hidden border-2 border-(--stage-ink) bg-(--stage-paper) shadow-[8px_8px_0_0_var(--stage-ink)] md:col-span-8"
+      >
         <div class="absolute left-4 top-4 z-10 border-2 border-(--stage-theater) bg-(--stage-ink) p-4 text-(--stage-cream)">
           <p class="stitch-display text-sm font-black">Local Circuit Map</p>
         </div>

@@ -10,10 +10,6 @@ import {
   toEventPath,
   toTheaterAdminPath,
 } from "~/utils/routes";
-import {
-  demoTheaterDetails,
-  demoTheaterUpcoming,
-} from "~/utils/stitchDemo";
 
 definePageMeta({
   layout: "hybrid",
@@ -22,27 +18,31 @@ definePageMeta({
 const route = useRoute();
 const slug = computed(() => String(route.params.theaterSlug || ""));
 
-const { data: theaterData } = useQuery(
+const {
+  data: theaterData,
+  error: theaterError,
+  isLoading: theaterLoading,
+} = useQuery(
   theaterDetailsQueryOptions,
   computed(() => ({ slug: slug.value })),
 );
-const { data: upcomingData } = useQuery(
+const {
+  data: upcomingData,
+  error: upcomingError,
+  isLoading: upcomingLoading,
+} = useQuery(
   theaterUpcomingQueryOptions,
   computed(() => ({ slug: slug.value })),
 );
 
-const details = computed(() => theaterData.value ?? demoTheaterDetails);
-const upcoming = computed(() =>
-  upcomingData.value?.shows?.length || upcomingData.value?.otherEvents?.length
-    ? upcomingData.value
-    : demoTheaterUpcoming,
-);
+const details = computed(() => theaterData.value ?? null);
+const upcoming = computed(() => upcomingData.value ?? { shows: [], otherEvents: [] });
 
 const tonight = computed(() => upcoming.value.shows.slice(0, 2));
-const membership = computed(() => details.value.membership ?? demoTheaterDetails.membership);
-const canReview = computed(() => details.value.permissions.canReview);
-const isMember = computed(() => membership.value.status === "active");
-const canCreateShow = computed(() => details.value.permissions.canCreateShow);
+const membership = computed(() => details.value?.membership ?? null);
+const canReview = computed(() => details.value?.permissions.canReview ?? false);
+const isMember = computed(() => membership.value?.status === "active");
+const canCreateShow = computed(() => details.value?.permissions.canCreateShow ?? false);
 
 const {
   handleFollowToggle,
@@ -52,7 +52,7 @@ const {
   relationshipLoading,
 } = useTheaterRelationshipActions({
   slug,
-  theater: computed(() => details.value.theater),
+  theater: computed(() => details.value?.theater ?? null),
   membership,
   canReview,
 });
@@ -60,6 +60,27 @@ const {
 
 <template>
   <div class="bg-(--stage-cream) p-6 md:p-12">
+    <section
+      v-if="theaterLoading"
+      class="border-[4px] border-(--stage-ink) bg-(--stage-paper) p-6 shadow-[8px_8px_0_0_var(--stage-ink)]"
+    >
+      <h1 class="stitch-display text-4xl font-black">Loading Theater</h1>
+      <p class="mt-3 text-sm font-bold text-(--stage-ink)/70">
+        Pulling theater details and schedule context.
+      </p>
+    </section>
+
+    <section
+      v-else-if="theaterError || !details"
+      class="border-[4px] border-(--stage-ink) bg-(--stage-performer-soft) p-6 shadow-[8px_8px_0_0_var(--stage-ink)]"
+    >
+      <h1 class="stitch-display text-4xl font-black">Theater Unavailable</h1>
+      <p class="mt-3 text-sm font-bold">
+        {{ theaterError?.message || "We couldn't load this theater." }}
+      </p>
+    </section>
+
+    <template v-else>
     <div class="mb-12 grid grid-cols-1 gap-8 lg:grid-cols-12">
       <div class="flex flex-col gap-6 lg:col-span-8">
         <section class="border-[4px] border-(--stage-ink) bg-(--stage-theater) p-8 shadow-[8px_8px_0_0_var(--stage-ink)]">
@@ -153,15 +174,24 @@ const {
     </div>
 
     <section class="mb-12">
-        <div class="mb-8 flex items-center gap-6">
-          <h2 class="stitch-display text-4xl font-black">Tonight's Bill</h2>
-          <div class="h-1 flex-1 bg-(--stage-ink)" />
-          <span class="text-sm font-black uppercase tracking-[0.18em]">
-            {{ details.stats.visibleNextThirtyDaysCount }} visible events in next 30 days
-          </span>
-        </div>
+      <div class="mb-8 flex items-center gap-6">
+        <h2 class="stitch-display text-4xl font-black">Tonight's Bill</h2>
+        <div class="h-1 flex-1 bg-(--stage-ink)" />
+        <span class="text-sm font-black uppercase tracking-[0.18em]">
+          {{ details.stats.visibleNextThirtyDaysCount }} visible events in next 30 days
+        </span>
+      </div>
 
-      <div class="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
+      <div v-if="upcomingLoading" class="text-sm font-bold text-(--stage-ink)/70">
+        Loading upcoming programming.
+      </div>
+      <div v-else-if="upcomingError" class="text-sm font-bold text-(--stage-performer)">
+        {{ upcomingError.message || "Upcoming programming is unavailable." }}
+      </div>
+      <div v-else-if="!tonight.length && !upcoming.otherEvents.length" class="text-sm font-bold text-(--stage-ink)/70">
+        No visible upcoming events for this theater yet.
+      </div>
+      <div v-else class="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
         <article
           v-for="show in tonight"
           :key="show.show.id"
@@ -219,7 +249,7 @@ const {
 
     <section class="border-[4px] border-(--stage-ink) bg-[color:color-mix(in_srgb,var(--stage-paper)_85%,white)] p-8">
       <h2 class="stitch-display mb-8 text-3xl font-black">The Ensemble</h2>
-      <div class="flex flex-wrap gap-6">
+      <div v-if="tonight.length" class="flex flex-wrap gap-6">
         <div
           v-for="person in tonight.flatMap((show) => show.cast).slice(0, 8)"
           :key="person.userId"
@@ -229,6 +259,10 @@ const {
           <span class="text-[10px] font-black uppercase">{{ person.displayName || "Unlisted" }}</span>
         </div>
       </div>
+      <p v-else class="text-sm font-bold text-(--stage-ink)/70">
+        No cast roster is visible until upcoming programming loads.
+      </p>
     </section>
+    </template>
   </div>
 </template>

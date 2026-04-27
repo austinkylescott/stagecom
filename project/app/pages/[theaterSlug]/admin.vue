@@ -4,7 +4,6 @@ import {
   reviewQueueQueryOptions,
   theaterMetaQueryOptions,
 } from "~/queries/theaters";
-import { demoReviewQueue, demoTheaterDetails } from "~/utils/stitchDemo";
 
 definePageMeta({
   layout: "app",
@@ -14,21 +13,50 @@ definePageMeta({
 const route = useRoute();
 const slug = computed(() => String(route.params.theaterSlug || ""));
 
-const { data: metaData } = useQuery(
+const {
+  data: metaData,
+  error: metaError,
+  isLoading: metaLoading,
+} = useQuery(
   theaterMetaQueryOptions,
   computed(() => ({ slug: slug.value })),
 );
-const { data: reviewData } = useQuery(
+const {
+  data: reviewData,
+  error: reviewError,
+  isLoading: reviewLoading,
+} = useQuery(
   reviewQueueQueryOptions,
   computed(() => ({ slug: slug.value })),
 );
 
-const theater = computed(() => metaData.value?.theater ?? demoTheaterDetails.theater);
-const queue = computed(() => (reviewData.value?.shows?.length ? reviewData.value : demoReviewQueue));
+const theater = computed(() => metaData.value?.theater ?? null);
+const queue = computed(() => reviewData.value?.shows ?? []);
 </script>
 
 <template>
   <div class="bg-(--stage-cream) p-6 md:p-10">
+    <section
+      v-if="metaLoading"
+      class="border-[4px] border-(--stage-ink) bg-(--stage-paper) p-6 shadow-[8px_8px_0_0_var(--stage-ink)]"
+    >
+      <h1 class="stitch-display text-4xl font-black">Loading Admin Surface</h1>
+      <p class="mt-3 text-sm font-bold text-(--stage-ink)/70">
+        Pulling theater admin context.
+      </p>
+    </section>
+
+    <section
+      v-else-if="metaError || !theater"
+      class="border-[4px] border-(--stage-ink) bg-(--stage-performer-soft) p-6 shadow-[8px_8px_0_0_var(--stage-ink)]"
+    >
+      <h1 class="stitch-display text-4xl font-black">Admin Unavailable</h1>
+      <p class="mt-3 text-sm font-bold">
+        {{ metaError?.message || "We couldn't load theater admin data." }}
+      </p>
+    </section>
+
+    <template v-else>
     <header class="mb-10">
       <p class="stitch-nav-label text-xs tracking-[0.22em] text-(--stage-performer)">Operational Home Surface</p>
       <h1 class="stitch-display mt-3 text-5xl font-black md:text-7xl">{{ theater.name }} Admin</h1>
@@ -43,9 +71,18 @@ const queue = computed(() => (reviewData.value?.shows?.length ? reviewData.value
           <header class="border-b-[4px] border-(--stage-ink) bg-(--stage-performer) p-5">
             <h2 class="stitch-display text-2xl font-black">Review Queue</h2>
           </header>
-          <div>
+          <div v-if="reviewLoading" class="p-5 text-sm font-bold text-(--stage-ink)/70">
+            Loading review queue.
+          </div>
+          <div v-else-if="reviewError" class="p-5 text-sm font-bold text-(--stage-performer)">
+            {{ reviewError.message || "Review queue is unavailable." }}
+          </div>
+          <div v-else-if="!queue.length" class="p-5 text-sm font-bold text-(--stage-ink)/70">
+            Nothing is currently pending review.
+          </div>
+          <div v-else>
             <div
-              v-for="show in queue.shows"
+              v-for="show in queue"
               :key="show.id"
               class="grid gap-3 border-b border-(--stage-ink)/10 p-5 md:grid-cols-[1fr_auto_auto] md:items-center"
             >
@@ -77,5 +114,6 @@ const queue = computed(() => (reviewData.value?.shows?.length ? reviewData.value
         </article>
       </aside>
     </div>
+    </template>
   </div>
 </template>

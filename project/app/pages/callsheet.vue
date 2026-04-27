@@ -2,12 +2,8 @@
 import { useQuery } from "@pinia/colada";
 import { notificationsPageQueryOptions } from "~/queries/notifications";
 import { memberShowsScheduleQueryOptions } from "~/queries/shows";
+import { formatNotification } from "~/utils/notifications";
 import { toEventPath } from "~/utils/routes";
-import {
-  demoCompany,
-  demoNotifications,
-  demoSchedule,
-} from "~/utils/stitchDemo";
 
 definePageMeta({
   layout: "app",
@@ -28,18 +24,31 @@ const notificationsParams = computed(() => ({
   page: 1,
 }));
 
-const { data: scheduleData } = useQuery(memberShowsScheduleQueryOptions, scheduleParams);
-const { data: notificationsData } = useQuery(notificationsPageQueryOptions, notificationsParams);
+const {
+  data: scheduleData,
+  error: scheduleError,
+  isLoading: scheduleLoading,
+} = useQuery(memberShowsScheduleQueryOptions, scheduleParams);
+const {
+  data: notificationsData,
+  error: notificationsError,
+  isLoading: notificationsLoading,
+} = useQuery(notificationsPageQueryOptions, notificationsParams);
 
-const schedule = computed(() =>
-  scheduleData.value?.items?.length ? scheduleData.value : demoSchedule,
-);
-const notifications = computed(() =>
-  notificationsData.value?.notifications?.length ? notificationsData.value : demoNotifications,
-);
+const scheduleItems = computed(() => scheduleData.value?.items ?? []);
+const notifications = computed(() => notificationsData.value?.notifications ?? []);
+const heroItem = computed(() => scheduleItems.value[0] ?? null);
+const upcomingItems = computed(() => scheduleItems.value.slice(1, 3));
+const activeTheaters = computed(() => {
+  const seen = new Set<string>();
 
-const heroItem = computed(() => schedule.value.items[0] ?? demoSchedule.items[0]);
-const upcomingItems = computed(() => schedule.value.items.slice(1, 3));
+  return scheduleItems.value.filter((item) => {
+    const key = item.show.theaterSlug;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+});
 
 const formatDay = (value: string) =>
   new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(new Date(value));
@@ -72,7 +81,40 @@ const formatRelative = (value: string) => {
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
       <div class="space-y-6 lg:col-span-8">
-        <section class="stitch-border bg-[color:color-mix(in_srgb,var(--stage-paper)_80%,white)] shadow-[6px_6px_0_0_var(--stage-ink)]">
+        <section
+          v-if="scheduleLoading"
+          class="stitch-border bg-[color:color-mix(in_srgb,var(--stage-paper)_80%,white)] p-6 shadow-[6px_6px_0_0_var(--stage-ink)]"
+        >
+          <h2 class="stitch-display text-2xl font-black">Loading Callsheet</h2>
+          <p class="mt-3 text-sm font-bold text-(--stage-ink)/70">
+            Pulling your upcoming schedule.
+          </p>
+        </section>
+
+        <section
+          v-else-if="scheduleError"
+          class="border-[4px] border-(--stage-ink) bg-(--stage-performer-soft) p-6 shadow-[6px_6px_0_0_var(--stage-ink)]"
+        >
+          <h2 class="stitch-display text-2xl font-black">Schedule Unavailable</h2>
+          <p class="mt-3 text-sm font-bold">
+            {{ scheduleError.message || "We couldn't load your callsheet." }}
+          </p>
+        </section>
+
+        <section
+          v-else-if="!heroItem"
+          class="stitch-border bg-[color:color-mix(in_srgb,var(--stage-paper)_80%,white)] p-6 shadow-[6px_6px_0_0_var(--stage-ink)]"
+        >
+          <h2 class="stitch-display text-2xl font-black">No Upcoming Events</h2>
+          <p class="mt-3 text-sm font-bold text-(--stage-ink)/70">
+            Your personal schedule is clear right now.
+          </p>
+        </section>
+
+        <section
+          v-else
+          class="stitch-border bg-[color:color-mix(in_srgb,var(--stage-paper)_80%,white)] shadow-[6px_6px_0_0_var(--stage-ink)]"
+        >
           <header class="flex items-center justify-between border-b-2 border-(--stage-ink) bg-(--stage-event) p-4">
             <h2 class="stitch-display text-xl font-black">Now Playing / Next Up</h2>
             <span class="bg-(--stage-ink) px-3 py-1 text-xs font-black uppercase tracking-[0.18em] text-(--stage-cream)">
@@ -120,7 +162,8 @@ const formatRelative = (value: string) => {
                 </div>
 
                 <p class="mt-4 max-w-2xl text-lg leading-relaxed text-(--stage-ink)/80">
-                  Nightly long-form improv focusing on dramatic irony. Full cast required for pre-show physical warm-ups.
+                  {{ heroItem.show.status.replaceAll("_", " ") }} {{ heroItem.show.eventType || "event" }}
+                  at {{ heroItem.show.theaterName }}.
                 </p>
               </div>
             </div>
@@ -171,9 +214,18 @@ const formatRelative = (value: string) => {
       <div class="space-y-6 lg:col-span-4">
         <section class="stitch-panel bg-[color:color-mix(in_srgb,var(--stage-paper)_92%,black)] p-6 shadow-[4px_4px_0_0_var(--stage-ink)]">
           <h2 class="stitch-display mb-4 border-b-2 border-(--stage-ink) pb-2 text-lg font-black">Urgent Inbound</h2>
-          <div class="space-y-4">
+          <div v-if="notificationsLoading" class="text-sm font-bold text-(--stage-ink)/70">
+            Loading notifications.
+          </div>
+          <div v-else-if="notificationsError" class="text-sm font-bold text-(--stage-performer)">
+            {{ notificationsError.message || "Notifications are unavailable." }}
+          </div>
+          <div v-else-if="!notifications.length" class="text-sm font-bold text-(--stage-ink)/70">
+            No unread operational updates.
+          </div>
+          <div v-else class="space-y-4">
             <div
-              v-for="(notification, index) in notifications.notifications.slice(0, 2)"
+              v-for="(notification, index) in notifications.slice(0, 2)"
               :key="notification.id"
               class="flex items-start gap-4"
             >
@@ -186,10 +238,10 @@ const formatRelative = (value: string) => {
                   class="text-xs font-black uppercase"
                   :class="index === 0 ? 'text-red-600' : 'text-(--stage-theater)'"
                 >
-                  {{ notification.payload?.title || notification.type }}
+                  {{ notification.type.replaceAll(".", " ") }}
                 </p>
                 <p class="mt-1 text-sm font-bold">
-                  {{ notification.payload?.message || "New notification received." }}
+                  {{ formatNotification(notification.type, notification.payload).text }}
                 </p>
                 <span class="text-[10px] text-(--stage-ink)/60">
                   {{ formatRelative(notification.created_at) }}
@@ -201,43 +253,32 @@ const formatRelative = (value: string) => {
 
         <section class="stitch-panel overflow-hidden">
           <header class="border-b-2 border-(--stage-ink) bg-(--stage-theater) p-4">
-            <h2 class="stitch-display text-lg font-black">Active Company</h2>
+            <h2 class="stitch-display text-lg font-black">Active Theaters</h2>
           </header>
-          <div>
+          <div v-if="!activeTheaters.length" class="p-4 text-sm font-bold text-(--stage-ink)/70">
+            Join or get cast in events to populate your callsheet context.
+          </div>
+          <div v-else>
             <div
-              v-for="person in demoCompany"
-              :key="person.name"
+              v-for="item in activeTheaters.slice(0, 4)"
+              :key="item.show.theaterSlug"
               class="flex items-center justify-between border-b border-(--stage-ink)/10 p-4 last:border-b-0"
             >
               <div class="flex items-center gap-3">
                 <div
-                  class="flex h-10 w-10 items-center justify-center border-2 border-(--stage-ink) font-black"
-                  :class="
-                    person.state === 'ready'
-                      ? 'bg-(--stage-event-soft)'
-                      : person.state === 'warning'
-                        ? 'bg-(--stage-performer-soft)'
-                        : 'bg-(--stage-theater-soft)'
-                  "
+                  class="flex h-10 w-10 items-center justify-center border-2 border-(--stage-ink) bg-(--stage-theater-soft) font-black"
                 >
-                  {{ person.initials }}
+                  {{ item.show.theaterName.slice(0, 2).toUpperCase() }}
                 </div>
                 <div>
-                  <p class="text-sm font-black leading-none">{{ person.name }}</p>
-                  <p class="mt-1 text-[10px] font-bold uppercase text-(--stage-ink)/65">{{ person.role }}</p>
+                  <p class="text-sm font-black leading-none">{{ item.show.theaterName }}</p>
+                  <p class="mt-1 text-[10px] font-bold uppercase text-(--stage-ink)/65">{{ item.show.title }}</p>
                 </div>
               </div>
 
-              <span
-                class="h-2 w-2 rounded-full"
-                :class="
-                  person.state === 'ready'
-                    ? 'bg-green-600'
-                    : person.state === 'warning'
-                      ? 'bg-orange-500'
-                      : 'bg-gray-400'
-                "
-              />
+              <span class="text-[10px] font-black uppercase text-(--stage-ink)/60">
+                {{ formatDay(item.startsAt) }}
+              </span>
             </div>
           </div>
         </section>
@@ -245,11 +286,11 @@ const formatRelative = (value: string) => {
         <section class="border-[4px] border-(--stage-ink) bg-(--stage-event) p-6 shadow-[6px_6px_0_0_var(--stage-ink)]">
           <h2 class="stitch-display mb-2 text-2xl font-black">Print Ready</h2>
           <p class="mb-4 text-sm font-bold opacity-80">
-            Export this week's callsheet as a physical PDF poster for the bulletin board.
+            Export is not wired yet. This surface now reflects live schedule state instead of demo output.
           </p>
-          <button class="stitch-display w-full bg-(--stage-ink) py-3 text-lg font-black text-(--stage-cream)">
-            Generate PDF
-          </button>
+          <div class="stitch-display w-full bg-(--stage-ink) py-3 text-center text-lg font-black text-(--stage-cream)">
+            Pending Implementation
+          </div>
         </section>
       </div>
     </div>

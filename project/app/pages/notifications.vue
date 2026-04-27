@@ -2,7 +2,6 @@
 import { useQuery, useQueryCache } from "@pinia/colada";
 import { notificationsPageQueryOptions } from "~/queries/notifications";
 import { formatNotification } from "~/utils/notifications";
-import { demoNotifications } from "~/utils/stitchDemo";
 import { queryKeys } from "~/composables/queryKeys";
 
 definePageMeta({
@@ -12,11 +11,9 @@ definePageMeta({
 
 const filter = ref<"all" | "my_shows" | "other">("all");
 const params = computed(() => ({ filter: filter.value, page: 1 }));
-const { data } = useQuery(notificationsPageQueryOptions, params);
+const { data, error, isLoading } = useQuery(notificationsPageQueryOptions, params);
 
-const notifications = computed(() =>
-  data.value?.notifications?.length ? data.value : demoNotifications,
-);
+const notifications = computed(() => data.value?.notifications ?? []);
 const isMarkingRead = ref(false);
 const queryCache = useQueryCache();
 
@@ -84,9 +81,18 @@ const tabs = [
         <h2 class="stitch-display text-2xl font-black">Inbound System</h2>
       </div>
 
-      <div>
+      <div v-if="isLoading" class="p-5 text-sm font-bold text-(--stage-ink)/70">
+        Loading notifications.
+      </div>
+      <div v-else-if="error" class="p-5 text-sm font-bold text-(--stage-performer)">
+        {{ error.message || "Notifications are unavailable." }}
+      </div>
+      <div v-else-if="!notifications.length" class="p-5 text-sm font-bold text-(--stage-ink)/70">
+        No notifications match this filter.
+      </div>
+      <div v-else>
         <article
-          v-for="notification in notifications.notifications"
+          v-for="notification in notifications"
           :key="notification.id"
           class="grid gap-4 border-b border-(--stage-ink)/10 p-5 md:grid-cols-[10rem_1fr_auto] md:items-start"
         >

@@ -2,7 +2,6 @@
 import { useQuery } from "@pinia/colada";
 import { useCreateShow } from "~/composables/useShowMutations";
 import { theaterMetaQueryOptions } from "~/queries/theaters";
-import { demoTheaterDetails } from "~/utils/stitchDemo";
 import { toEventPath } from "~/utils/routes";
 
 definePageMeta({
@@ -12,11 +11,11 @@ definePageMeta({
 
 const route = useRoute();
 const slug = computed(() => String(route.params.theaterSlug || ""));
-const { data } = useQuery(
+const { data, error, isLoading } = useQuery(
   theaterMetaQueryOptions,
   computed(() => ({ slug: slug.value })),
 );
-const theater = computed(() => data.value?.theater ?? demoTheaterDetails.theater);
+const theater = computed(() => data.value?.theater ?? null);
 const createShow = useCreateShow(slug.value);
 const formError = ref<string | null>(null);
 
@@ -25,13 +24,13 @@ const form = reactive({
   eventType: "show",
   summary: "",
   startsAt: "",
-  venue: theater.value.name,
+  venue: "",
 });
 
 watch(
   theater,
   (value) => {
-    form.venue = value.name;
+    form.venue = value?.name ?? "";
   },
   { immediate: true },
 );
@@ -71,6 +70,27 @@ const submit = async () => {
 
 <template>
   <div class="bg-(--stage-cream) p-6 md:p-10">
+    <section
+      v-if="isLoading"
+      class="border-[4px] border-(--stage-ink) bg-(--stage-paper) p-6 shadow-[8px_8px_0_0_var(--stage-ink)]"
+    >
+      <h1 class="stitch-display text-4xl font-black">Loading Event Builder</h1>
+      <p class="mt-3 text-sm font-bold text-(--stage-ink)/70">
+        Pulling theater context for this event.
+      </p>
+    </section>
+
+    <section
+      v-else-if="error || !theater"
+      class="border-[4px] border-(--stage-ink) bg-(--stage-performer-soft) p-6 shadow-[8px_8px_0_0_var(--stage-ink)]"
+    >
+      <h1 class="stitch-display text-4xl font-black">Event Builder Unavailable</h1>
+      <p class="mt-3 text-sm font-bold">
+        {{ error?.message || "We couldn't load the target theater." }}
+      </p>
+    </section>
+
+    <template v-else>
     <header class="mb-10">
       <p class="stitch-nav-label text-xs tracking-[0.22em] text-(--stage-theater)">Theater-Scoped Workflow</p>
       <h1 class="stitch-display mt-3 text-5xl font-black md:text-7xl">New Event</h1>
@@ -146,5 +166,6 @@ const submit = async () => {
         </button>
       </aside>
     </div>
+    </template>
   </div>
 </template>
