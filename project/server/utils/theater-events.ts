@@ -16,6 +16,7 @@ type MembershipContext = {
 type ShowRow = Pick<
   Tables<"shows">,
   | "id"
+  | "slug"
   | "title"
   | "description"
   | "status"
@@ -69,6 +70,7 @@ export type TheaterEventItem = {
     description: string | null;
     eventType: Enums<"event_type"> | null;
     id: string;
+    slug: string;
     status: Enums<"show_status">;
     theaterId: string;
     theaterName: string;
@@ -102,7 +104,7 @@ export const getVisibleTheaterShows = async ({
   const { data: shows, error: showError } = await serviceSupabase
     .from("shows")
     .select(
-      "id,title,description,status,theater_id,event_type,casting_mode,is_public_listed,ticket_url",
+      "id,slug,title,description,status,theater_id,event_type,casting_mode,is_public_listed,ticket_url",
     )
     .eq("theater_id", theaterId);
 
@@ -130,7 +132,7 @@ export const getTheaterShows = async ({
   let showQuery = serviceSupabase
     .from("shows")
     .select(
-      "id,title,description,status,theater_id,event_type,casting_mode,is_public_listed,ticket_url",
+      "id,slug,title,description,status,theater_id,event_type,casting_mode,is_public_listed,ticket_url",
     )
     .eq("theater_id", theaterId);
 
@@ -403,6 +405,7 @@ export const buildTheaterEventItems = ({
           description: show.description,
           eventType: show.event_type,
           id: show.id,
+          slug: show.slug,
           status: show.status,
           theaterId: theater.id,
           theaterName: theater.name,

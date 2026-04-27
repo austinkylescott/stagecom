@@ -27,7 +27,7 @@ This slice should replace the current thin `new show` form with a guided draft-t
 - Keep the canonical theater hub at `/theaters/[slug]`.
 - Keep the creation route at `/theaters/[slug]/shows/new`, but reframe it as a generic event proposal builder for `show`, `workshop`, `practice`, `audition`, and `meeting`.
 - Keep the canonical operational record at `/theaters/[slug]/shows/[id]`.
-- Strengthen `/shows` into the cross-theater work board for the signed-in user’s owned, assigned, and monitored events.
+- Strengthen the cross-theater work board for the signed-in user’s owned, assigned, and monitored events. This was originally scoped as `/shows`; Schedule System Unification v1 superseded the canonical route to `/schedule`, with `/shows` retained as compatibility-only.
 - Do not move theater pages to top-level `/<slug>` in this slice.
 
 ## Builder Workflow

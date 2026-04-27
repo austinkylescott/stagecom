@@ -1,5 +1,6 @@
 import { computed, type Ref } from "vue";
 import type { TheaterEventItem, TheaterMeta } from "~/queries/theaters";
+import { toEventPath } from "~/utils/routes";
 import { getTimeZoneDateKey, normalizeTimeZone } from "~/utils/timezone";
 
 export type PublicEvent = TheaterEventItem;
@@ -156,7 +157,7 @@ export const useTheaterPublicEvents = ({
       .map((event) => ({
         ...event,
         title: event.show.title,
-        eventPath: `/theaters/${event.show.theaterSlug}/shows/${event.show.id}`,
+        eventPath: toEventPath(event.show.theaterSlug, event.show.slug),
         dateKey: getTimeZoneDateKey(event.startsAt, theaterTimeZone.value),
         dateLabel: formatDate(event.startsAt),
         timeLabel: formatTime(event.startsAt),

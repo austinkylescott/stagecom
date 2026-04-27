@@ -14,7 +14,7 @@ This is the common workflow that we will use for every single feature/fix:
 
 1. **Draft Spec** - Write or update the feature spec in `docs/specs/YYYY-MM-DD/` when the work is spec-driven.
 2. **Document** - Load that spec into `context/current-feature.md`.
-3. **Read Sources** - Review the relevant source-of-truth docs before coding. For app UI work, this includes `docs/design/app-design-bible.md`.
+3. **Read Sources** - Consult the maintained `wiki/` folder first, then read the relevant raw source docs in `docs/` when the wiki is missing detail, has a conflict callout, or you are changing the source doc itself. For app UI work, this includes the wiki design pages and `docs/design/app-design-bible.md` when needed.
 4. **Branch** - Start from `main`, then create a new branch for the feature or fix
 5. **Implement** - Switch to that new branch and do all implementation work there, not on `main`
 6. **Test** - Verify it works in the browser. Implement unit testing later. Run `npm run build` and fix any errors
@@ -23,7 +23,7 @@ This is the common workflow that we will use for every single feature/fix:
 9. **Push Branch** - Push the feature branch to origin
 10. **Merge** - Merge into `main`
 11. **Review** - Review AI-generated code periodically and on demand.
-12. Mark as completed in `context/current-feature.md` and add to history
+12. Update the relevant pages in `wiki/` if product/data/architecture/design knowledge changed, then mark as completed in `context/current-feature.md` and add to history
 
 Use the feature skill to load written specs from `docs/specs/YYYY-MM-DD/` into `context/current-feature.md` before starting implementation.
 
@@ -32,8 +32,18 @@ Do NOT commit without permission and until the build passes. If build fails, fix
 ## UI And Design Work
 
 - Treat `docs/design/app-design-bible.md` as the source of truth for authenticated app design decisions.
+- Prefer the maintained design wiki pages for quick context, then verify against `docs/design/app-design-bible.md` and the locked spec package when the work is design-sensitive.
 - Use `docs/development/nuxt-ui-design-system-subagent.md` when spawning a UI-specialist subagent for Stagecom.
-- For UI work, prefer extending shared primitives and `app.config.ts` over introducing page-local styling systems.
+- For redesign work, start from the locked sitemap and component-system specs under `docs/specs/2026-04-12/` before touching components.
+- Do not assume the current Stage wrapper system is the target architecture. It is migration context only.
+- Prefer `app.config.ts`, then component `:ui`, then Tailwind utilities, and keep shared CSS minimal.
+
+## Wiki Maintenance
+
+- `docs/` in this repo is the raw source layer.
+- `wiki/` in this repo is the maintained synthesis layer that agents should consult first.
+- When you add or update a meaningful doc in `docs/`, update the affected wiki pages in `wiki/`.
+- If a coding session resolves an open question or makes a durable architectural/product decision that is not yet represented in raw docs, record it in the wiki decisions layer and, when appropriate, backfill the matching raw doc later.
 
 ## Branching
 

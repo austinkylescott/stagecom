@@ -5,7 +5,7 @@ import { canViewTheaterReview } from "~~/server/utils/visibility-policy";
 
 type ReviewShowRow = Pick<
   Tables<"shows">,
-  "id" | "title" | "status" | "event_type"
+  "id" | "slug" | "title" | "status" | "event_type"
 >;
 type OccurrenceRow = Pick<Tables<"show_occurrences">, "show_id" | "starts_at">;
 const paramsSchema = z.object({ slug: z.string().trim().min(1) });
@@ -59,7 +59,7 @@ export default defineEventHandler(async (event) => {
   // 3) Fetch pending shows
   const { data: shows, error: showsError } = await supabase
     .from("shows")
-    .select("id,title,status,event_type")
+    .select("id,slug,title,status,event_type")
     .eq("theater_id", theater.id)
     .eq("status", "pending_review");
 
@@ -96,6 +96,7 @@ export default defineEventHandler(async (event) => {
   return {
     shows: safeShows.map((s) => ({
       id: s.id,
+      slug: s.slug,
       title: s.title,
       status: s.status,
       eventType: s.event_type,

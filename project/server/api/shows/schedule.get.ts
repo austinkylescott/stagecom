@@ -7,7 +7,7 @@ import { canViewShow } from "~~/server/utils/visibility-policy";
 
 type MembershipRow = Pick<
   Tables<"theater_memberships">,
-  "theater_id" | "roles" | "status"
+  "theater_id" | "roles" | "status" | "is_home"
 >;
 
 type TheaterRow = Pick<Tables<"theaters">, "id" | "name" | "slug">;
@@ -15,6 +15,7 @@ type TheaterRow = Pick<Tables<"theaters">, "id" | "name" | "slug">;
 type ShowRow = Pick<
   Tables<"shows">,
   | "id"
+  | "slug"
   | "title"
   | "status"
   | "theater_id"
@@ -39,6 +40,7 @@ const querySchema = z.object({
     .enum(["draft", "pending_review", "approved", "rejected", "cancelled"])
     .optional(),
   timeline: z.enum(["all", "upcoming", "past"]).optional().default("all"),
+  scope: z.enum(["personal", "home", "joined"]).optional().default("personal"),
 });
 
 const titleCase = (value: string) =>
@@ -46,6 +48,12 @@ const titleCase = (value: string) =>
     .split("_")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
+
+const isMissingShowStaffAssignmentsError = (error?: { message?: string } | null) =>
+  Boolean(
+    error?.message?.includes("show_staff_assignments") &&
+      error.message.includes("schema cache"),
+  );
 
 const getMonthBounds = (month: string) => {
   const [year, monthIndex] = month.split("-").map(Number);
@@ -79,7 +87,7 @@ export default defineEventHandler(async (event) => {
 
   const { data: memberships, error: membershipError } = await supabase
     .from("theater_memberships")
-    .select("theater_id,roles,status")
+    .select("theater_id,roles,status,is_home")
     .eq("user_id", userId)
     .eq("status", "active");
 
@@ -90,7 +98,11 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const theaterIds = (memberships ?? []).map((membership) => membership.theater_id);
+  const activeMemberships = (memberships as MembershipRow[] | null | undefined) ?? [];
+  const theaterIds = activeMemberships.map((membership) => membership.theater_id);
+  const homeTheaterIds = activeMemberships
+    .filter((membership) => membership.is_home)
+    .map((membership) => membership.theater_id);
   const [
     relatedRoleResult,
     relatedCastResult,
@@ -110,7 +122,12 @@ export default defineEventHandler(async (event) => {
       .eq("user_id", userId),
   ]);
 
-  if (relatedRoleResult.error || relatedCastResult.error || relatedStaffResult.error) {
+  if (
+    relatedRoleResult.error ||
+    relatedCastResult.error ||
+    (relatedStaffResult.error &&
+      !isMissingShowStaffAssignmentsError(relatedStaffResult.error))
+  ) {
     throw createError({
       statusCode: 500,
       statusMessage:
@@ -126,8 +143,16 @@ export default defineEventHandler(async (event) => {
     ...(relatedCastResult.data ?? []).map((row) => row.show_id),
     ...(relatedStaffResult.data ?? []).map((row) => row.show_id),
   ];
+  const relatedShowIdSet = new Set(relatedShowIds);
+  const candidateRelatedShowIds = Array.from(relatedShowIdSet);
+  const candidateTheaterIds =
+    query.scope === "home"
+      ? homeTheaterIds
+      : query.scope === "joined"
+        ? theaterIds
+        : [];
 
-  if (!theaterIds.length && !relatedShowIds.length) {
+  if (!candidateTheaterIds.length && !candidateRelatedShowIds.length) {
     return {
       items: [],
       filters: {
@@ -140,16 +165,16 @@ export default defineEventHandler(async (event) => {
 
   const showQuery = serviceSupabase
     .from("shows")
-    .select("id,title,status,theater_id,event_type,casting_mode,is_public_listed");
+    .select("id,slug,title,status,theater_id,event_type,casting_mode,is_public_listed");
 
-  if (theaterIds.length > 0 && relatedShowIds.length > 0) {
+  if (candidateTheaterIds.length > 0 && candidateRelatedShowIds.length > 0) {
     showQuery.or(
-      `theater_id.in.(${theaterIds.join(",")}),id.in.(${relatedShowIds.join(",")})`,
+      `theater_id.in.(${candidateTheaterIds.join(",")}),id.in.(${candidateRelatedShowIds.join(",")})`,
     );
-  } else if (theaterIds.length > 0) {
-    showQuery.in("theater_id", theaterIds);
+  } else if (candidateTheaterIds.length > 0) {
+    showQuery.in("theater_id", candidateTheaterIds);
   } else {
-    showQuery.in("id", relatedShowIds);
+    showQuery.in("id", candidateRelatedShowIds);
   }
 
   const { data: shows, error: showError } = await showQuery;
@@ -188,10 +213,10 @@ export default defineEventHandler(async (event) => {
   }
 
   const membershipByTheaterId = new Map<string, MembershipRow>(
-    (memberships as MembershipRow[] | null | undefined)?.map((membership) => [
+    activeMemberships.map((membership) => [
       membership.theater_id,
       membership,
-    ]) ?? [],
+    ]),
   );
   const theaterById = new Map<string, TheaterRow>(
     (theaters as TheaterRow[] | null | undefined)?.map((theater) => [
@@ -210,6 +235,34 @@ export default defineEventHandler(async (event) => {
   const showStaffIds = new Set(
     (relatedStaffResult.data ?? []).map((row) => row.show_id),
   );
+  const viewerRelationshipsByShowId = new Map<string, string[]>();
+
+  for (const show of (shows as ShowRow[] | null | undefined) ?? []) {
+    const membership = membershipByTheaterId.get(show.theater_id);
+    const relationships: string[] = [];
+
+    if (producerShowIds.has(show.id)) {
+      relationships.push("producer");
+    }
+
+    if (castByShowId.has(show.id)) {
+      relationships.push("cast");
+    }
+
+    if (showStaffIds.has(show.id)) {
+      relationships.push("show_staff");
+    }
+
+    if (membership?.status === "active") {
+      relationships.push("theater_member");
+    }
+
+    if (membership?.is_home) {
+      relationships.push("home_theater");
+    }
+
+    viewerRelationshipsByShowId.set(show.id, relationships);
+  }
 
   const visibleShows = ((shows as ShowRow[] | null | undefined) ?? []).filter(
     (show) => {
@@ -376,6 +429,7 @@ export default defineEventHandler(async (event) => {
         occurrenceStatus: occurrence.status,
         show: {
           id: show.id,
+          slug: show.slug,
           title: show.title,
           status: show.status,
           eventType: show.event_type,
@@ -383,6 +437,7 @@ export default defineEventHandler(async (event) => {
           theaterName: theater?.name ?? "Unknown theater",
           theaterSlug: theater?.slug ?? "",
         },
+        viewerRelationships: viewerRelationshipsByShowId.get(show.id) ?? [],
       };
     })
     .filter(Boolean);

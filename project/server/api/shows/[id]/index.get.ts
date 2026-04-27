@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
   const { data: show, error: showError } = await serviceSupabase
     .from("shows")
     .select(
-      "id,title,summary,description,producer_note,poster_url,status,event_type,casting_mode,cast_min,cast_max,is_cast_finalized,is_public_listed,ticket_url,on_sale_at,theater_id,created_by_user_id",
+      "id,slug,title,summary,description,producer_note,poster_url,status,event_type,casting_mode,cast_min,cast_max,is_cast_finalized,is_public_listed,ticket_url,on_sale_at,theater_id,created_by_user_id",
     )
     .eq("id", showId)
     .maybeSingle();
@@ -266,6 +266,7 @@ export default defineEventHandler(async (event) => {
   return {
     show: {
       id: show.id,
+      slug: show.slug,
       title: show.title,
       summary: show.summary,
       description: show.description,

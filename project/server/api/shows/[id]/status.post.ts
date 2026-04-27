@@ -96,7 +96,7 @@ export default defineEventHandler(async (event) => {
 
   const { data: show, error: showError } = await supabase
     .from("shows")
-    .select("id,title,summary,description,theater_id,status,theaters(slug)")
+    .select("id,slug,title,summary,description,theater_id,status,theaters(slug)")
     .eq("id", showId)
     .maybeSingle();
 
@@ -249,6 +249,7 @@ export default defineEventHandler(async (event) => {
       await emitEvent(
         buildShowEvent("show.submitted_for_review", {
           showId,
+          showSlug: show.slug,
           showTitle: show.title,
           theaterSlug: theaterSlug ?? "",
           recipientId: membershipRow.user_id,
@@ -274,9 +275,10 @@ export default defineEventHandler(async (event) => {
 
     for (const producerRow of producerRows ?? []) {
       await emitEvent(
-        buildShowEvent(transition.notifyType, {
-          showId,
-          showTitle: show.title,
+          buildShowEvent(transition.notifyType, {
+            showId,
+            showSlug: show.slug,
+            showTitle: show.title,
           theaterSlug: theaterSlug ?? "",
           recipientId: producerRow.user_id,
           note: note || reason,

@@ -349,6 +349,7 @@ export type Database = {
           on_sale_at: string | null;
           poster_url: string | null;
           producer_note: string | null;
+          slug: string;
           status: Database["public"]["Enums"]["show_status"];
           summary: string | null;
           theater_id: string;
@@ -370,6 +371,7 @@ export type Database = {
           on_sale_at?: string | null;
           poster_url?: string | null;
           producer_note?: string | null;
+          slug: string;
           status?: Database["public"]["Enums"]["show_status"];
           summary?: string | null;
           theater_id: string;
@@ -391,6 +393,7 @@ export type Database = {
           on_sale_at?: string | null;
           poster_url?: string | null;
           producer_note?: string | null;
+          slug?: string;
           status?: Database["public"]["Enums"]["show_status"];
           summary?: string | null;
           theater_id?: string;

@@ -6,7 +6,8 @@ Repository guide for coding agents working in Stagecom.
 
 - This file applies to the entire repository.
 - Main application code lives in `project/`.
-- Product and architecture docs live in `docs/`.
+- Product and architecture raw docs live in `docs/`.
+- The maintained synthesis wiki lives in `wiki/`.
 - Feature specs live in dated folders under `docs/specs/YYYY-MM-DD/`.
 
 ## Project Shape
@@ -21,17 +22,25 @@ Repository guide for coding agents working in Stagecom.
 
 Read these before making behavior changes:
 
-- `docs/product/PRD.md`: locked product requirements and role philosophy.
-- `docs/data/data-model.md`: schema rules and entity relationships.
+- `wiki/_index.md`: wiki entry point and map of maintained knowledge pages.
+- `wiki/product/overview.md`: synthesized product overview.
+- `wiki/data/permissions-model.md`: synthesized permission and visibility model.
+- `wiki/architecture/route-model.md`: current route-model synthesis, including known conflicts.
+- `wiki/design/design-system.md`: current design-system synthesis.
 - `docs/development/server-api-conventions.md`: required server auth, permission, and validation patterns.
 - `docs/development/coding-rules.md`: repo-specific guardrails.
 - `docs/development/ai-interaction.md`: workflow, branch, commit, and collaboration rules for AI-assisted work.
-- `docs/design/app-design-bible.md`: authenticated app design system and locked UI references.
-- `docs/product/events-and-notifications.md` and feature specs when touching those areas.
 
 ## Documentation Sources
 
-- Use repository docs in `docs/` as the source of truth for product behavior, architecture, and repo-specific constraints.
+- Consult `wiki/` first for product, data-model, architecture, feature, and design context.
+- Treat `docs/` as the raw source layer, not the default first-read layer.
+- Read raw docs in `docs/` when:
+  - the wiki does not answer the question
+  - the wiki page has a conflict callout
+  - you are verifying or changing a source-of-truth document
+  - you are ingesting new or updated docs into the wiki
+- If you rely on raw docs because the wiki is missing or stale, update `wiki/` as part of the same work when feasible.
 - Draft new feature specs in a dated folder under `docs/specs/YYYY-MM-DD/`, then load them into `context/current-feature.md` with the feature skill before implementation.
 - Use Context7 for current framework and library documentation when working with Nuxt, Nuxt UI, Vue, Supabase, and Vitest.
 - Prefer official or high-reputation Context7 libraries when multiple matches exist.
@@ -39,7 +48,7 @@ Read these before making behavior changes:
 
 ## Non-Negotiable Rules
 
-- Every feature change must map back to `docs/product/PRD.md`.
+- Every feature change must map back to the maintained wiki and, where needed, the raw source docs it cites.
 - Follow `docs/development/ai-interaction.md` for communication, workflow, branching, and commit behavior.
 - Do not add tables or schema-level entities without updating `docs/data/data-model.md`.
 - Any change to database schema, enums, relationships, seeded assumptions, or DB-backed product expectations must update the mock-data workflow and configs so seeded data still reflects the current model.
@@ -47,6 +56,7 @@ Read these before making behavior changes:
 - Producers are never assumed to be cast.
 - Cast membership requires an explicit `show_cast` entry.
 - Significant behavior changes require corresponding doc updates in `docs/`.
+- When `docs/` changes in a way that affects product, data, architecture, features, design, or decisions, update the corresponding pages in `wiki/`.
 - Ask before large refactors or architectural changes.
 - Do not add features that are not in the project spec.
 - Never delete files without clarification.
@@ -91,6 +101,7 @@ Run commands from `project/` unless there is a clear reason not to.
 - Preserve uncommitted user changes; do not revert unrelated work.
 - If something is still failing after 2 to 3 serious attempts, stop and explain the blocker instead of continuing with random fixes.
 - Update docs in the same change when behavior, schema, roles, or events shift.
+- Keep `wiki/` synchronized with meaningful doc or behavior changes; do not leave the repo-local wiki stale after changing the underlying source set.
 - When database or data-model behavior changes, update the relevant mock-data assets in the same change:
   - `project/mock-data.config.example.json`
   - `project/mock-data.config.json` if it exists locally for the active workflow

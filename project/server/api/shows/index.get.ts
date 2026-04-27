@@ -7,6 +7,7 @@ import { canViewShow } from "~~/server/utils/visibility-policy";
 type ShowRow = Pick<
   Tables<"shows">,
   | "id"
+  | "slug"
   | "title"
   | "description"
   | "status"
@@ -23,6 +24,7 @@ type OccRow = Pick<
 
 type ShowItem = {
   id: string;
+  slug: string;
   title: string;
   description: string | null;
   status: Enums<"show_status">;
@@ -97,7 +99,7 @@ export default defineEventHandler(async (event) => {
 
   const showQuery = serviceSupabase
     .from("shows")
-    .select("id,title,description,status,theater_id,event_type,casting_mode,is_public_listed");
+    .select("id,slug,title,description,status,theater_id,event_type,casting_mode,is_public_listed");
 
   if (theaterIds.length > 0 && relatedShowIds.length > 0) {
     showQuery.or(
@@ -206,6 +208,7 @@ export default defineEventHandler(async (event) => {
     const theater = theaterById.get(s.theater_id);
     return {
       id: s.id,
+      slug: s.slug,
       title: s.title,
       description: s.description,
       status: s.status,

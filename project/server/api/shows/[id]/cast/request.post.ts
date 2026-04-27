@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
 
   const { data: show, error: showError } = await supabase
     .from("shows")
-    .select("id,title,casting_mode,theater_id,theaters(slug)")
+    .select("id,slug,title,casting_mode,theater_id,theaters(slug)")
     .eq("id", showId)
     .maybeSingle();
 
@@ -131,6 +131,7 @@ export default defineEventHandler(async (event) => {
     await emitEvent(
       buildCastEvent("cast.requested", {
         showId,
+        showSlug: show.slug,
         showTitle: show.title,
         theaterSlug: theaterSlug ?? "",
         actorId,

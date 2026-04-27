@@ -4,6 +4,7 @@ import type { Enums, TablesInsert } from "~/types/database.types";
 import { buildShowEvent, emitEvent } from "~~/server/utils/notify";
 import { hasStaffRole } from "~~/server/utils/permissions";
 import { getServiceRoleClient } from "~~/server/utils/service-role";
+import { generateUniqueSlug } from "~~/server/utils/slug";
 import {
   normalizeLegacyOccurrenceInput,
   replaceShowOccurrences,
@@ -86,8 +87,28 @@ export default defineEventHandler(async (event) => {
     ? "pending_review"
     : "draft";
 
+  const showSlug = await generateUniqueSlug({
+    baseValue: body.title,
+    exists: async (candidate) => {
+      const { data, error } = await supabase
+        .from("shows")
+        .select("id")
+        .eq("theater_id", theater.id)
+        .eq("slug", candidate)
+        .maybeSingle();
+
+      if (error) {
+        throw createError({ statusCode: 500, statusMessage: error.message });
+      }
+
+      return Boolean(data?.id);
+    },
+    fallback: "event",
+  });
+
   const payload: TablesInsert<"shows"> = {
     theater_id: theater.id,
+    slug: showSlug,
     title: body.title,
     summary: body.summary ?? null,
     description: body.description ?? null,
@@ -109,7 +130,7 @@ export default defineEventHandler(async (event) => {
   const { data: show, error: showError } = await supabase
     .from("shows")
     .insert(payload)
-    .select("id")
+    .select("id,slug")
     .single();
 
   if (showError) {
@@ -179,6 +200,7 @@ export default defineEventHandler(async (event) => {
       await emitEvent(
         buildShowEvent("show.submitted_for_review", {
           showId: show.id,
+          showSlug: show.slug,
           showTitle: body.title,
           theaterSlug: slug,
           recipientId: membershipRow.user_id,
@@ -190,6 +212,8 @@ export default defineEventHandler(async (event) => {
 
   return {
     id: show.id,
+    slug: show.slug,
+    theaterSlug: slug,
     status,
     submittedForReview: body.submitForReview,
   };

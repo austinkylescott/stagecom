@@ -9,7 +9,13 @@ export const useCreateShow = (slug: string) => {
   const queryCache = useQueryCache();
 
   return useMutation<
-    { id: string; status: string; submittedForReview: boolean },
+    {
+      id: string;
+      slug: string;
+      theaterSlug: string;
+      status: string;
+      submittedForReview: boolean;
+    },
     CreateShowInput
   >({
     mutation: ({ submitForReview, payload }) =>

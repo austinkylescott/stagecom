@@ -4,6 +4,8 @@ These rules exist to keep Stagecom aligned with the current product docs, data m
 
 ## 1. Source of truth
 
+- Consult `wiki/` first for synthesized project knowledge.
+- Treat `docs/` as the raw source layer that the wiki is compiled from.
 - Every feature must map back to `docs/product/PRD.md`.
 - Follow `docs/development/ai-interaction.md` for AI workflow, branching, commit, and collaboration expectations.
 - Follow `docs/design/app-design-bible.md` for authenticated app UI and design-system decisions.
@@ -15,6 +17,7 @@ These rules exist to keep Stagecom aligned with the current product docs, data m
   - `docs/product/events-and-notifications.md` for event or recipient changes
   - `docs/data/mock-data-workflow.md` and the mock-data configs/scripts when database-backed test expectations change
   - feature specs in dated folders under `docs/specs/YYYY-MM-DD/` when behavior is spec-driven
+- When those raw docs change in a way that affects project knowledge, update the corresponding pages in `wiki/` as part of the same change or immediately after.
 
 ## 2. Stack requirements
 
@@ -49,11 +52,12 @@ These rules exist to keep Stagecom aligned with the current product docs, data m
 ## 5. Nuxt UI and styling rules
 
 - Prefer Nuxt UI primitives such as `UButton`, `UCard`, `UInput`, `UFormField`, `UHeader`, `UNavigationMenu`, and related components before writing custom base UI.
-- Treat the theater dashboard and navbar/account controls as the primary reference surfaces for authenticated UI composition.
+- Treat `docs/specs/2026-04-12/feature-spec-app-design-reset-v1.md`, `feature-spec-app-sitemap-and-surface-map-v1.md`, and `feature-spec-component-system-v1.md` as the primary reference for redesign work.
 - Match the visual language already configured in `project/app/assets/css/main.css` and `project/nuxt.config.ts`.
 - Reuse the configured font tokens and shared theme variables rather than importing ad hoc fonts per page or component.
 - Prefer `project/app/app.config.ts` for shared component theming and use component-level `:ui` overrides before introducing new custom wrappers.
 - Prefer utility classes and existing layout patterns over bespoke CSS files unless a shared style abstraction is clearly needed.
+- Do not preserve current Stage wrapper components by default. Keep them only if the active component-system spec gives them a clear job.
 
 ## 6. Data fetching and state rules
 

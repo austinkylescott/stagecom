@@ -1,0 +1,90 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "Stagecom" [ref=e5] [cursor=pointer]:
+          - /url: /
+        - navigation [ref=e6]:
+          - link "Home" [ref=e7] [cursor=pointer]:
+            - /url: /
+          - link "Theaters" [ref=e8] [cursor=pointer]:
+            - /url: /login
+          - link "Features" [ref=e9] [cursor=pointer]:
+            - /url: /dev/components
+      - link "●" [ref=e11] [cursor=pointer]:
+        - /url: /login
+        - generic [ref=e12]: ●
+    - main [ref=e13]:
+      - generic [ref=e14]:
+        - generic [ref=e15]:
+          - generic [ref=e16]:
+            - generic [ref=e17]: Improv Management System
+            - heading "The Analog Stage Digitalized." [level=1] [ref=e18]
+            - paragraph [ref=e19]: Ditch the messy spreadsheets and forgotten group chats. Stagecom is the letterpress-inspired operating system for theaters, performers, and creators.
+            - generic [ref=e20]:
+              - link "Get Access" [ref=e21] [cursor=pointer]:
+                - /url: /signup
+              - link "Watch Demo" [ref=e22] [cursor=pointer]:
+                - /url: /dev/components
+          - generic [ref=e24]:
+            - img "Improv show on stage" [ref=e25]
+            - generic [ref=e26]: Live Tonight
+        - generic [ref=e27]:
+          - heading "Built For The Chaos Of Creation" [level=2] [ref=e29]
+          - generic [ref=e31]:
+            - article [ref=e32]:
+              - generic [ref=e33]:
+                - generic [ref=e34]: Dynamic Callsheets
+                - generic [ref=e35]: ■
+              - generic [ref=e36]:
+                - generic [ref=e37]:
+                  - paragraph [ref=e38]: Real-time schedule synchronization for cast and crew. No more "what time is soundcheck?"
+                  - list [ref=e39]:
+                    - listitem [ref=e40]: ■ Automated reminders
+                    - listitem [ref=e41]: ■ Stage-door access logs
+                    - listitem [ref=e42]: ■ Digital prop tracking
+                - generic [ref=e44]:
+                  - generic [ref=e45]: CALLSHEET // OCT-24-2026
+                  - generic [ref=e46]:
+                    - generic [ref=e47]: 18:00
+                    - generic [ref=e48]: HOUSE OPENS
+                  - generic [ref=e49]:
+                    - generic [ref=e50]: 19:30
+                    - generic [ref=e51]: CURTAIN CALL
+                  - generic [ref=e52]:
+                    - generic [ref=e53]: 21:00
+                    - generic [ref=e54]: STRIKE
+            - article [ref=e55]:
+              - generic [ref=e56]:
+                - generic [ref=e57]: ●
+                - heading "The Cast Directory" [level=3] [ref=e58]
+              - paragraph [ref=e59]: A living archive of your community. Track specialties, availability, and workshop history in one bold ledger.
+            - article [ref=e60]:
+              - heading "Theater Network" [level=3] [ref=e61]
+              - generic [ref=e62]:
+                - generic [ref=e63]:
+                  - generic [ref=e64]: The PIT NY
+                  - generic [ref=e65]: 3 stages • active
+                - generic [ref=e66]:
+                  - generic [ref=e67]: Second City Chi
+                  - generic [ref=e68]: Rehearsal in progress
+            - article [ref=e69]:
+              - generic [ref=e70]:
+                - generic [ref=e71]:
+                  - heading "Inbound System" [level=3] [ref=e72]
+                  - paragraph [ref=e73]: Centralized notifications that actually matter. Audition results, schedule changes, and community announcements delivered with brutalist clarity.
+                - generic [ref=e75]: "!"
+        - generic [ref=e76]:
+          - generic [ref=e77]:
+            - generic [ref=e78]:
+              - generic [ref=e79]: 450+
+              - generic [ref=e80]: Theaters Mapped
+            - generic [ref=e81]:
+              - generic [ref=e82]: 12K
+              - generic [ref=e83]: Performers Synced
+            - generic [ref=e84]:
+              - generic [ref=e85]: 98%
+              - generic [ref=e86]: Less Chaos
+          - generic: Improv
+  - region "Notifications (F8)":
+    - list

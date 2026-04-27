@@ -234,7 +234,7 @@ export default defineEventHandler(async (event) => {
 
   const { data: show } = await supabase
     .from("shows")
-    .select("id,title,theater_id,theaters(slug)")
+    .select("id,slug,title,theater_id,theaters(slug)")
     .eq("id", showId)
     .maybeSingle();
 
@@ -250,6 +250,7 @@ export default defineEventHandler(async (event) => {
 
   const eventBase = {
     showId,
+    showSlug: show?.slug ?? "",
     showTitle: show?.title ?? "",
     theaterSlug: theaterSlug ?? "",
     actorName: actorProfile?.display_name ?? "Someone",

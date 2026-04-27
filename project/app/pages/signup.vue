@@ -1,156 +1,113 @@
 <script setup lang="ts">
-import * as z from "zod";
-import type { AuthFormField, FormSubmitEvent } from "@nuxt/ui";
-
 const supabase = useSupabaseClient();
 const authError = ref<string | null>(null);
 const isSubmitting = ref(false);
-const toast = useToast();
 
-const signInWithOAuth = async (provider: "google" | "github") => {
+const state = reactive({
+  name: "",
+  email: "",
+  password: "",
+  confirm: "",
+});
+
+const onSubmit = async () => {
   authError.value = null;
-  const { error } = await supabase.auth.signInWithOAuth({ provider });
-  if (error) {
-    authError.value = error.message;
+
+  if (state.password !== state.confirm) {
+    authError.value = "Passwords must match.";
+    return;
   }
-};
 
-const fields: AuthFormField[] = [
-  {
-    name: "name",
-    type: "text",
-    label: "Full name",
-    placeholder: "How should we greet you?",
-    required: true,
-  },
-  {
-    name: "email",
-    type: "email",
-    label: "Email",
-    placeholder: "you@example.com",
-    required: true,
-  },
-  {
-    name: "password",
-    label: "Password",
-    type: "password",
-    placeholder: "Create a password",
-    required: true,
-  },
-  {
-    name: "confirm",
-    label: "Confirm password",
-    type: "password",
-    placeholder: "Repeat your password",
-    required: true,
-  },
-];
-
-const providers = [
-  {
-    label: "Google",
-    icon: "i-simple-icons-google",
-    onClick: () => {
-      toast.add({ title: "Google", description: "Continue with Google" });
-      signInWithOAuth("google");
-    },
-  },
-  {
-    label: "GitHub",
-    icon: "i-simple-icons-github",
-    onClick: () => {
-      toast.add({ title: "GitHub", description: "Continue with GitHub" });
-      signInWithOAuth("github");
-    },
-  },
-];
-
-const schema = z
-  .object({
-    name: z.string().min(2, "Name is required"),
-    email: z.email("Invalid email"),
-    password: z
-      .string("Password is required")
-      .min(8, "Must be at least 8 characters"),
-    confirm: z.string("Please confirm your password"),
-  })
-  .refine((data) => data.password === data.confirm, {
-    message: "Passwords must match",
-    path: ["confirm"],
-  });
-
-type Schema = z.output<typeof schema>;
-
-const onSubmit = async (payload: FormSubmitEvent<Schema>) => {
-  authError.value = null;
   isSubmitting.value = true;
 
   const { data, error } = await supabase.auth.signUp({
-    email: payload.data.email,
-    password: payload.data.password,
+    email: state.email,
+    password: state.password,
     options: {
       data: {
-        full_name: payload.data.name,
+        full_name: state.name,
       },
       emailRedirectTo:
-        typeof window !== "undefined"
-          ? `${window.location.origin}/confirm`
-          : undefined,
+        typeof window !== "undefined" ? `${window.location.origin}/confirm` : undefined,
     },
   });
 
+  isSubmitting.value = false;
+
   if (error) {
     authError.value = error.message;
-  } else if (data.user?.aud === "authenticated") {
-    // Email confirmation disabled, or user already confirmed
-    await navigateTo("/");
-  } else {
-    await navigateTo("/confirm");
+    return;
   }
 
-  isSubmitting.value = false;
+  await navigateTo(data.user?.aud === "authenticated" ? "/callsheet" : "/confirm");
 };
 </script>
 
 <template>
-  <div class="space-y-8 px-4 py-6">
-    <section class="mx-auto w-full max-w-3xl stage-message stage-texture overflow-hidden px-6 py-7 sm:px-8 sm:py-8">
-      <span class="stage-kicker">Join Stagecom</span>
-      <h1 class="mt-4 stage-section-title">Create your account.</h1>
-      <p class="mt-3 max-w-2xl text-lg leading-8 stage-muted">
-        The product promise starts here, so signup should already feel like the homepage system.
-      </p>
+  <div class="grid min-h-screen grid-cols-1 pt-16 md:grid-cols-2">
+    <section class="flex items-center justify-center bg-(--stage-cream) p-6 md:p-10">
+      <div class="w-full max-w-xl stitch-border-heavy bg-(--stage-paper) stitch-shadow-lg">
+        <div class="border-b-[4px] border-(--stage-ink) bg-(--stage-theater) p-6">
+          <p class="stitch-nav-label text-xs tracking-[0.22em] text-(--stage-ink)">Join Stagecom</p>
+          <h1 class="stitch-display mt-3 text-4xl font-black">Create Your Account</h1>
+        </div>
+
+        <form class="space-y-5 p-6 md:p-8" @submit.prevent="onSubmit">
+          <div>
+            <label class="mb-2 block text-xs font-black uppercase tracking-[0.2em]">Full Name</label>
+            <input v-model="state.name" required class="stitch-input" placeholder="HOW SHOULD WE GREET YOU?">
+          </div>
+
+          <div>
+            <label class="mb-2 block text-xs font-black uppercase tracking-[0.2em]">Email</label>
+            <input v-model="state.email" type="email" required class="stitch-input" placeholder="YOU@THEATER.COM">
+          </div>
+
+          <div class="grid gap-5 md:grid-cols-2">
+            <div>
+              <label class="mb-2 block text-xs font-black uppercase tracking-[0.2em]">Password</label>
+              <input v-model="state.password" type="password" required class="stitch-input" placeholder="CREATE PASSWORD">
+            </div>
+
+            <div>
+              <label class="mb-2 block text-xs font-black uppercase tracking-[0.2em]">Confirm</label>
+              <input v-model="state.confirm" type="password" required class="stitch-input" placeholder="REPEAT PASSWORD">
+            </div>
+          </div>
+
+          <div v-if="authError" class="stitch-border bg-(--stage-performer-soft) p-4 text-sm font-bold">
+            {{ authError }}
+          </div>
+
+          <button
+            type="submit"
+            class="stitch-display w-full border-[4px] border-(--stage-ink) bg-(--stage-event) px-6 py-4 text-2xl font-black shadow-[6px_6px_0_0_var(--stage-ink)] transition-all hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[4px_4px_0_0_var(--stage-ink)] disabled:cursor-wait disabled:opacity-70"
+            :disabled="isSubmitting"
+          >
+            {{ isSubmitting ? "Signing Up..." : "Join Now" }}
+          </button>
+
+          <p class="text-sm font-bold uppercase">
+            Already have an account?
+            <NuxtLink to="/login" class="underline underline-offset-4">Log in</NuxtLink>
+          </p>
+        </form>
+      </div>
     </section>
-    <div class="flex flex-col items-center justify-center gap-4">
-      <UPageCard class="w-full max-w-md">
-      <UAuthForm
-        :schema="schema"
-        :fields="fields"
-        :providers="providers"
-        title="Create your account"
-        icon="i-lucide-user-plus"
-        :loading="isSubmitting"
-        @submit="onSubmit"
-      >
-        <template #description>
-          Already have an account?
-          <ULink to="/login" class="text-primary font-medium">Log in</ULink>.
-        </template>
-        <template #validation>
-          <UAlert
-            v-if="authError"
-            color="error"
-            icon="i-lucide-info"
-            :title="authError"
-          />
-        </template>
-        <template #footer>
-          By signing up, you agree to our
-          <ULink to="#" class="text-primary font-medium">Terms of Service</ULink
-          >.
-        </template>
-      </UAuthForm>
-      </UPageCard>
-    </div>
+
+    <section class="flex flex-col justify-between border-t-[4px] border-(--stage-ink) bg-(--stage-ink) p-8 text-(--stage-cream) md:border-l-[4px] md:border-t-0 md:p-12">
+      <div>
+        <p class="stitch-nav-label mb-8 text-sm text-(--stage-event)">Enrollment Sheet</p>
+        <h2 class="stitch-display text-6xl font-black md:text-7xl">Step Into The Network.</h2>
+        <p class="mt-6 max-w-xl text-lg font-medium text-(--stage-cream)/80">
+          Build your profile, join theaters, and get onto the callsheet without leaving the same system.
+        </p>
+      </div>
+      <div class="space-y-4 text-sm font-black uppercase tracking-[0.18em]">
+        <div class="border-l-[4px] border-(--stage-theater) pl-4">Theater identity</div>
+        <div class="border-l-[4px] border-(--stage-event) pl-4">Event creation</div>
+        <div class="border-l-[4px] border-(--stage-performer) pl-4">Performer context</div>
+      </div>
+    </section>
   </div>
 </template>

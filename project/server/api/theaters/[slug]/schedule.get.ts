@@ -13,6 +13,7 @@ type MembershipRow = Pick<
 type ShowRow = Pick<
   Tables<"shows">,
   | "id"
+  | "slug"
   | "title"
   | "status"
   | "theater_id"
@@ -26,6 +27,7 @@ type OccurrenceRow = Pick<
 >;
 type ShowRoleRow = Pick<Tables<"show_roles">, "show_id" | "role">;
 type ShowCastRow = Pick<Tables<"show_cast">, "show_id" | "source" | "status">;
+type ShowStaffAssignmentRow = Pick<Tables<"show_staff_assignments">, "show_id">;
 
 const monthPattern = /^\d{4}-(0[1-9]|1[0-2])$/;
 const paramsSchema = z.object({ slug: z.string().trim().min(1) });
@@ -45,6 +47,12 @@ const titleCase = (value: string) =>
     .split("_")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
+
+const isMissingShowStaffAssignmentsError = (error?: { message?: string } | null) =>
+  Boolean(
+    error?.message?.includes("show_staff_assignments") &&
+      error.message.includes("schema cache"),
+  );
 
 const getMonthBounds = (month: string) => {
   const [year, monthIndex] = month.split("-").map(Number);
@@ -100,7 +108,7 @@ export default defineEventHandler(async (event) => {
 
   const { data: shows, error: showError } = await serviceSupabase
     .from("shows")
-    .select("id,title,status,theater_id,event_type,casting_mode,is_public_listed")
+    .select("id,slug,title,status,theater_id,event_type,casting_mode,is_public_listed")
     .eq("theater_id", theater.id);
 
   if (showError) {
@@ -123,11 +131,13 @@ export default defineEventHandler(async (event) => {
 
   let roleRows: ShowRoleRow[] = [];
   let castRows: ShowCastRow[] = [];
+  let staffAssignmentRows: ShowStaffAssignmentRow[] = [];
 
   if (userId) {
     const [
       { data: fetchedRoleRows, error: roleError },
       { data: fetchedCastRows, error: castError },
+      { data: fetchedStaffAssignmentRows, error: staffAssignmentError },
     ] = await Promise.all([
       serviceSupabase
         .from("show_roles")
@@ -137,6 +147,11 @@ export default defineEventHandler(async (event) => {
       serviceSupabase
         .from("show_cast")
         .select("show_id,source,status")
+        .in("show_id", showIds)
+        .eq("user_id", userId),
+      serviceSupabase
+        .from("show_staff_assignments")
+        .select("show_id")
         .in("show_id", showIds)
         .eq("user_id", userId),
     ]);
@@ -149,14 +164,50 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 500, statusMessage: castError.message });
     }
 
+    if (
+      staffAssignmentError &&
+      !isMissingShowStaffAssignmentsError(staffAssignmentError)
+    ) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: staffAssignmentError.message,
+      });
+    }
+
     roleRows = (fetchedRoleRows as ShowRoleRow[] | null | undefined) ?? [];
     castRows = (fetchedCastRows as ShowCastRow[] | null | undefined) ?? [];
+    staffAssignmentRows =
+      (fetchedStaffAssignmentRows as ShowStaffAssignmentRow[] | null | undefined) ?? [];
   }
 
   const producerShowIds = new Set(
     roleRows.filter((row) => row.role === "producer").map((row) => row.show_id),
   );
   const castByShowId = new Map(castRows.map((row) => [row.show_id, row]));
+  const showStaffIds = new Set(staffAssignmentRows.map((row) => row.show_id));
+  const viewerRelationshipsByShowId = new Map<string, string[]>();
+
+  for (const show of showRows) {
+    const relationships: string[] = [];
+
+    if (producerShowIds.has(show.id)) {
+      relationships.push("producer");
+    }
+
+    if (castByShowId.has(show.id)) {
+      relationships.push("cast");
+    }
+
+    if (showStaffIds.has(show.id)) {
+      relationships.push("show_staff");
+    }
+
+    if (membership?.status === "active") {
+      relationships.push("theater_member");
+    }
+
+    viewerRelationshipsByShowId.set(show.id, relationships);
+  }
 
   const visibleShows = showRows.filter((show) => {
     const viewerCast = castByShowId.get(show.id) ?? null;
@@ -171,7 +222,7 @@ export default defineEventHandler(async (event) => {
         userId,
         isProducer: producerShowIds.has(show.id),
         isTheaterStaff: Boolean(membership && hasStaffRole(membership.roles)),
-        isShowStaff: false,
+        isShowStaff: showStaffIds.has(show.id),
         isActiveTheaterMember: membership?.status === "active",
         viewerCast: viewerCast
           ? {
@@ -274,6 +325,7 @@ export default defineEventHandler(async (event) => {
         occurrenceStatus: occurrence.status,
         show: {
           id: show.id,
+          slug: show.slug,
           title: show.title,
           status: show.status,
           eventType: show.event_type,
@@ -281,6 +333,7 @@ export default defineEventHandler(async (event) => {
           theaterName: theater.name,
           theaterSlug: theater.slug,
         },
+        viewerRelationships: viewerRelationshipsByShowId.get(show.id) ?? [],
       },
     ];
   });

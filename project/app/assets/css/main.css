@@ -258,6 +258,172 @@
     text-transform: uppercase;
   }
 
+  .app-shell-rail {
+    display: flex;
+    width: 4rem;
+    min-width: 4rem;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    border-right: 2px solid var(--stage-ink);
+    padding: 1.75rem 0.65rem;
+    color: var(--stage-ink);
+  }
+
+  .app-shell-rail__label {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    line-height: 1;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .app-shell-workspace {
+    height: 100%;
+    overflow: hidden;
+    border: 3px solid var(--stage-ink);
+    background:
+      linear-gradient(180deg, rgba(255, 252, 247, 0.9), rgba(243, 237, 232, 0.96)),
+      linear-gradient(90deg, color-mix(in srgb, var(--stage-ink) 6%, transparent) 1px, transparent 1px),
+      linear-gradient(color-mix(in srgb, var(--stage-ink) 6%, transparent) 1px, transparent 1px);
+    background-size:
+      auto,
+      1.15rem 1.15rem,
+      1.15rem 1.15rem;
+    box-shadow: var(--stage-shadow);
+  }
+
+  .app-shell-workspace--desktop {
+    padding: 1.25rem;
+  }
+
+  .app-shell-workspace--mobile {
+    padding: 0.75rem;
+  }
+
+  .app-shell-root {
+    min-height: 100dvh;
+    background:
+      radial-gradient(circle at top left, rgba(130, 191, 182, 0.18), transparent 28%),
+      radial-gradient(circle at top right, rgba(234, 165, 66, 0.16), transparent 24%),
+      linear-gradient(180deg, #fbf7ef 0%, #f0e6d5 100%);
+    color: var(--stage-ink);
+  }
+
+  .app-shell-sidebar {
+    display: flex;
+    min-height: 0;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1.5rem;
+    border-right: 3px solid var(--stage-ink);
+    background:
+      linear-gradient(180deg, rgba(251, 247, 239, 0.98), rgba(239, 227, 205, 0.92));
+    padding: 1.25rem;
+  }
+
+  .app-shell-sidebar-card {
+    border: 3px solid var(--stage-ink);
+    box-shadow: var(--stage-shadow-sm);
+    padding: 1rem;
+  }
+
+  .app-shell-context-card {
+    border: 2px solid var(--stage-ink);
+    box-shadow: var(--stage-shadow-sm);
+    padding: 0.75rem;
+  }
+
+  .app-shell-main {
+    display: flex;
+    min-width: 0;
+    min-height: 0;
+    flex-direction: column;
+  }
+
+  .app-shell-topbar {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    border-bottom: 3px solid var(--stage-ink);
+    background:
+      linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(245, 239, 226, 0.95));
+    padding: 1rem 1rem 0.9rem;
+  }
+
+  .app-shell-topbar__badge {
+    display: inline-flex;
+    align-items: center;
+    border: 2px solid var(--stage-ink);
+    padding: 0.35rem 0.65rem;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .app-shell-page-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    border-bottom: 2px solid var(--stage-ink);
+    padding-bottom: 1rem;
+  }
+
+  .app-shell-pane {
+    display: flex;
+    min-height: 0;
+    flex-direction: column;
+  }
+
+  .app-shell-pane__scroll {
+    min-height: 0;
+    flex: 1;
+    overflow: auto;
+    padding-right: 0.15rem;
+  }
+
+  .app-shell-metric-strip {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+
+  .app-shell-stack-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border: 2px solid var(--stage-ink);
+    padding: 0.35rem 0.6rem;
+    background: var(--stage-paper-strong);
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .app-shell-mobile-nav-link {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    border: 2px solid var(--stage-ink);
+    padding: 0.5rem;
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    box-shadow: var(--stage-shadow-sm);
+  }
+
   .stage-grid-board {
     background-image:
       linear-gradient(color-mix(in srgb, var(--stage-ink) 12%, transparent) 1px, transparent 1px),
@@ -398,8 +564,114 @@
   }
 }
 
+@media (min-width: 640px) {
+  .app-shell-metric-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .app-shell-metric-strip {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 1024px) {
   .stage-page-grid-rail {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@layer components {
+  .stitch-border {
+    border: 2px solid var(--stage-ink);
+  }
+
+  .stitch-border-heavy {
+    border: 4px solid var(--stage-ink);
+  }
+
+  .stitch-shadow {
+    box-shadow: 4px 4px 0 0 var(--stage-ink);
+  }
+
+  .stitch-shadow-lg {
+    box-shadow: 8px 8px 0 0 var(--stage-ink);
+  }
+
+  .stitch-panel {
+    border: 2px solid var(--stage-ink);
+    background: var(--stage-paper);
+  }
+
+  .stitch-panel-cream {
+    border: 2px solid var(--stage-ink);
+    background: var(--stage-cream);
+  }
+
+  .stitch-panel-mint {
+    border: 2px solid var(--stage-ink);
+    background: var(--stage-theater);
+  }
+
+  .stitch-panel-amber {
+    border: 2px solid var(--stage-ink);
+    background: var(--stage-event);
+  }
+
+  .stitch-panel-coral {
+    border: 2px solid var(--stage-ink);
+    background: var(--stage-performer);
+  }
+
+  .stitch-display {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    line-height: 0.92;
+  }
+
+  .stitch-nav-label {
+    font-family: var(--font-display);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .stitch-input {
+    width: 100%;
+    border: 2px solid var(--stage-ink);
+    background: var(--stage-cream);
+    padding: 0.85rem 1rem;
+    color: var(--stage-ink);
+    font-weight: 700;
+    outline: none;
+  }
+
+  .stitch-input::placeholder {
+    color: color-mix(in srgb, var(--stage-ink) 60%, white);
+  }
+
+  .stitch-input:focus {
+    background: white;
+  }
+
+  .stitch-link {
+    color: color-mix(in srgb, var(--stage-ink) 70%, white);
+  }
+
+  .stitch-link-active {
+    color: var(--stage-ink);
+    border-bottom: 4px solid var(--stage-ink);
+  }
+}
+
+@layer base {
+  html {
+    background: var(--stage-cream);
+  }
+
+  body {
+    background: var(--stage-cream);
   }
 }

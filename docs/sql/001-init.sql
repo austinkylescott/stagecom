@@ -8,6 +8,7 @@ drop table if exists email_outbox cascade;
 drop table if exists notifications cascade;
 drop table if exists show_review_events cascade;
 drop table if exists show_cast cascade;
+drop table if exists show_staff_assignments cascade;
 drop table if exists show_occurrences cascade;
 drop table if exists show_roles cascade;
 drop table if exists shows cascade;
@@ -110,6 +111,7 @@ create table shows (
     theater_id uuid not null references theaters(id) on delete cascade,
     created_by_user_id uuid references profiles(id) on delete set null,
     status show_status not null default 'draft',
+    slug text not null check (btrim(slug) <> ''),
     title text not null,
     description text,
     event_type event_type not null default 'show',
@@ -125,6 +127,7 @@ create table shows (
 );
 create index idx_shows_theater on shows (theater_id);
 create index idx_shows_status on shows (status);
+create unique index idx_shows_theater_slug_unique on shows (theater_id, slug);
 
 -- Show roles (producer, etc.)
 create table show_roles (
@@ -145,6 +148,26 @@ create table show_occurrences (
     created_at timestamptz not null default now()
 );
 create index idx_show_occurrences_show on show_occurrences (show_id, starts_at);
+
+-- Show staff assignments
+create table show_staff_assignments (
+    id uuid primary key default gen_random_uuid(),
+    show_id uuid not null references shows(id) on delete cascade,
+    user_id uuid not null references profiles(id) on delete cascade,
+    assignment_type text not null check (
+        assignment_type in ('front_of_house', 'box_office', 'bar', 'tech', 'other')
+    ),
+    status text not null default 'assigned' check (
+        status in ('assigned', 'confirmed', 'cancelled')
+    ),
+    note text,
+    created_at timestamptz not null default now(),
+    unique (show_id, user_id, assignment_type)
+);
+create index idx_show_staff_assignments_show
+    on show_staff_assignments (show_id, assignment_type);
+create index idx_show_staff_assignments_user
+    on show_staff_assignments (user_id);
 
 -- Cast assignments
 create table show_cast (
@@ -491,6 +514,7 @@ alter table public.theater_memberships enable row level security;
 alter table public.shows enable row level security;
 alter table public.show_roles enable row level security;
 alter table public.show_occurrences enable row level security;
+alter table public.show_staff_assignments enable row level security;
 alter table public.show_cast enable row level security;
 alter table public.show_review_events enable row level security;
 alter table public.notifications enable row level security;
@@ -597,6 +621,40 @@ using (public.can_view_show(show_id));
 drop policy if exists "show_occurrences_mutate_staff_or_producer" on public.show_occurrences;
 create policy "show_occurrences_mutate_staff_or_producer"
 on public.show_occurrences
+for all
+to authenticated
+using (
+  public.is_show_producer(show_id)
+  or exists (
+    select 1
+    from public.shows s
+    where s.id = show_id
+      and public.is_theater_staff(s.theater_id)
+  )
+)
+with check (
+  public.is_show_producer(show_id)
+  or exists (
+    select 1
+    from public.shows s
+    where s.id = show_id
+      and public.is_theater_staff(s.theater_id)
+  )
+);
+
+drop policy if exists "show_staff_assignments_select_visible" on public.show_staff_assignments;
+create policy "show_staff_assignments_select_visible"
+on public.show_staff_assignments
+for select
+to authenticated, anon
+using (
+  user_id = auth.uid()
+  or public.can_view_show(show_id)
+);
+
+drop policy if exists "show_staff_assignments_mutate_staff_or_producer" on public.show_staff_assignments;
+create policy "show_staff_assignments_mutate_staff_or_producer"
+on public.show_staff_assignments
 for all
 to authenticated
 using (

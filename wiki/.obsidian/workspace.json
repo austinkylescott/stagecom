@@ -1,0 +1,213 @@
+{
+  "main": {
+    "id": "1939e490bd276d1c",
+    "type": "split",
+    "children": [
+      {
+        "id": "3aa9336a7935c822",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f964c4ec16e439e2",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "design/design-system.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "design-system"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "c63b877e02c56ade",
+    "type": "split",
+    "children": [
+      {
+        "id": "11c977074219564a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f9e87b8aa859d69c",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "277601e4b92a1624",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "5a3e2ac9d816ac0c",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "fb6fd762d99905d9",
+    "type": "split",
+    "children": [
+      {
+        "id": "53c124593a566dec",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "943fa96daf85ff8e",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "wiki/architecture/stack-and-layout.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for stack-and-layout"
+            }
+          },
+          {
+            "id": "f3ee903e046c1a86",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "wiki/architecture/stack-and-layout.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from stack-and-layout"
+            }
+          },
+          {
+            "id": "1c58e967b06cc791",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "48e2e5700b8e4ba2",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "0807d36c6fe1a9cd",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "wiki/architecture/stack-and-layout.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of stack-and-layout"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "f964c4ec16e439e2",
+  "lastOpenFiles": [
+    "design/surface-map.md",
+    "design/page-archetypes.md",
+    "design/design-system.md",
+    "wiki/design/design-system.md",
+    "wiki/data/theater-memberships.md",
+    "features/show-lifecycle.md",
+    "wiki/architecture/stack-and-layout.md",
+    "product/overview.md",
+    "features/visibility-policy.md",
+    "features/notifications.md",
+    "data/theaters.md",
+    "data/shows.md",
+    "data/profiles.md",
+    "architecture/stack-and-layout.md",
+    "architecture/server-api-patterns.md",
+    "architecture/route-model.md",
+    "architecture/notifications-service.md",
+    "architecture/data-fetching.md",
+    "wiki/data/shows.md",
+    "_index.md",
+    "wiki/architecture",
+    "wiki/data",
+    "wiki/design",
+    "wiki"
+  ]
+}

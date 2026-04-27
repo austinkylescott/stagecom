@@ -2,37 +2,45 @@
 
 ## Purpose
 
-This document is the source of truth for the authenticated app design system.
+This document is the source of truth for the Stagecom app design system.
 
 Its job is to stop drift.
 
 When a screen, component, or agent needs a design reference, start here before inventing a new pattern.
 
-## Locked References
+## Active Design Authority
 
-These surfaces are the strongest current references and should be treated as design gospel:
+Start with these documents, in this order:
 
-- `project/app/components/TheaterDashboardSection.vue`
-- `project/app/components/AppNav.vue`
-- `project/app/components/AppAccountMenu.vue`
-- `project/app/components/AppHeaderDropdown.vue`
+- `docs/specs/2026-04-12/feature-spec-app-design-reset-v1.md`
+- `docs/specs/2026-04-12/feature-spec-app-sitemap-and-surface-map-v1.md`
+- `docs/specs/2026-04-12/feature-spec-component-system-v1.md`
+- `docs/specs/2026-04-12/stitch-translation-matrix-v1.md`
 
-These express the current product language most clearly:
+These documents are the new design authority. They replace the prior assumption that the current authenticated surfaces are the reference implementation.
 
-- flat, ink-framed controls
-- semantic theater / event / performer accents
-- readable dashboard modules on cream surfaces
-- dropdowns and account controls that feel part of the same system
+## Historical Context
 
-## Secondary References
+Use the following only as context while migrating:
 
-Use these only as supporting context:
+- current production surfaces under `project/app/`
+- April 2026 design specs under `docs/specs/2026-04-01/`
+- `docs/specs/2026-04-08/feature-spec-sitemap-reset-v1.md`
 
-- `project/app/pages/index.vue` for color, voice, and atmosphere
-- `docs/design/v0-gap-analysis.md`
-- related April 2026 specs under `docs/specs/2026-04-01/`
+These are not locked references. They are material to evaluate, replace, merge, or remove during the redesign.
 
-The homepage is not a structural source of truth for the authenticated app. It is a brand and palette reference.
+## System Reference Surface
+
+`/dev/components` must remain as the internal overview of the implemented design system.
+
+Use it to:
+
+- inspect every durable component and important variant
+- review key page-pattern excerpts with dummy data
+- verify empty, loading, and other contract states where relevant
+- confirm the system still reads coherently in one place
+
+The page should use deterministic demo data so examples remain useful regardless of the real date or backend state.
 
 ## Core Rules
 
@@ -61,20 +69,31 @@ Use this order:
 
 If a styling rule should affect multiple surfaces, it belongs in `app.config.ts`.
 
-### 3. Extend shared primitives instead of bypassing them
+### 3. Use the component-system spec before preserving wrappers
 
-Use these shared app primitives first:
+Do not assume current Stage wrappers should be extended.
 
-- `project/app/components/stage/StageButton.vue`
-- `project/app/components/stage/StageDropdown.vue`
-- `project/app/components/stage/StageSectionHeader.vue`
+For each reused pattern, first decide whether it belongs in:
 
-Use these theater detail components before copying page markup:
+1. `project/app/app.config.ts`
+2. component-level `:ui`
+3. a small app primitive
+4. a composite section
+5. a page composition
 
-- `project/app/components/theater/detail/TheaterUpcomingCard.vue`
-- `project/app/components/theater/detail/TheaterEventDateGroup.vue`
+Current Stage components are candidates for replacement or removal.
 
-If a new surface feels similar but not identical, prefer extending one of these rather than starting over.
+### 4. Layout intent must be explicit
+
+Authenticated app structure should not be inferred from loose path matching.
+
+Use:
+
+1. `default` for public marketing and auth pages
+2. `app` for authenticated-only work surfaces such as `/callsheet`, `/profile`, `/notifications`, `/theaters`, `/[theaterSlug]/new`, and `/[theaterSlug]/admin`
+3. `hybrid` for canonical public/member pages such as `/[theaterSlug]` and `/[theaterSlug]/[eventSlug]`
+
+Hybrid pages must work as public pages first, then reveal richer member/admin affordances when auth and permissions allow.
 
 ## Visual Grammar
 
@@ -163,8 +182,9 @@ When building a new reusable component that needs color or surface control, use 
 
 ### Typography
 
-- Display headlines use the configured display font and uppercase rhythm.
-- Dense operational text stays in the sans stack and should optimize for scanability.
+- Display headlines should use `Cubano` as the target display font and preserve the bold poster/playbill character it brings.
+- Dense operational text should use `Public Sans` as the target body font and optimize for scanability.
+- If a design tool cannot output those exact fonts, approximate their role and feel rather than changing the typography strategy.
 - Overlines and chips are for structure, not decoration.
 
 ## Tailwind Rules
@@ -178,19 +198,26 @@ When building a new reusable component that needs color or surface control, use 
 
 ### Buttons
 
-- Default interactive shell button styling should go through `StageButton`.
-- Button tone should match the job of the action, not just the page color.
-- Account, navigation, and theater action buttons should feel related even when their content differs.
+- Prefer a Nuxt UI-first implementation.
+- Reintroduce an app-specific wrapper only if it adds a stable semantic API or shared behavior.
+- Do not keep wrapper components whose main job is forwarding classes.
+
+### App shell
+
+- Desktop authenticated routes use a sidebar shell.
+- Mobile authenticated routes use a bottom navigation bar with limited primary destinations.
+- Primary nav should stay small: `Callsheet`, `<home theater>`, `Profile`.
+- Secondary tools such as notifications and theater-admin controls should not crowd the primary nav.
 
 ### Dropdowns
 
-- Dropdown surfaces should use the shared Stage dropdown treatment.
-- Header tone may vary by context, but content framing, row spacing, and hover behavior should stay consistent.
+- Prefer `UDropdownMenu` directly unless a smaller semantic wrapper is justified by the new component-system spec.
+- Shared dropdown treatment belongs in theme config or a narrow primitive, not a broad pass-through abstraction.
 
 ### Section headers
 
-- Repeated page-section headers should use `StageSectionHeader` instead of bespoke heading wrappers.
-- Pair each section title with one clear sentence about why that section exists.
+- Repeated page-section headers should become a systemized section pattern in the new component taxonomy.
+- Do not default to preserving `StageSectionHeader` by name or shape.
 
 ### Theater detail composition
 
@@ -202,9 +229,9 @@ When building a new reusable component that needs color or surface control, use 
 
 Before shipping a UI change, answer these:
 
-- Does it look like it belongs with the theater dashboard and nav/account surfaces?
+- Does it match the locked sitemap, page archetype, and new design-reset spec?
 - Did the work use Nuxt UI where it reasonably could?
 - Was shared styling moved up to `app.config.ts` when appropriate?
-- Did the implementation extend a Stage primitive instead of bypassing it?
+- Did the implementation choose the correct ownership layer instead of inventing a new wrapper?
 - Is Tailwind usage canonical and restrained?
 - Did this reduce drift, or just move drift into a new component?
