@@ -1,16 +1,26 @@
 import { defineQueryOptions } from "@pinia/colada";
 import { useRequestHeaders } from "#app";
 import { queryKeys } from "~/composables/queryKeys";
+import type {
+  ProfileContactLinks,
+  ProfileFieldVisibility,
+  ProfileVisibility,
+  ShareableContacts,
+} from "~~/shared/profile";
 
 export type ProfileRow = {
   id: string;
   display_name: string | null;
   avatar_url: string | null;
   timezone: string | null;
+  handle: string | null;
   pronouns?: string | null;
   bio?: string | null;
   city?: string | null;
-  visibility?: "public" | "private" | "theater_only";
+  visibility?: ProfileVisibility;
+  fieldVisibility: ProfileFieldVisibility;
+  contactLinks: ProfileContactLinks;
+  shareableContacts: ShareableContacts;
 };
 
 export const profileQueryOptions = defineQueryOptions<

@@ -4,6 +4,7 @@ import {
   canViewNotifications,
   canViewPerformerAffiliation,
   canViewPerformerProfile,
+  canViewProfileField,
   canViewShow,
   canViewTheaterReview,
   type ShowVisibility,
@@ -139,6 +140,67 @@ describe("visibility-policy", () => {
         performerUserId: "performer-1",
         visibility: "private",
         sharedTheaterIds: new Set(),
+      }),
+    ).toBe(true);
+
+    expect(
+      canViewPerformerProfile({
+        viewerUserId: null,
+        performerUserId: "performer-1",
+        visibility: "private",
+        fieldVisibility: {
+          displayName: "private",
+          handle: "public",
+          pronouns: "private",
+          city: "private",
+          bio: "private",
+        },
+        sharedTheaterIds: new Set(),
+      }),
+    ).toBe(false);
+
+    expect(
+      canViewPerformerProfile({
+        viewerUserId: "viewer-1",
+        performerUserId: "performer-1",
+        visibility: "theater_only",
+        fieldVisibility: {
+          displayName: "private",
+          handle: "public",
+          pronouns: "private",
+          city: "private",
+          bio: "private",
+        },
+        sharedTheaterIds: new Set(),
+      }),
+    ).toBe(false);
+  });
+
+  it("applies field-level performer visibility rules independently", () => {
+    expect(
+      canViewProfileField({
+        viewerUserId: null,
+        performerUserId: "performer-1",
+        visibility: "public",
+        sharedTheaterIds: new Set(),
+      }),
+    ).toBe(true);
+
+    expect(
+      canViewProfileField({
+        viewerUserId: "viewer-1",
+        performerUserId: "performer-1",
+        visibility: "theater_only",
+        sharedTheaterIds: new Set(),
+      }),
+    ).toBe(false);
+
+    expect(
+      canViewProfileField({
+        viewerUserId: "viewer-1",
+        performerUserId: "performer-1",
+        visibility: "theater_only",
+        sharedTheaterIds: new Set(["theater-1"]),
       }),
     ).toBe(true);
   });

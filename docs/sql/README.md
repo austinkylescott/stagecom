@@ -26,6 +26,12 @@ PGHOST="$DB_HOST" PGPORT="$DB_PORT" PGDATABASE="$DB_NAME" PGUSER="$DB_USER" PGPA
 Run commands from `project/`.
 
 ```bash
+npm run env:status
+npm run env:doctor
+npm run env:use:remote
+npm run env:use:local
+npm run dev:remote
+npm run dev:local
 npm run db:audit:live
 npm run auth:seed:mock -- --config ./mock-data.config.json --out ./mock-data.resolved.json
 npm run db:seed:mock:full -- ./mock-data.config.json
@@ -36,6 +42,7 @@ npm run db:rebuild:mock -- ./mock-data.config.json
 
 These project scripts use the repo’s Node Postgres client and no longer require `psql` to be installed locally.
 The auth seed script uses `SUPABASE_SERVICE_ROLE_KEY` and writes a resolved config file with real auth user IDs.
+Use `env:use:remote` before touching the canonical shared dev database and `env:use:local` before using the optional local Supabase stack.
 
 ### Preferred mock-data workflow
 

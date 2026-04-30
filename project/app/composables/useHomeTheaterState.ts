@@ -4,8 +4,15 @@ import { useHomeTheater } from "~/composables/useHomeTheater";
 export const useHomeTheaterState = () => {
   const { data, refresh: refreshHome } = useHomeTheater();
 
-  const homeTheaters = computed(() => data.value?.homeTheaters || []);
-  const candidateTheaters = computed(() => data.value?.candidateTheaters || []);
+  const memberships = computed(() => data.value?.memberships || []);
+  const homeTheaters = computed(() =>
+    memberships.value.filter((entry) => entry.membership.isHome),
+  );
+  const candidateTheaters = computed(() =>
+    memberships.value
+      .filter((entry) => !entry.membership.isHome)
+      .map((entry) => entry.theater),
+  );
   const primaryHome = computed(() => homeTheaters.value[0] || null);
   const homeTheater = computed(() => primaryHome.value?.theater || null);
   const homeMembership = computed(
@@ -25,6 +32,7 @@ export const useHomeTheaterState = () => {
   return {
     candidateTheaters,
     data,
+    memberships,
     refreshHome,
     homeIds,
     homeTheaters,

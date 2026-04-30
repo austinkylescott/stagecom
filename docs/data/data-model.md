@@ -51,6 +51,35 @@ Compatibility note:
 
 ---
 
+### profiles
+- id
+- display_name
+- avatar_url
+- timezone
+- pronouns
+- bio
+- city
+- handle (nullable unique public identity field)
+- home_theater_id (legacy compatibility pointer only)
+- contact_links (jsonb)
+- field_visibility (jsonb)
+- visibility (`public`, `theater_only`, `private`)
+
+Rules:
+- Profiles are user-owned identity records.
+- `handle` is an optional public identity field and should be stored in slug form.
+- `visibility` is the profile discoverability setting and defaults to `theater_only`.
+- `visibility` controls whether the user can appear to others in people-discovery surfaces such as search results, theater people surfaces, show people surfaces, and invite pickers.
+- `private` profiles remain fully usable by the owner but should not appear to other users in discovery-driven surfaces.
+- `contact_links` is the active storage location for profile contact visibility and phone value.
+- `field_visibility` stores per-field visibility for `display_name`, `handle`, `pronouns`, `city`, and `bio`.
+- `contact_links.email` stores visibility only; email value is always derived from the auth user record.
+- `contact_links.phone` stores the user-managed phone number plus its visibility.
+- `field_visibility` does not widen discoverability beyond `visibility`; it only controls which fields are shown after the profile is already visible to the viewer.
+- Timezone may remain stored for compatibility, but it is not currently part of the user-facing profile identity surface.
+
+---
+
 ### shows
 - theater_id
 - created_by_user_id

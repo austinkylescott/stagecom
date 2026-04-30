@@ -14,6 +14,7 @@ export type PerformersResponse = {
     id: string;
     display_name: string | null;
     avatar_url: string | null;
+    handle: string | null;
     visibility: "public" | "theater_only" | "private";
   }[];
   memberships: {

@@ -21,8 +21,7 @@ export default defineEventHandler(async (event) => {
   const activeMemberships = memberships ?? [];
   if (!activeMemberships.length) {
     return {
-      candidateTheaters: [],
-      homeTheaters: [],
+      memberships: [],
     };
   }
 
@@ -60,15 +59,7 @@ export default defineEventHandler(async (event) => {
     });
 
   return {
-    candidateTheaters: sortedMemberships
-      .filter((membership) => !membership.is_home)
-      .flatMap((membership) => {
-        const theater = theaterById.get(membership.theater_id);
-        return theater ? [theater] : [];
-      }),
-    homeTheaters: sortedMemberships
-      .filter((membership) => membership.is_home)
-      .flatMap((membership) => {
+    memberships: sortedMemberships.flatMap((membership) => {
         const theater = theaterById.get(membership.theater_id);
         if (!theater) {
           return [];
