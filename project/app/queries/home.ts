@@ -30,6 +30,8 @@ export type HomeTheaterSummary = {
   };
 };
 
+export type HomeTheaterMembershipSummary = HomeTheaterSummary;
+
 export type HomeTheaterDashboard = {
   upNextShow: TheaterEventItem | null;
   upNextOtherEvent: TheaterEventItem | null;
@@ -38,8 +40,7 @@ export type HomeTheaterDashboard = {
 };
 
 export type HomePayload = {
-  homeTheaters: HomeTheaterSummary[];
-  candidateTheaters: HomeTheater[];
+  memberships: HomeTheaterMembershipSummary[];
 };
 
 export type HomeTheaterDashboardResponse = {
@@ -81,8 +82,7 @@ export const homeTheaterQueryOptions = defineQueryOptions<void, HomePayload>(
           const httpError = err as { status?: number; statusCode?: number };
           if (httpError.status === 401 || httpError.statusCode === 401) {
             return {
-              candidateTheaters: [],
-              homeTheaters: [],
+              memberships: [],
             };
           }
           throw err;
@@ -167,19 +167,19 @@ export const applyOptimisticHomeClearOnLeave = (
   queryCache.setQueryData(queryKeys.homeTheater(), (previous: unknown) => {
     if (!previous) return previous;
     const payload = previous as HomePayload;
-    const removedHome = payload.homeTheaters.find(
-      (entry) => entry.theater.id === theaterId,
-    );
-
     return {
       ...payload,
-      candidateTheaters: removedHome
-        ? [...payload.candidateTheaters, removedHome.theater].sort((left, right) =>
-            left.name.localeCompare(right.name),
-          )
-        : payload.candidateTheaters,
-      homeTheaters: payload.homeTheaters.filter(
-        (entry) => entry.theater.id !== theaterId,
+      memberships: payload.memberships.map((entry) =>
+        entry.theater.id !== theaterId
+          ? entry
+          : {
+              ...entry,
+              membership: {
+                ...entry.membership,
+                isHome: false,
+                homeRank: null,
+              },
+            },
       ),
     };
   });

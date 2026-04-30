@@ -113,6 +113,7 @@ export type Database = {
           created_at: string;
           deleted_at: string | null;
           display_name: string;
+          field_visibility: Json;
           handle: string | null;
           home_theater_id: string | null;
           id: string;
@@ -134,6 +135,7 @@ export type Database = {
           created_at?: string;
           deleted_at?: string | null;
           display_name: string;
+          field_visibility?: Json;
           handle?: string | null;
           home_theater_id?: string | null;
           id?: string;
@@ -155,6 +157,7 @@ export type Database = {
           created_at?: string;
           deleted_at?: string | null;
           display_name?: string;
+          field_visibility?: Json;
           handle?: string | null;
           home_theater_id?: string | null;
           id?: string;

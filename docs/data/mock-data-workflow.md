@@ -9,6 +9,31 @@ This repo now has a deterministic mock-data workflow for local/dev databases.
 - Make it easy to rebuild or wipe the dev database without hand-editing SQL.
 - Keep dev/test data trustworthy as the product and schema evolve.
 
+## Database Target Policy
+
+- The shared remote Supabase project is the canonical dev database.
+- `project/supabase/migrations/` is the schema source of truth for both remote and local.
+- Local Supabase is optional and disposable. Use it for experiments only.
+- Do not switch targets by hand-editing `project/.env`. Use the env profile scripts so the app target and direct DB target stay aligned.
+
+Run commands from `project/`:
+
+```bash
+npm run env:status
+npm run env:doctor
+npm run env:use:remote
+npm run env:use:local
+npm run dev:remote
+npm run dev:local
+```
+
+Profile files:
+
+- `project/.env.remote` — shared remote dev profile
+- `project/.env.local` — local Supabase profile
+- `project/.env` — active generated env used by the app and scripts
+- `project/.env.remote.example` and `project/.env.local.example` — tracked templates
+
 ## Maintenance Rule
 
 Any change to database schema, enums, relationships, DB-backed product assumptions, or seeded workflow expectations must update the mock-data assets in the same change. At minimum, review and update as needed:
@@ -67,6 +92,21 @@ Behavior:
 - The first home theater in the array is also mirrored into `profiles.home_theater_id` as a compatibility pointer
 - Membership rows now receive `is_home` and `home_rank` values based on the ordered home-theater list
 - Home theater entries must still correspond to active theater memberships in the config; the seed does not invent membership implicitly
+
+## Profile Visibility Shape
+
+The mock-data generator supports optional field-level profile visibility through:
+
+- `users[].fieldVisibility.displayName`
+- `users[].fieldVisibility.handle`
+- `users[].fieldVisibility.pronouns`
+- `users[].fieldVisibility.city`
+- `users[].fieldVisibility.bio`
+
+`users[].visibility` is the profile discoverability setting.
+
+If `fieldVisibility` is omitted, the generator reuses `users[].visibility` as the
+default field visibility for seeded identity fields.
 
 ## Theater Board Settings Shape
 
@@ -128,8 +168,8 @@ npm run supabase:stop
 
 ## Recommended Workflow
 
-- Local schema work: use the Supabase CLI scaffold under `project/supabase/` when Docker is available.
-- Shared remote dev data: use split DB env vars plus `SUPABASE_SERVICE_ROLE_KEY` in `project/.env`, run `npm run db:audit:live`, then use `npm run db:seed:mock:full -- ./mock-data.config.json`.
+- Shared remote dev data: switch to the remote env profile first, use split DB env vars plus `SUPABASE_SERVICE_ROLE_KEY`, run `npm run db:audit:live`, then use `npm run db:seed:mock:full -- ./mock-data.config.json`.
+- Local schema work: switch to the local env profile, then use the Supabase CLI scaffold under `project/supabase/` when Docker is available.
 - Production: do not use `db:reset` or `db:rebuild:mock`.
 
 ## Current Seed Shape

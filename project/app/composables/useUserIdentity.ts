@@ -1,11 +1,14 @@
-import { useQuery } from "@pinia/colada";
-import { computed } from "vue";
+import { useQuery, useQueryCache } from "@pinia/colada";
+import { computed, watch } from "vue";
+import { queryKeys } from "~/composables/queryKeys";
 import { profileQueryOptions, type ProfileRow } from "~/queries/users";
+import { deriveProfileDisplayName } from "~~/shared/profile";
 
 export type { ProfileRow } from "~/queries/users";
 
 export const useUserIdentity = () => {
   const user = useSupabaseUser();
+  const queryCache = useQueryCache();
 
   const params = computed(() => ({ userId: user.value?.id || "" }));
 
@@ -16,23 +19,15 @@ export const useUserIdentity = () => {
     error: profileError,
   } = useQuery(profileQueryOptions, params);
 
-  const displayName = computed(() => {
-    const meta = user.value?.user_metadata || {};
-    const primaryName = (profile.value?.display_name || "").trim();
-    if (primaryName) return primaryName;
-
-    const metaName = (
-      meta.display_name ||
-      meta.full_name ||
-      meta.name ||
-      meta.user_name ||
-      ""
-    ).trim();
-    if (metaName) return metaName;
-
-    const email = user.value?.email || "";
-    return email.split("@")[0] || "Anonymous";
-  });
+  const displayName = computed(() =>
+    deriveProfileDisplayName({
+      profileDisplayName: profile.value?.display_name,
+      userMetadata:
+        (user.value?.user_metadata as Record<string, unknown> | undefined) ||
+        null,
+      email: user.value?.email || null,
+    }),
+  );
 
   const initials = computed(() => {
     const parts = displayName.value.split(/\s+/).filter(Boolean);
@@ -50,6 +45,22 @@ export const useUserIdentity = () => {
   const email = computed(() => user.value?.email || "");
   const isAuthed = computed(() => !!user.value);
 
+  const setProfile = (nextProfile: ProfileRow | null) => {
+    const userId = params.value.userId;
+    if (!userId) return;
+
+    queryCache.setQueryData(queryKeys.profile(userId), nextProfile);
+  };
+
+  watch(
+    () => user.value?.id || "",
+    async (userId, previousUserId) => {
+      if (!userId || userId === previousUserId) return;
+      await refreshProfile();
+    },
+    { immediate: true },
+  );
+
   return {
     user,
     displayName,
@@ -61,5 +72,6 @@ export const useUserIdentity = () => {
     isLoading,
     profileError,
     refreshProfile,
+    setProfile,
   };
 };

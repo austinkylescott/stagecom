@@ -15,6 +15,13 @@
       "handle": "maya-manager",
       "bio": "Keeps The Focus Theater review queue moving.",
       "visibility": "theater_only",
+      "fieldVisibility": {
+        "displayName": "public",
+        "handle": "public",
+        "pronouns": "theater_only",
+        "city": "theater_only",
+        "bio": "theater_only"
+      },
       "homeTheaters": ["focus_theater"],
       "notificationPreferences": {
         "email": true,

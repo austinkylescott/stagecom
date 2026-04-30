@@ -46,10 +46,38 @@ export const demoProfile: ProfileRow = {
   display_name: "Mira Lee",
   avatar_url: null,
   timezone: "America/Chicago",
+  handle: "mira-lee",
   pronouns: "she/her",
   bio: "Stage manager, producer, and performer keeping The Empty Box moving on time.",
   city: "Chicago",
   visibility: "theater_only",
+  fieldVisibility: {
+    displayName: "theater_only",
+    handle: "public",
+    pronouns: "theater_only",
+    city: "theater_only",
+    bio: "theater_only",
+  },
+  contactLinks: {
+    email: {
+      source: "auth",
+      visibility: "private",
+    },
+    phone: {
+      value: null,
+      visibility: "private",
+    },
+  },
+  shareableContacts: {
+    email: {
+      value: "mira@example.com",
+      visibility: "private",
+    },
+    phone: {
+      value: null,
+      visibility: "private",
+    },
+  },
 };
 
 export const demoMemberShows: MemberShowsResponse = {

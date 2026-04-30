@@ -299,7 +299,15 @@ describe("visibility route wiring", () => {
               id: "performer-1",
               display_name: "Performer One",
               avatar_url: null,
+              handle: "performer-one",
               visibility: "public",
+              field_visibility: {
+                displayName: "private",
+                handle: "public",
+                pronouns: "private",
+                city: "private",
+                bio: "private",
+              },
             },
           ],
           count: 1,
@@ -334,8 +342,12 @@ describe("visibility route wiring", () => {
 
     const result = await handler({} as never);
 
-    expect(result.profiles.map((profile: { id: string }) => profile.id)).toEqual([
-      "performer-1",
+    expect(result.profiles).toMatchObject([
+      {
+        id: "performer-1",
+        display_name: "@performer-one",
+        handle: "performer-one",
+      },
     ]);
     expect(result.memberships).toEqual([]);
   });

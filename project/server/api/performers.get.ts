@@ -1,15 +1,29 @@
 import { serverSupabaseClient } from "#supabase/server";
 import { z } from "zod";
 import type { Enums } from "~/types/database.types";
+import { normalizeProfileFieldVisibility } from "~~/shared/profile";
 import { filterVisiblePerformerMemberships } from "~~/server/utils/performer-memberships";
+import {
+  isMissingFieldVisibilityColumnError,
+  performerProfileSelectLegacy,
+  performerProfileSelectWithFieldVisibility,
+} from "~~/server/utils/profile-field-visibility";
 import { getServiceRoleClient } from "~~/server/utils/service-role";
-import { canViewPerformerProfile } from "~~/server/utils/visibility-policy";
+import {
+  canViewPerformerProfile,
+  canViewProfileField,
+} from "~~/server/utils/visibility-policy";
 
 type PerformerProfile = {
   id: string;
   display_name: string | null;
   avatar_url: string | null;
+  handle: string | null;
   visibility: Enums<"profile_visibility">;
+};
+
+type PerformerProfileRow = PerformerProfile & {
+  field_visibility: unknown;
 };
 
 type PerformerMembership = {
@@ -36,6 +50,46 @@ const sortProfiles = (profiles: PerformerProfile[]) =>
     if (!bName) return -1;
     return aName.localeCompare(bName);
   });
+
+const sanitizeProfile = ({
+  profile,
+  userId,
+  sharedTheaterIds,
+}: {
+  profile: PerformerProfileRow;
+  userId: string | null;
+  sharedTheaterIds: Set<string>;
+}): PerformerProfile => {
+  const fieldVisibility = normalizeProfileFieldVisibility(
+    profile.field_visibility,
+    profile.visibility,
+  );
+  const displayNameVisible = canViewProfileField({
+    viewerUserId: userId,
+    performerUserId: profile.id,
+    visibility: fieldVisibility.displayName,
+    sharedTheaterIds,
+  });
+  const handleVisible = canViewProfileField({
+    viewerUserId: userId,
+    performerUserId: profile.id,
+    visibility: fieldVisibility.handle,
+    sharedTheaterIds,
+  });
+  const handle = handleVisible ? profile.handle : null;
+
+  return {
+    id: profile.id,
+    display_name: displayNameVisible
+      ? profile.display_name
+      : handle
+        ? `@${handle}`
+        : null,
+    avatar_url: profile.avatar_url,
+    handle,
+    visibility: profile.visibility,
+  };
+};
 
 const querySchema = z.object({
   search: z.string().optional().default(""),
@@ -131,9 +185,12 @@ export default defineEventHandler(
 
     const sharedTheaterIds = new Set(viewerTheaterIds);
 
+    let supportsFieldVisibility = true;
     let profileQuery = supabase
       .from("profiles")
-      .select("id,display_name,avatar_url,visibility", { count: "exact" })
+      .select(performerProfileSelectWithFieldVisibility, {
+        count: "exact",
+      })
       .order("display_name", { ascending: true, nullsFirst: false });
 
     if (search) {
@@ -156,11 +213,48 @@ export default defineEventHandler(
       profileQuery = profileQuery.eq("visibility", "public");
     }
 
-    const {
+    let {
       data: profiles,
       error: profilesError,
       count,
     } = await profileQuery.range(from, to);
+
+    if (isMissingFieldVisibilityColumnError(profilesError)) {
+      supportsFieldVisibility = false;
+
+      let legacyProfileQuery = supabase
+        .from("profiles")
+        .select(performerProfileSelectLegacy, {
+          count: "exact",
+        })
+        .order("display_name", { ascending: true, nullsFirst: false });
+
+      if (search) {
+        legacyProfileQuery = legacyProfileQuery.ilike("display_name", `%${search}%`);
+      }
+      if (allowedUserIds) {
+        legacyProfileQuery = legacyProfileQuery.in("id", allowedUserIds);
+      }
+      if (userId) {
+        const visibilityFilters = ["visibility.eq.public", `id.eq.${userId}`];
+
+        if (theaterOnlyVisibleUserIds.length > 0) {
+          visibilityFilters.push(
+            `and(visibility.eq.theater_only,id.in.(${theaterOnlyVisibleUserIds.join(",")}))`,
+          );
+        }
+
+        legacyProfileQuery = legacyProfileQuery.or(visibilityFilters.join(","));
+      } else {
+        legacyProfileQuery = legacyProfileQuery.eq("visibility", "public");
+      }
+
+      ({
+        data: profiles,
+        error: profilesError,
+        count,
+      } = await legacyProfileQuery.range(from, to));
+    }
 
     if (profilesError) {
       throw createError({
@@ -169,14 +263,26 @@ export default defineEventHandler(
       });
     }
 
-    const visibleProfiles = (profiles ?? []).filter((profile) =>
-      canViewPerformerProfile({
-        viewerUserId: userId,
-        performerUserId: profile.id,
-        visibility: profile.visibility,
-        sharedTheaterIds,
-      }),
-    );
+    const visibleProfiles = (profiles ?? [])
+      .filter((profile) =>
+        canViewPerformerProfile({
+          viewerUserId: userId,
+          performerUserId: profile.id,
+          visibility: profile.visibility,
+          fieldVisibility: normalizeProfileFieldVisibility(
+            supportsFieldVisibility ? profile.field_visibility : null,
+            profile.visibility,
+          ),
+          sharedTheaterIds,
+        }),
+      )
+      .map((profile) =>
+        sanitizeProfile({
+          profile,
+          userId,
+          sharedTheaterIds,
+        }),
+      );
 
     if (!userId) {
       return {

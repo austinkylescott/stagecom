@@ -58,6 +58,7 @@ create table profiles (
     handle text,
     home_theater_id uuid,
     contact_links jsonb not null default '{}'::jsonb,
+    field_visibility jsonb not null default '{}'::jsonb,
     notification_preferences jsonb not null default '{}'::jsonb,
     availability jsonb,
     casting_notes text,

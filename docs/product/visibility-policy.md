@@ -44,7 +44,8 @@ These scopes are vocabulary, not a replacement for contextual roles. A surface m
 | Accepted cast on public show | `public` | n/a | anyone who can view the show | filtered result set |
 | Accepted cast on non-public show | `relationship` with `oversight_only` override | n/a | viewers who can view that show | filtered result set |
 | Pending cast | `relationship` / `oversight_only` | n/a | producers, theater oversight, accepted cast, invited pending cast | filtered result set |
-| Performer profile | user-controlled `public`, `theater_only`, `self_only` | n/a | anyone for `public`; shared-theater viewers for `theater_only`; only self for private | filtered result set |
+| Performer profile discoverability | `public`, `theater_only`, `self_only` | n/a | `public` profiles may appear to anyone; `theater_only` profiles may appear only to viewers with shared active theater membership; `private` profiles are self-only | filtered result set |
+| Performer profile fields | user-controlled per-field `public`, `theater_only`, `self_only` | n/a | only evaluated after the profile itself is visible to that viewer; hidden fields are omitted individually | filtered result set |
 | Performer affiliations | `theater_only` or `self_only` | n/a | viewers who share that theater with the performer, or the performer themself | filtered result set |
 | Notifications (`GET /api/notifications`, `POST /api/notifications/read`) | `self_only` | `self_only` | recipient user only | `401` if not signed in; otherwise scoped to own records only |
 
@@ -59,6 +60,30 @@ These scopes are vocabulary, not a replacement for contextual roles. A surface m
 - accepted cast
 - invited pending cast
 - requested pending cast
+
+## Performer Contact Methods
+
+- Performer profile discoverability is separate from field and contact visibility.
+- A profile must be discoverable before another viewer can benefit from any less-restrictive field setting.
+- A `private` profile remains undiscoverable to other users even if one field or contact method is marked `public`.
+- Performer identity fields and contact methods are configured separately.
+- Identity-field visibility currently applies independently to:
+  - display name
+  - handle
+  - pronouns
+  - city
+  - bio
+- The current performer contact methods are:
+  - auth-derived account email
+  - profile-managed phone number
+- Each contact method uses the same vocabulary as the profile surface:
+  - `public`
+  - `theater_only`
+  - `private`
+- Profile discoverability defaults to `theater_only`.
+- A visible profile does not automatically make email or phone visible.
+- A visible profile does not automatically make every identity field visible.
+- Email value is always derived from the authenticated account record rather than persisted as a second profile email.
 
 ## Helper Mapping
 

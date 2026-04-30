@@ -1,4 +1,5 @@
 import type { Enums } from "~/types/database.types";
+import type { ProfileFieldVisibility } from "~~/shared/profile";
 import { hasStaffRole } from "./permissions";
 
 export type VisibilityScope =
@@ -38,7 +39,8 @@ export type TheaterVisibilityViewer = {
 export type PerformerProfileVisibilityInput = {
   viewerUserId: string | null;
   performerUserId: string;
-  visibility: Enums<"profile_visibility">;
+  visibility?: Enums<"profile_visibility"> | null;
+  fieldVisibility?: ProfileFieldVisibility | null;
   sharedTheaterIds: Set<string>;
 };
 
@@ -134,11 +136,52 @@ export const canRequestToJoinShow = (
 };
 
 export const canViewPerformerProfile = ({
+  fieldVisibility,
   viewerUserId,
   performerUserId,
   visibility,
   sharedTheaterIds,
 }: PerformerProfileVisibilityInput) => {
+  if (viewerUserId === performerUserId) {
+    return true;
+  }
+
+  const discoverability = canViewProfileField({
+    viewerUserId,
+    performerUserId,
+    visibility: visibility ?? "private",
+    sharedTheaterIds,
+  });
+
+  if (!discoverability) {
+    return false;
+  }
+
+  if (fieldVisibility) {
+    return Object.values(fieldVisibility).some((fieldVisibilityValue) =>
+      canViewProfileField({
+        viewerUserId,
+        performerUserId,
+        visibility: fieldVisibilityValue,
+        sharedTheaterIds,
+      }),
+    );
+  }
+
+  return true;
+};
+
+export const canViewProfileField = ({
+  viewerUserId,
+  performerUserId,
+  visibility,
+  sharedTheaterIds,
+}: {
+  viewerUserId: string | null;
+  performerUserId: string;
+  visibility: Enums<"profile_visibility">;
+  sharedTheaterIds: Set<string>;
+}) => {
   if (viewerUserId === performerUserId) {
     return true;
   }

@@ -182,6 +182,15 @@ function pushProfileUpserts(lines, users, theaterByKey) {
       asSqlNullableString(optionalString(user.handle)),
       primaryHomeTheaterId,
       asSqlJson(user.contactLinks ?? {}),
+      asSqlJson(
+        user.fieldVisibility ?? {
+          displayName: optionalString(user.visibility) ?? "theater_only",
+          handle: optionalString(user.visibility) ?? "theater_only",
+          pronouns: optionalString(user.visibility) ?? "theater_only",
+          city: optionalString(user.visibility) ?? "theater_only",
+          bio: optionalString(user.visibility) ?? "theater_only",
+        },
+      ),
       asSqlJson(user.notificationPreferences ?? {}),
       user.availability === undefined ? "null" : asSqlJson(user.availability),
       asSqlNullableString(optionalString(user.castingNotes)),
@@ -194,7 +203,7 @@ function pushProfileUpserts(lines, users, theaterByKey) {
 
   lines.push("-- Profiles");
   lines.push(
-    "insert into profiles (id, display_name, avatar_url, timezone, pronouns, bio, city, handle, home_theater_id, contact_links, notification_preferences, availability, casting_notes, visibility, verified_at, trust_flags, deleted_at)",
+    "insert into profiles (id, display_name, avatar_url, timezone, pronouns, bio, city, handle, home_theater_id, contact_links, field_visibility, notification_preferences, availability, casting_notes, visibility, verified_at, trust_flags, deleted_at)",
   );
   lines.push(`values\n${rows.join(",\n")}`);
   lines.push(
@@ -208,6 +217,7 @@ function pushProfileUpserts(lines, users, theaterByKey) {
     "  handle = excluded.handle,",
     "  home_theater_id = excluded.home_theater_id,",
     "  contact_links = excluded.contact_links,",
+    "  field_visibility = excluded.field_visibility,",
     "  notification_preferences = excluded.notification_preferences,",
     "  availability = excluded.availability,",
     "  casting_notes = excluded.casting_notes,",
